@@ -4,8 +4,8 @@ import requests
 from datetime import datetime
 import json
 import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 from functools import lru_cache
-
 
 def treeview_sort_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children('')]
@@ -86,8 +86,9 @@ def fetch_league_details(league_id):
 def fetch_league_rosters(league_id):
     url = f"https://api.sleeper.app/v1/league/{league_id}/rosters"
     response = requests.get(url)
-    return response.json() if response.status_code == 200 else None
-    
+    rosters = response.json() if response.status_code == 200 else []
+    return rosters
+
 class MainApplication(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,6 +178,7 @@ class StartPage(tk.Frame):
                 print("No leagues found for the user")
         else:
             print("User ID not found")
+        self.controller.state('zoomed') 
 
 class UserLeaguesPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -219,22 +221,25 @@ class UserLeaguesPage(tk.Frame):
 
         if self.controller.user_leagues:
             for index, league in enumerate(self.controller.user_leagues):
-                league_id = league.get("league_id")
                 league_name = league.get("name", "Unknown League")
+                if league_name == "Leagues will be posted here!":
+                    continue
+                league_id = league.get("league_id")
                 total_rosters = league.get("total_rosters", "N/A")
                 bench_spots = league.get("roster_positions", []).count('BN')
                 scoring_description = self.parse_scoring_settings(league.get("scoring_settings", {}))
                 waiver_budget = league.get("settings", {}).get("waiver_budget", "N/A")
                 trade_deadline = league.get("settings", {}).get("trade_deadline", "N/A")
-
+                if trade_deadline == 99:
+                    trade_deadline = "None"
                 self.tree.insert('', 'end', values=(league_name, total_rosters, bench_spots, scoring_description, waiver_budget, trade_deadline))
             for widget in self.button_frame.winfo_children():
                 widget.destroy()
-
             for index, league in enumerate(self.controller.user_leagues):
-                button = tk.Button(self.button_frame, text="Rosters", width=10, command=lambda lid=league['league_id']: self.open_league_details(lid))
-                button.grid(row=index, column=0, padx=5, pady=5, sticky='ew')
-                
+                if league.get("name", "Unknown League") != "Leagues will be posted here!":
+                    button = tk.Button(self.button_frame, text="Rosters", width=10, command=lambda lid=league['league_id']: self.open_league_details(lid))
+                    button.grid(row=index, column=0, padx=5, pady=5, sticky='ew')
+       
     def go_back(self):
         self.controller.show_frame(StartPage)
 
@@ -344,23 +349,32 @@ class LeagueDetailsPage(tk.Frame):
 
         if league_info:
             self.league_name = league_info.get('name', 'Unknown League')
-            winner_roster_id = league_info.get('settings', {}).get('latest_league_winner_roster_id')
-            winner_username = self.roster_id_to_username(winner_roster_id, league_info.get('rosters', []))
-            self.champ_label.config(text=f"2023 Champ: {winner_username}")
             self.league_name_label.config(text=f"League Name: {self.league_name}")
-            
+            league_rosters = fetch_league_rosters(self.league_id)
+            all_players_info = fetch_player_info()
+            player_stats_2023 = fetch_player_stats(2023)
+            owner_usernames = self.get_all_usernames(league_rosters)
+            winner_roster_id = league_info.get('metadata', {}).get('latest_league_winner_roster_id')
+            if winner_roster_id:
+                winner_username = self.roster_id_to_username(winner_roster_id, league_rosters)
+            else:
+                winner_username = "Unknown"
+                logging.warning("Winner roster ID not found in league metadata")
+
+            self.champ_label.config(text=f"2023 Champ: {winner_username}")
+
             self.roster_positions = league_info.get('roster_positions', [])
             formatted_roster_positions = self.format_roster_positions(self.roster_positions)
             self.roster_positions_label.config(text=f"Roster Positions: {formatted_roster_positions}")
 
-            league_rosters = fetch_league_rosters(self.league_id)
             all_players_info = fetch_player_info()
             player_stats_2023 = fetch_player_stats(2023)
-
             if league_rosters:
                 owner_usernames = self.get_all_usernames(league_rosters)
                 self.populate_dropdown(owner_usernames)
                 self.display_league_rosters(league_rosters, all_players_info, owner_usernames, player_stats_2023)
+        else:
+            logging.error("Failed to retrieve league info")
 
     def format_roster_positions(self, positions):
         position_count = {}
@@ -370,9 +384,11 @@ class LeagueDetailsPage(tk.Frame):
             if pos == 'BN': 
                 continue
             if pos == 'SUPER_FLEX':
-                pos = 'SF'  
+                pos = 'SF'
+            if pos == 'REC_FLEX': 
+                pos = 'FLEX'
             position_count[pos] = position_count.get(pos, 0) + 1
-        
+
         for pos, count in position_count.items():
             formatted_positions.append(f"{count}{pos}" if count > 1 else pos)
         
@@ -395,7 +411,6 @@ class LeagueDetailsPage(tk.Frame):
         if current_roster is None:
             logging.warning(f"No roster found for owner '{self.current_owner_username}'")
             return
-        # Safely handle reserve list
         reserve_ids = set(current_roster.get('reserve', []) or [])
 
         starter_ids = current_roster.get('starters', [])
@@ -432,8 +447,6 @@ class LeagueDetailsPage(tk.Frame):
             player_stats_info = player_stats.get(player_id, {})
             player_points = player_stats_info.get('pts_ppr', 'N/A')
             player_rank = player_stats_info.get('rank_ppr', 'N/A')
-
-            logging.debug(f"Inserting into Bench Tree: {player_name}, {player_position}, {player_points}, {player_rank}, {player_exp}")
             self.bench_tree.insert('', 'end', values=(self.current_owner_username, player_name, player_position, player_points, player_rank, player_exp))
 
         self.update_tree_height(self.bench_tree)
@@ -450,15 +463,11 @@ class LeagueDetailsPage(tk.Frame):
         self.update_tree_height(self.ir_tree)
 
     def sort_starters(self, starter_ids, roster_positions, all_players_info):
-        logging.debug(f"Sorting Starters: Starter IDs: {starter_ids}, Roster Positions: {roster_positions}")
         position_order = ['QB', 'RB', 'WR', 'TE', 'FLEX', 'RB', 'RB', 'K','DEF']
         sorted_positions = []
         position_counters = {pos: roster_positions.count(pos) for pos in set(roster_positions) if pos != 'BN'}
         if 'SUPER_FLEX' in position_counters:
             position_counters['SF'] = position_counters.pop('SUPER_FLEX')
-        
-        logging.debug(f"Starter IDs: {starter_ids}")
-        logging.debug(f"Position Counters: {position_counters}")
 
         for player_id in starter_ids:
             if not player_id.isdigit():
@@ -469,8 +478,6 @@ class LeagueDetailsPage(tk.Frame):
 
             player_info = all_players_info.get(player_id, {})
             player_position = player_info.get('position')
-            logging.debug(f"Player ID: {player_id}, Position: {player_position}")
-
             if position_counters.get(player_position, 0) > 0:
                 sorted_positions.append((player_id, player_position))
                 position_counters[player_position] -= 1
@@ -484,11 +491,12 @@ class LeagueDetailsPage(tk.Frame):
 
     def roster_id_to_username(self, roster_id, rosters):
         for roster in rosters:
-            if roster.get('roster_id') == roster_id:
+            if str(roster.get('roster_id')) == str(roster_id):
                 owner_id = roster.get('owner_id')
-                return self.fetch_username(owner_id)
+                username = self.fetch_username(owner_id)
+                return username
         return "Unknown"
-    
+
     def get_all_usernames(self, rosters):
         usernames = {}
         for roster in rosters:
@@ -561,4 +569,6 @@ class RankingsPage(tk.Frame):
     
 if __name__ == "__main__":
     app = MainApplication()
+    app.state('zoomed')  # Maximize the window on Windows (use `attributes('-zoomed', True)` on Linux)
     app.mainloop()
+
