@@ -4,8 +4,8 @@ import requests
 from datetime import datetime
 import json
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 from functools import lru_cache
+import time
 
 def treeview_sort_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children('')]
@@ -32,7 +32,7 @@ def fetch_user_id(username):
 @lru_cache(maxsize=None)
 def fetch_user_leagues(user_id, year):
     leagues_url = f'https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}'
-    print(f"Making GET request to: {leagues_url}")  
+    print(f"Making GET request to: {leagues_url}")
     response = requests.get(leagues_url)
     if response.status_code == 200:
         return response.json()
@@ -70,6 +70,7 @@ def fetch_player_stats(year):
     else:
         print(f'Error fetching stats for {year}:', response.status_code)
         return {}
+    
 @lru_cache(maxsize=None)   
 def fetch_user_data(username, year, user_id):  
     user_url = f'https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}'
@@ -113,19 +114,18 @@ class MainApplication(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
         self.show_frame(StartPage)
-        self.set_window_size_and_position(percentage=0.65)
+        self.geometry('1000x800')  # Set the window size
+        self.after(10, self.set_window_size_and_position)  # Center the window after a delay
+        self.mainloop()
 
-    def set_window_size_and_position(self, percentage=0.65):
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        
-        window_width = int(screen_width * percentage)
-        window_height = int(screen_height * percentage)
+    def set_window_size_and_position(self):
+        self.update()  # Update the window to ensure correct dimensions
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        position_right = int(self.winfo_screenwidth()/2 - window_width/2)
+        position_down = int(self.winfo_screenheight()/2 - window_height/2)
+        self.geometry("+{}+{}".format(position_right, position_down))
 
-        position_right = int((screen_width - window_width) / 2)
-        position_down = int((screen_height - window_height) / 2)
-
-        self.geometry(f'{window_width}x{window_height}+{position_right}+{position_down}')
 
     def show_frame(self, cont, league_id=None, username=None):
         if cont == LeagueDetailsPage and league_id is not None:
@@ -178,7 +178,6 @@ class StartPage(tk.Frame):
                 print("No leagues found for the user")
         else:
             print("User ID not found")
-        self.controller.state('zoomed') 
 
 class UserLeaguesPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -187,7 +186,9 @@ class UserLeaguesPage(tk.Frame):
         self.init_ui()
 
     def init_ui(self):
-        self.label = tk.Label(self, text="Your Leagues", font=("Arial", 16))
+        self.status_label = tk.Label(self, text="", fg='blue')  
+        self.status_label.pack(pady=10)
+        self.label = tk.Label(self, text="LEAGUES", font=("Arial", 24))
         self.label.pack(pady=10)
         self.main_frame = tk.Frame(self)
         self.main_frame.pack(fill="both", expand=True)
@@ -214,38 +215,56 @@ class UserLeaguesPage(tk.Frame):
         self.tree.heading("Trade Deadline", text="Trade Deadline")
 
     def update_data(self):
-        for widget in self.button_frame.winfo_children():
-            widget.destroy()
+        self.set_status("Loading leagues...")
+        self.after(2000, self.actual_update) 
 
-        self.tree.delete(*self.tree.get_children())
-
-        if self.controller.user_leagues:
-            for index, league in enumerate(self.controller.user_leagues):
-                league_name = league.get("name", "Unknown League")
-                if league_name == "Leagues will be posted here!":
-                    continue
-                league_id = league.get("league_id")
-                total_rosters = league.get("total_rosters", "N/A")
-                bench_spots = league.get("roster_positions", []).count('BN')
-                scoring_description = self.parse_scoring_settings(league.get("scoring_settings", {}))
-                waiver_budget = league.get("settings", {}).get("waiver_budget", "N/A")
-                trade_deadline = league.get("settings", {}).get("trade_deadline", "N/A")
-                if trade_deadline == 99:
-                    trade_deadline = "None"
-                self.tree.insert('', 'end', values=(league_name, total_rosters, bench_spots, scoring_description, waiver_budget, trade_deadline))
+    def actual_update(self):
+        try:
             for widget in self.button_frame.winfo_children():
                 widget.destroy()
-            for index, league in enumerate(self.controller.user_leagues):
-                if league.get("name", "Unknown League") != "Leagues will be posted here!":
-                    button = tk.Button(self.button_frame, text="Rosters", width=10, command=lambda lid=league['league_id']: self.open_league_details(lid))
-                    button.grid(row=index, column=0, padx=5, pady=5, sticky='ew')
-       
+
+            self.tree.delete(*self.tree.get_children())
+
+            if self.controller.user_leagues:
+                for index, league in enumerate(self.controller.user_leagues):
+                    league_name = league.get("name", "Unknown League")
+                    if league_name == "Leagues will be posted here!":
+                        continue
+                    league_id = league.get("league_id")
+                    total_rosters = league.get("total_rosters", "N/A")
+                    bench_spots = league.get("roster_positions", []).count('BN')
+                    scoring_description = self.parse_scoring_settings(league.get("scoring_settings", {}))
+                    waiver_budget = league.get("settings", {}).get("waiver_budget", "N/A")
+                    trade_deadline = league.get("settings", {}).get("trade_deadline", "N/A")
+                    if trade_deadline == 99:
+                        trade_deadline = "None"
+                    self.tree.insert('', 'end', values=(league_name, total_rosters, bench_spots, scoring_description, waiver_budget, trade_deadline))
+                for widget in self.button_frame.winfo_children():
+                    widget.destroy()
+                for index, league in enumerate(self.controller.user_leagues):
+                    if league.get("name", "Unknown League") != "Leagues will be posted here!":
+                        button = tk.Button(self.button_frame, text="Rosters", width=10, command=lambda lid=league['league_id']: self.open_league_details(lid))
+                        button.grid(row=index, column=0, padx=5, pady=5, sticky='ew')
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.clear_status()
+
     def go_back(self):
+        self.controller.state('normal') 
+        self.controller.set_window_size_and_position() 
         self.controller.show_frame(StartPage)
 
     def open_league_details(self, league_id):
+        self.set_status("Loading Roster...")
         self.controller.show_frame(LeagueDetailsPage, league_id, self.controller.username)
 
+
+    def set_status(self, message):
+        self.status_label.config(text=message)
+
+    def clear_status(self):
+        self.status_label.config(text="")
 
     def show_league_details(self, league_id):
         print(f"Showing details for league {league_id}")
@@ -284,12 +303,12 @@ class LeagueDetailsPage(tk.Frame):
         self.init_ui()                  
         self.update_data()   
 
-    def update_tree_height(self, tree, max_height=10):
+    def update_tree_height(self, tree, max_height=20, min_height=1):
         """Dynamically adjust the height of a tree view."""
         num_items = len(tree.get_children())
-        new_height = min(num_items, max_height)
-        tree.config(height=new_height)
-        
+        new_height = min(max(num_items, min_height), max_height)
+        tree.configure(height=new_height)
+
     def init_ui(self):
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side="top", fill="x", expand=False)
@@ -329,6 +348,17 @@ class LeagueDetailsPage(tk.Frame):
         self.ir_tree = ttk.Treeview(self, columns=("Owner", "Player", "Position", "Points", "Rank", "Exp"), show='')
         self.style_treeview(self.ir_tree)
         self.ir_tree.pack(fill="both", expand=True, pady=0)
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical")
+        self.scrollbar.pack(side="right", fill="y")
+        self.starters_tree.configure(yscrollcommand=self.scrollbar.set)
+        self.bench_tree.configure(yscrollcommand=self.scrollbar.set)
+        self.ir_tree.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.configure(command=self.sync_scroll)
+
+    def sync_scroll(self, *args):
+        self.starters_tree.yview(*args)
+        self.bench_tree.yview(*args)
+        self.ir_tree.yview(*args)
 
     def style_treeview(self, tree):
         tree.column("Owner", width=100, stretch=tk.YES)  
@@ -350,10 +380,12 @@ class LeagueDetailsPage(tk.Frame):
         if league_info:
             self.league_name = league_info.get('name', 'Unknown League')
             self.league_name_label.config(text=f"League Name: {self.league_name}")
+            
             league_rosters = fetch_league_rosters(self.league_id)
             all_players_info = fetch_player_info()
             player_stats_2023 = fetch_player_stats(2023)
             owner_usernames = self.get_all_usernames(league_rosters)
+
             winner_roster_id = league_info.get('metadata', {}).get('latest_league_winner_roster_id')
             if winner_roster_id:
                 winner_username = self.roster_id_to_username(winner_roster_id, league_rosters)
@@ -367,12 +399,12 @@ class LeagueDetailsPage(tk.Frame):
             formatted_roster_positions = self.format_roster_positions(self.roster_positions)
             self.roster_positions_label.config(text=f"Roster Positions: {formatted_roster_positions}")
 
-            all_players_info = fetch_player_info()
-            player_stats_2023 = fetch_player_stats(2023)
-            if league_rosters:
-                owner_usernames = self.get_all_usernames(league_rosters)
-                self.populate_dropdown(owner_usernames)
-                self.display_league_rosters(league_rosters, all_players_info, owner_usernames, player_stats_2023)
+            self.populate_dropdown(owner_usernames)
+            self.display_league_rosters(league_rosters, all_players_info, owner_usernames, player_stats_2023)
+            user_leagues_page = self.controller.frames.get(UserLeaguesPage, None)
+            if user_leagues_page:
+                user_leagues_page.clear_status()
+
         else:
             logging.error("Failed to retrieve league info")
 
@@ -407,12 +439,18 @@ class LeagueDetailsPage(tk.Frame):
         self.bench_tree.delete(*self.bench_tree.get_children())
         self.ir_tree.delete(*self.ir_tree.get_children())  
         current_roster = next((roster for roster in rosters if owner_usernames[roster['owner_id']].lower() == self.current_owner_username), None)
-
         if current_roster is None:
             logging.warning(f"No roster found for owner '{self.current_owner_username}'")
             return
         reserve_ids = set(current_roster.get('reserve', []) or [])
-
+        current_roster = next((roster for roster in rosters if owner_usernames[roster['owner_id']].lower() == self.current_owner_username), None)
+        if not current_roster:
+            logging.warning(f"No roster found for owner '{self.current_owner_username}'")
+            return
+        reserve_ids = set(current_roster.get('reserve', []) or [])
+        all_player_ids = set(current_roster.get('players', []))
+        starter_ids = set(current_roster.get('starters', []))
+        bench_ids = all_player_ids - starter_ids - reserve_ids
         starter_ids = current_roster.get('starters', [])
         starter_positions = self.sort_starters(starter_ids, self.roster_positions, all_players_info)
         for player_id, pos in starter_positions:
@@ -424,20 +462,8 @@ class LeagueDetailsPage(tk.Frame):
             player_points = player_stats_info.get('pts_ppr', 'N/A')
             player_rank = player_stats_info.get('rank_ppr', 'N/A')
             self.starters_tree.insert('', 'end', values=(self.current_owner_username, player_name, player_position, player_points, player_rank, player_exp))
-        self.update_tree_height(self.starters_tree)
+        self.update_tree_height(self.starters_tree, min_height=1)
         self.bench_tree.delete(*self.bench_tree.get_children())
-
-        current_roster = next((roster for roster in rosters if owner_usernames[roster['owner_id']].lower() == self.current_owner_username), None)
-
-        if not current_roster:
-            logging.warning(f"No roster found for owner '{self.current_owner_username}'")
-            return
-
-        reserve_ids = set(current_roster.get('reserve', []) or [])
-
-        all_player_ids = set(current_roster.get('players', []))
-        starter_ids = set(current_roster.get('starters', []))
-        bench_ids = all_player_ids - starter_ids - reserve_ids
 
         for player_id in bench_ids:
             player_info = all_players_info.get(player_id, {})
@@ -448,8 +474,8 @@ class LeagueDetailsPage(tk.Frame):
             player_points = player_stats_info.get('pts_ppr', 'N/A')
             player_rank = player_stats_info.get('rank_ppr', 'N/A')
             self.bench_tree.insert('', 'end', values=(self.current_owner_username, player_name, player_position, player_points, player_rank, player_exp))
-
-        self.update_tree_height(self.bench_tree)
+            self.update_tree_height(self.bench_tree, min_height=1)
+            self.ir_tree.delete(*self.ir_tree.get_children())
 
         for player_id in reserve_ids:
             player_info = all_players_info.get(player_id, {})
@@ -460,7 +486,7 @@ class LeagueDetailsPage(tk.Frame):
             player_points = player_stats_info.get('pts_ppr', 'N/A')
             player_rank = player_stats_info.get('rank_ppr', 'N/A')
             self.ir_tree.insert('', 'end', values=(self.current_owner_username, player_name, player_position, player_points, player_rank, player_exp))
-        self.update_tree_height(self.ir_tree)
+            self.update_tree_height(self.ir_tree, min_height=1)
 
     def sort_starters(self, starter_ids, roster_positions, all_players_info):
         position_order = ['QB', 'RB', 'WR', 'TE', 'FLEX', 'RB', 'RB', 'K','DEF']
@@ -516,7 +542,10 @@ class LeagueDetailsPage(tk.Frame):
             return 'Unknown'
         
     def go_back(self):
+        self.controller.state('normal')  # Reset the main application window to normal state
+        self.controller.set_window_size_and_position()  # Re-center the window
         self.controller.show_frame(UserLeaguesPage)
+
 
 class RankingsPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -569,6 +598,5 @@ class RankingsPage(tk.Frame):
     
 if __name__ == "__main__":
     app = MainApplication()
-    app.state('zoomed')  # Maximize the window on Windows (use `attributes('-zoomed', True)` on Linux)
     app.mainloop()
 
