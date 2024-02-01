@@ -186,8 +186,8 @@ class UserLeaguesPage(tk.Frame):
         self.init_ui()
 
     def init_ui(self):
-        self.status_label = tk.Label(self, text="", fg='blue')  
-        self.status_label.pack(pady=10)
+        self.status_label = tk.Label(self, text="", fg='blue')
+        self.status_label.pack(pady=10)  # Adjust the layout as needed
         self.label = tk.Label(self, text="LEAGUES", font=("Arial", 24))
         self.label.pack(pady=10)
         self.main_frame = tk.Frame(self)
@@ -256,9 +256,11 @@ class UserLeaguesPage(tk.Frame):
         self.controller.show_frame(StartPage)
 
     def open_league_details(self, league_id):
-        self.set_status("Loading Roster...")
-        self.controller.show_frame(LeagueDetailsPage, league_id, self.controller.username)
+        # Set loading status
+        self.set_status("Loading League Details...") 
 
+        # Delay the transition to LeagueDetailsPage
+        self.after(100, lambda: self.controller.show_frame(LeagueDetailsPage, league_id, self.controller.username))
 
     def set_status(self, message):
         self.status_label.config(text=message)
@@ -310,55 +312,79 @@ class LeagueDetailsPage(tk.Frame):
         tree.configure(height=new_height)
 
     def init_ui(self):
+        self.status_label = tk.Label(self, text="", fg='blue')
+        self.status_label.pack(pady=10)  
+
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side="top", fill="x", expand=False)
+
         self.back_button = tk.Button(self.top_frame, text="Back", command=self.go_back)
         self.back_button.pack(side="left", padx=10, pady=10)
+
         self.league_details_frame = tk.Frame(self.top_frame)
         self.league_details_frame.pack(side="left", fill="x", expand=True)
+
         self.change_owner_frame = tk.Frame(self.top_frame)
         self.change_owner_frame.pack(side="right", fill="x", expand=False)
+
         self.league_name_label = tk.Label(self.league_details_frame, text="League Name: Loading...", font=("Arial", 16, "bold"))
         self.league_name_label.grid(row=0, column=0, sticky="n")
+
         self.roster_positions_label = tk.Label(self.league_details_frame, text="Roster Positions:", font=("Arial", 12))
         self.roster_positions_label.grid(row=1, column=0, sticky="w")
+
         self.champ_label = tk.Label(self.league_details_frame, text="2023 Champ: Loading...")
         self.champ_label.grid(row=3, column=0, sticky="w")
+
         self.change_owner_header = tk.Label(self.change_owner_frame, text="Change owner")
         self.change_owner_header.pack()
+
         self.owner_var = tk.StringVar()
         self.owner_dropdown = ttk.Combobox(self.change_owner_frame, textvariable=self.owner_var)
         self.owner_dropdown.pack(side="left", padx=2)
+
         self.enter_button = tk.Button(self.change_owner_frame, text="Enter", command=self.on_owner_change)
         self.enter_button.pack(side="left", padx=2)
+
         self.separator = ttk.Separator(self, orient='horizontal')
         self.separator.pack(fill='x', expand=False)
+
+        # Starters Section
         self.starters_header = tk.Label(self, text="Starters", font=("Arial", 16, "bold"))
         self.starters_header.pack(pady=(10, 0))
+
         self.starters_tree = ttk.Treeview(self, columns=("Owner", "Player", "Position", "Points", "Rank", "Exp"), show='headings')
         self.style_treeview(self.starters_tree)
         self.starters_tree.pack(fill="both", expand=True)
+
+        self.starters_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.starters_tree.yview)
+        self.starters_tree.configure(yscrollcommand=self.starters_scrollbar.set)
+        self.starters_scrollbar.pack(side="right", fill="y")
+
+        # Bench Section
         self.bench_header = tk.Label(self, text="Bench", font=("Arial", 16, "bold"))
-        self.bench_header.pack(pady=(5, 0))   
+        self.bench_header.pack(pady=(5, 0))
+
         self.bench_tree = ttk.Treeview(self, columns=("Owner", "Player", "Position", "Points", "Rank", "Exp"), show='')
         self.style_treeview(self.bench_tree)
         self.bench_tree.pack(fill="both", expand=True, pady=0)
+
+        self.bench_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.bench_tree.yview)
+        self.bench_tree.configure(yscrollcommand=self.bench_scrollbar.set)
+        self.bench_scrollbar.pack(side="right", fill="y")
+
+        # IR Section
         self.ir_header = tk.Label(self, text="IR", font=("Arial", 16, "bold"))
-        self.ir_header.pack(pady=(5, 0)) 
+        self.ir_header.pack(pady=(5, 0))
+
         self.ir_tree = ttk.Treeview(self, columns=("Owner", "Player", "Position", "Points", "Rank", "Exp"), show='')
         self.style_treeview(self.ir_tree)
         self.ir_tree.pack(fill="both", expand=True, pady=0)
-        self.scrollbar = ttk.Scrollbar(self, orient="vertical")
-        self.scrollbar.pack(side="right", fill="y")
-        self.starters_tree.configure(yscrollcommand=self.scrollbar.set)
-        self.bench_tree.configure(yscrollcommand=self.scrollbar.set)
-        self.ir_tree.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.configure(command=self.sync_scroll)
 
-    def sync_scroll(self, *args):
-        self.starters_tree.yview(*args)
-        self.bench_tree.yview(*args)
-        self.ir_tree.yview(*args)
+        self.ir_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.ir_tree.yview)
+        self.ir_tree.configure(yscrollcommand=self.ir_scrollbar.set)
+        self.ir_scrollbar.pack(side="right", fill="y")
+
 
     def style_treeview(self, tree):
         tree.column("Owner", width=100, stretch=tk.YES)  
@@ -386,6 +412,9 @@ class LeagueDetailsPage(tk.Frame):
             player_stats_2023 = fetch_player_stats(2023)
             owner_usernames = self.get_all_usernames(league_rosters)
 
+            self.set_status("Loading League Details...")
+            self.after(100, self.actual_update_data)
+
             winner_roster_id = league_info.get('metadata', {}).get('latest_league_winner_roster_id')
             if winner_roster_id:
                 winner_username = self.roster_id_to_username(winner_roster_id, league_rosters)
@@ -407,6 +436,37 @@ class LeagueDetailsPage(tk.Frame):
 
         else:
             logging.error("Failed to retrieve league info")
+
+    def actual_update_data(self):
+        try:
+            # Fetch the latest league rosters, player information, and player stats
+            league_rosters = fetch_league_rosters(self.league_id)
+            all_players_info = fetch_player_info()
+            player_stats_2023 = fetch_player_stats(2023)
+            owner_usernames = self.get_all_usernames(league_rosters)  # Make sure this method is defined and returns a dictionary of owner usernames
+
+            # Clear existing data from the treeviews
+            self.starters_tree.delete(*self.starters_tree.get_children())
+            self.bench_tree.delete(*self.bench_tree.get_children())
+            self.ir_tree.delete(*self.ir_tree.get_children())
+
+            # Populate treeviews with new data
+            # Now including all four required arguments
+            self.display_league_rosters(league_rosters, all_players_info, owner_usernames, player_stats_2023)
+
+        except Exception as e:
+            print(f"An error occurred while updating league details: {e}")
+        finally:
+            self.clear_status()
+            user_leagues_page = self.controller.frames.get(UserLeaguesPage, None)
+            if user_leagues_page:
+                user_leagues_page.clear_status()
+
+    def set_status(self, message):
+        self.status_label.config(text=message)
+
+    def clear_status(self):
+        self.status_label.config(text="")
 
     def format_roster_positions(self, positions):
         position_count = {}
@@ -545,7 +605,6 @@ class LeagueDetailsPage(tk.Frame):
         self.controller.state('normal')  # Reset the main application window to normal state
         self.controller.set_window_size_and_position()  # Re-center the window
         self.controller.show_frame(UserLeaguesPage)
-
 
 class RankingsPage(tk.Frame):
     def __init__(self, parent, controller):
