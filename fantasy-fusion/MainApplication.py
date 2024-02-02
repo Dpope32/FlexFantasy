@@ -7,88 +7,13 @@ import logging
 from functools import lru_cache
 import time
 
+
 def treeview_sort_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children('')]
     l.sort(key=lambda t: (t[0].lower(), t[1])) if col == 'Name' else l.sort(key=lambda t: t[0], reverse=reverse)
     for index, (val, k) in enumerate(l):
         tv.move(k, '', index)
     tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
-    
-@lru_cache(maxsize=None)   
-def fetch_user_id(username):
-    user_url = f'https://api.sleeper.app/v1/user/{username}'
-    response = requests.get(user_url)
-    if response.status_code == 200:
-        user_data = response.json()
-        if user_data is not None:
-            return user_data.get('user_id')  
-        else:
-            print(f"No data found for username: {username}")
-            return None
-    else:
-        print(f"Error fetching user ID: {response.status_code}, {response.text}")
-        return None
-
-@lru_cache(maxsize=None)
-def fetch_user_leagues(user_id, year):
-    leagues_url = f'https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}'
-    print(f"Making GET request to: {leagues_url}")
-    response = requests.get(leagues_url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error fetching leagues for {year}: {response.status_code}, {response.text}")
-        return None
-    
-@lru_cache(maxsize=None)
-def fetch_league_info(league_id):
-    url = f"https://api.sleeper.app/v1/league/{league_id}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        league_info = response.json()
-        return league_info
-    else:
-        logging.error(f"Error fetching league info: {response.status_code}, {response.text}")
-        return None
-
-@lru_cache(maxsize=None)
-def fetch_player_info():
-    url = 'https://api.sleeper.app/v1/players/nfl'
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print('Error fetching player info:', response.status_code)
-    return {}
-
-@lru_cache(maxsize=None)
-def fetch_player_stats(year):
-    url = f'https://api.sleeper.app/v1/stats/nfl/regular/{year}'
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f'Error fetching stats for {year}:', response.status_code)
-        return {}
-    
-@lru_cache(maxsize=None)   
-def fetch_user_data(username, year, user_id):  
-    user_url = f'https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}'
-    response = requests.get(user_url)
-    return response.json() if response.status_code == 200 else None
-
-@lru_cache(maxsize=None)
-def fetch_league_details(league_id):
-    url = f"https://api.sleeper.app/v1/league/{league_id}"
-    response = requests.get(url)
-    return response.json() if response.status_code == 200 else None
-
-@lru_cache(maxsize=None)
-def fetch_league_rosters(league_id):
-    url = f"https://api.sleeper.app/v1/league/{league_id}/rosters"
-    response = requests.get(url)
-    rosters = response.json() if response.status_code == 200 else []
-    return rosters
 
 class MainApplication(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -591,16 +516,6 @@ class LeagueDetailsPage(tk.Frame):
             usernames[owner_id] = username
         return usernames
 
-    @lru_cache(maxsize=None)
-    def fetch_username(self, owner_id):
-        user_url = f'https://api.sleeper.app/v1/user/{owner_id}'
-        response = requests.get(user_url)
-        if response.status_code == 200:
-            user_data = response.json()
-            return user_data.get('username', 'Unknown')
-        else:
-            return 'Unknown'
-        
     def go_back(self):
         self.controller.state('normal')  # Reset the main application window to normal state
         self.controller.set_window_size_and_position()  # Re-center the window

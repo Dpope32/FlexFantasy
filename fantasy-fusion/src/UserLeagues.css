@@ -1,0 +1,133 @@
+/* UserLeagues.css */
+.App {
+    background-color: #5f6974; /* Dark gray background */
+    min-height: 100vh; /* Full height */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center children horizontally */
+    justify-content: center; /* Center children vertically */
+  }
+
+  .App-header {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+.UserLeagues {
+    padding: 50px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .BackButton {
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: #64a2ff; /* Green background */
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.9em;
+    border-radius: 4px;
+    border-radius: 8px; /* Rounded corners for buttons */
+  }
+  
+  .TableWrapper {
+    overflow-x: auto;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1); /* Softer shadow */
+    width: 100%; /* Table size reduced by 20% */
+    margin: auto; /* Center the table */
+  }
+  
+  .Table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #92c0f8; /* Soft background for the table */
+    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); /* Barely visible gradient */
+    table-layout: auto;
+    margin: 0 auto; 
+  }   
+  
+  th, td {
+    padding: 12px 15px;
+    border: 2px solid #141b1c;
+    text-align: center;
+    overflow: hidden;
+    font-size: 1.0em; /* Auto fit text */
+    text-overflow: ellipsis;
+    font-weight: bold; /* Bolden the text */
+    white-space: nowrap; 
+  }
+  
+  th {
+    background-color: #444; /* Darker shade for headers */
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold; /* Bolden the text */
+  }
+  
+  td {
+    color: 222; /* Dark text for cells */
+  }
+  
+  tr:nth-child(even) {
+    background-color: #e5f6f8;
+  }
+  
+  
+  tr:hover {
+    background-color: #e0e0e0;
+  }
+  
+  button {
+    background-color: #3a7893; /* Green background for buttons */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px; /* Rounded corners for buttons */
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.85em;
+  }
+  
+  button:hover {
+    background-color: #367c39; /* Darker shade on hover */
+  }
+  
+.Table .td {
+    width: 1%;
+  white-space: nowrap;
+}
+
+
+.LeaguesImage {
+    display: block;
+    max-width: 80%; /* Ensure it's responsive */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 auto 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 8px; /* Optional: rounded corners */
+  }
+
+  .HeaderTitle {
+    font-size: 2em;
+    font-weight: bold;
+    background: linear-gradient(45deg, #4D9FEC, #e8e8e8);
+    -webkit-background-clip: text;
+    background-clip: text; /* Standard property */
+    color: transparent; /* Hide the text color to show the gradient */
+    animation: glow 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 10px #4D9FEC;
+    }
+    to {
+      text-shadow: 0 0 20px #4DDB6E;
+    }
+  }
+  
+  
