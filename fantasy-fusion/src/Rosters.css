@@ -1,56 +1,4 @@
-/* Rosters.css */
-.Rosters {
-  text-align: center;
-  padding: 20px;
-}
 
-.title {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.back-button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background-color: #0074d9;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.back-button:hover {
-  background-color: #0056b3;
-}
-
-.TableWrapper {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.Table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.Table th,
-.Table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.Table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-.Table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.Table tr:hover {
-  background-color: #ddd;
-}
 
 .owner-dropdown {
   margin-bottom: 20px;
@@ -58,4 +6,68 @@
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ddd;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1200px; /* or any other max-width or width you prefer */
+  margin: 0 auto; /* this will center your container */
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: adds a shadow for some depth */
+  background-color: #335e74; /* or any other color you prefer */
+}
+
+.controls-container {
+  background-color: #28373d;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+
+
+.owner-dropdown {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  background-color: white;
+  color: black;
+}
+
+.back-button {
+  background-color: #f44336; /* Red color for the button */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.change-owner-label {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #fff; /* White color for the text */
+}
+
+.owner-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-button {
+  background-color: #4f6675; /* Green color for new button */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 16px;
 }

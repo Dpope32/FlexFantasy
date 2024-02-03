@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import './Rosters.css';
+import StartPage from './StartPage';
 
 function Rosters() {
   const { leagueId } = useParams();
@@ -13,57 +15,77 @@ function Rosters() {
 
   useEffect(() => {
     // Fetch all players info
-    fetch('/api/players/nfl')
-      .then(response => response.json())
+    fetch('http://127.0.0.1:5000/players/nfl') // Removed the extra slash
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error fetching player info: ${response.statusText}`);
+        }
+        return response.json(); // Directly parsing JSON here
+      })
       .then(data => setAllPlayersInfo(data))
       .catch(error => console.error('Error fetching player info:', error));
 
     // Fetch player stats for the year 2023
-    fetch('/api/stats/nfl/regular/2023')
-      .then(response => response.json())
+    fetch('http://127.0.0.1:5000/stats/nfl/regular/2023')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error fetching player stats: ${response.statusText}`);
+        }
+        return response.json(); // Directly parsing JSON here
+      })
       .then(data => setPlayerStats2023(data))
       .catch(error => console.error('Error fetching player stats:', error));
 
-    async function fetchData() {
-      if (!leagueId) {
-        console.error("League ID is undefined");
-        return;
-      }
-      
-      setIsLoading(true);
-      try {
-        const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
-        if (!resLeagueRosters.ok) throw new Error('Roster data fetch failed');
-        const leagueRostersData = await resLeagueRosters.json();
-        console.log("League Rosters:", leagueRostersData);
-
-        const usernamePromises = leagueRostersData.map(roster => 
-          fetch(`http://localhost:5000/user/username/${roster.owner_id}`)
-            .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch username'))
-        );
-
-        const usernames = await Promise.all(usernamePromises);
-        console.log("Usernames:", usernames);
-
-        const updatedOwners = leagueRostersData.map(roster => {
-          const usernameObj = usernames.find(u => u.user_id === roster.owner_id);
-          return { owner_id: roster.owner_id, username: usernameObj ? usernameObj.username : 'Unknown' };
-        });
-
-        console.log("Updated Owners:", updatedOwners);
-
-        setOwners(updatedOwners);
-        setSelectedOwner(updatedOwners[0]?.username);
-        setRosters(leagueRostersData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
     fetchData();
-  }, [leagueId]);
+  }, [leagueId]); // Removed the incorrect second array, [selectedOwner]
+
+  async function fetchData() {
+    if (!leagueId) {
+      console.error("League ID is undefined");
+      return;
+    }
+  
+    setIsLoading(true);
+    try {
+      const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
+      if (!resLeagueRosters.ok) throw new Error('Roster data fetch failed');
+      const leagueRostersData = await resLeagueRosters.json();
+  
+      const ownerIds = leagueRostersData.map(roster => roster.owner_id);
+      const uniqueOwnerIds = Array.from(new Set(ownerIds)); // Remove duplicates
+  
+      const usernamePromises = uniqueOwnerIds.map(owner_id => 
+        fetch(`https://api.sleeper.app/v1/user/${owner_id}`)
+          .then(res => {
+            if (!res.ok) {
+              throw new Error(`Failed to fetch username for owner_id ${owner_id}`);
+            }
+            return res.json();
+          })
+      );
+  
+      const users = await Promise.all(usernamePromises);
+      const userMap = users.reduce((acc, user) => {
+        acc[user.user_id] = user.username;
+        return acc;
+      }, {});
+  
+      const updatedOwners = leagueRostersData.map(roster => ({
+        owner_id: roster.owner_id,
+        username: userMap[roster.owner_id] || 'Unknown'
+      }));
+  
+      setOwners(updatedOwners);
+      setSelectedOwner(updatedOwners[0]?.username || '');
+      setRosters(leagueRostersData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  
+  
 
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
     const positionOrder = ['QB', 'RB', 'WR', 'TE', 'FLEX', 'RB', 'RB', 'K', 'DEF'];
@@ -106,6 +128,11 @@ function Rosters() {
     });
   };
   
+  const handleEnterButtonClick = () => {
+    // This force update isn't strictly necessary if your components are already
+    // reacting properly to state changes. This function can be used for additional
+    // logic that needs to run when the user confirms their owner selection.
+  }; 
 
   const handleOwnerChange = (event) => {
     setSelectedOwner(event.target.value);
@@ -154,19 +181,26 @@ function Rosters() {
   }
 
   return (
-    <div className="Rosters">
-      <h1 className="title">League Rosters</h1>
-      <div>
-        <label>Change Owner:</label>
-        <select className="owner-dropdown" value={selectedOwner} onChange={handleOwnerChange}>
-        {owners.map(owner => (
-            <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
-        ))}
-        </select>
-      </div>
-      {ownerRoster ? (
-        <div className="TableWrapper">
-          <h3>Roster for {selectedOwner}</h3>
+    <div className="page-container">
+      <div className="Rosters">
+        <div className="controls-container">
+          <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+          <div className="owner-control">
+            <label className="change-owner-label">Change Owner:</label>
+            <select className="owner-dropdown" value={selectedOwner} onChange={handleOwnerChange}>
+              {owners.map(owner => (
+                <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
+              ))}
+            </select>
+            <button onClick={handleEnterButtonClick}>Enter</button>
+          </div>
+        <button className="home-button">{() => navigate(StartPage)}Home</button>
+        </div>
+        <h1 className="title">League Rosters</h1>
+        </div>
+        {ownerRoster ? (
+          <div className="TableWrapper">
+            <h3>{selectedOwner}'s Roster in {leagueId}</h3>
             <table className="Table">
                 <thead>
                     <tr>
@@ -195,7 +229,6 @@ function Rosters() {
             </table>
         </div>
       ) : <div>Select an owner to view their roster.</div>}
-      <button className="back-button" onClick={() => navigate(-1)}>Back</button>
     </div>
   );
   
