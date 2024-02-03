@@ -71,3 +71,14 @@
   cursor: pointer;
   font-size: 16px;
 }
+
+.league-title {
+  text-align: center;
+  color: #ffffff;
+  background-color: #007bff;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 20px 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}

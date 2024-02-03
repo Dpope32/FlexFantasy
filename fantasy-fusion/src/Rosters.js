@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
 import StartPage from './StartPage';
 
@@ -11,33 +11,43 @@ function Rosters() {
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [tempSelectedOwner, setTempSelectedOwner] = useState('');
+  const location = useLocation();
+  const initialUsername = location.state?.username;
   const navigate = useNavigate();
+  const leagueName = location.state?.leagueName || 'League';
+  const [positionRanks, setPositionRanks] = useState({});
+
 
   useEffect(() => {
     // Fetch all players info
-    fetch('http://127.0.0.1:5000/players/nfl') // Removed the extra slash
+    fetch('http://127.0.0.1:5000/players/nfl')
       .then(response => {
         if (!response.ok) {
           throw new Error(`Error fetching player info: ${response.statusText}`);
         }
-        return response.json(); // Directly parsing JSON here
+        return response.json();
       })
       .then(data => setAllPlayersInfo(data))
       .catch(error => console.error('Error fetching player info:', error));
-
+  
     // Fetch player stats for the year 2023
     fetch('http://127.0.0.1:5000/stats/nfl/regular/2023')
       .then(response => {
         if (!response.ok) {
           throw new Error(`Error fetching player stats: ${response.statusText}`);
         }
-        return response.json(); // Directly parsing JSON here
+        return response.json();
       })
-      .then(data => setPlayerStats2023(data))
+      .then(data => {
+        setPlayerStats2023(data);
+        const positionRanks = calculatePositionRanks(data);
+        setPositionRanks(positionRanks); // Set the position ranks
+      })
       .catch(error => console.error('Error fetching player stats:', error));
-
+  
     fetchData();
-  }, [leagueId]); // Removed the incorrect second array, [selectedOwner]
+  }, [leagueId]);
 
   async function fetchData() {
     if (!leagueId) {
@@ -76,6 +86,12 @@ function Rosters() {
       }));
   
       setOwners(updatedOwners);
+
+        // Use the initialUsername to find the owner and set them as selected
+    const initialOwner = updatedOwners.find(o => o.username === initialUsername);
+    setTempSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
+    setSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
+      setTempSelectedOwner(updatedOwners[0]?.username || '');
       setSelectedOwner(updatedOwners[0]?.username || '');
       setRosters(leagueRostersData);
     } catch (error) {
@@ -85,8 +101,30 @@ function Rosters() {
     }
   }
   
+  const calculatePositionRanks = (playerStats) => {
+    const positionScores = {};
+    
+    // Accumulate points for each position
+    Object.entries(playerStats).forEach(([playerId, stats]) => {
+      const position = allPlayersInfo[playerId]?.position || 'DEF';
+      if (!positionScores[position]) {
+        positionScores[position] = [];
+      }
+      positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
+    });
+    
+    // Sort each position by points in descending order and calculate ranks
+    const positionRanks = {};
+    Object.keys(positionScores).forEach(position => {
+      positionScores[position].sort((a, b) => b.points - a.points)
+        .forEach((entry, index) => {
+          positionRanks[entry.playerId] = index + 1; // Rank starts at 1
+        });
+    });
   
-
+    return positionRanks;
+  };
+  
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
     const positionOrder = ['QB', 'RB', 'WR', 'TE', 'FLEX', 'RB', 'RB', 'K', 'DEF'];
     const sortedStarters = [];
@@ -128,14 +166,20 @@ function Rosters() {
     });
   };
   
-  const handleEnterButtonClick = () => {
-    // This force update isn't strictly necessary if your components are already
-    // reacting properly to state changes. This function can be used for additional
-    // logic that needs to run when the user confirms their owner selection.
-  }; 
+    const findBenchPlayers = (roster) => {
+        // Assuming 'players' includes both starters and bench players
+        const allPlayers = roster.players || [];
+        const starters = roster.starters || [];
+        // Filter out starters to get bench players
+        return allPlayers.filter(playerId => !starters.includes(playerId));
+  };
 
+  const handleEnterButtonClick = () => {
+    setSelectedOwner(tempSelectedOwner);
+  };
+  
   const handleOwnerChange = (event) => {
-    setSelectedOwner(event.target.value);
+    setTempSelectedOwner(event.target.value);
   };
 
   const ownerRoster = rosters.find(roster => {
@@ -143,34 +187,6 @@ function Rosters() {
     return owner?.username === selectedOwner;
   });
 
- 
-
-  
-// Placeholder for converting roster_id to username - need more info to implement
-    const rosterIdToUsername = (rosterId) => {
-    const roster = rosters.find(r => r.roster_id === rosterId);
-    const owner = owners.find(o => o.owner_id === roster?.owner_id);
-    return owner?.username || 'Unknown';
-  };
-
-
-  const displayRosterDetails = (roster) => {
-    return roster.players.map(playerId => {
-      const playerDetails = allPlayersInfo[playerId];
-      const playerStats = playerStats2023[playerId];
-
-      return (
-        <div key={playerId}>
-          Owner: {selectedOwner}
-          Player ID: {playerId}
-          Position: {playerDetails?.position || 'Unknown'}
-          Points: {playerStats?.pts_ppr || 'Unknown'}
-          Rank: {playerStats?.rank_ppr || 'Unknown'}
-          Exp: {playerDetails?.years_exp || 'Unknown'}
-        </div>
-      );
-    });
-  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -179,6 +195,109 @@ function Rosters() {
   if (!rosters.length) {
     return <div>No rosters found for league {leagueId}</div>;
   }
+  const displayStarters = (roster) => {
+    const totalStarters = roster.starters.length;
+    return roster.starters.map((playerId, index) => {
+      const playerDetails = allPlayersInfo[playerId];
+      return displayPlayerRow(playerId, true, index, totalStarters, playerDetails);
+    });
+  };
+  
+  const displayBench = (roster) => {
+    const benchPlayerIds = sortPlayersByPoints(findBenchPlayers(roster)); // Sort the bench players
+    return benchPlayerIds.map(playerId => displayPlayerRow(playerId, 0, 0));
+  };
+  
+  const displayIR = (roster) => {
+    const irPlayerIds = sortPlayersByPoints(roster.reserve || []); // Sort the IR players
+    return irPlayerIds.map(playerId => displayPlayerRow(playerId, 0, 0));
+  };
+  
+  const displayTaxi = (roster) => {
+    const taxiPlayerIds = sortPlayersByPoints(roster.taxi || []); // Sort the Taxi players
+    return taxiPlayerIds.map(playerId => displayPlayerRow(playerId, 0, 0));
+  };
+
+const sortPlayersByPoints = (playerIds) => {
+    return playerIds.sort((a, b) => {
+      const pointsA = playerStats2023[a]?.pts_ppr !== undefined ? playerStats2023[a]?.pts_ppr : 0;
+      const pointsB = playerStats2023[b]?.pts_ppr !== undefined ? playerStats2023[b]?.pts_ppr : 0;
+      return pointsB - pointsA; 
+    });
+  };
+
+  const displayPlayerRow = (playerId, isStarter, index, totalStarters) => {
+    const playerDetails = allPlayersInfo[playerId] || {};
+    const playerStats = playerStats2023[playerId] || {};
+    const rank = positionRanks[playerId] || 'Unknown';
+    
+    let position = playerDetails.position;
+    let playerName = playerDetails.full_name;
+    const teamNameMapping = {
+        MIN: "Minnesota Vikings",
+        LV: "Las Vegas Raiders",
+        KC: "Kansas City Chiefs",
+        DEN: "Denver Broncos",
+        CIN: "Cincinatti Bengals",
+        CHI: "Chicago Bears",
+        TEN: "Tennessee Titans",
+        NYG: "New York Giants",
+        NYJ: "New York Jets",
+        SF: "San Francisco 49ers",
+        PHI: "Philadelphia Eagles",
+        BUF: "Buffalo Bills",
+        DET: "Detroit Lions",
+        MIA: "Miami Dolphins",
+        GB: "Green Bay Packers",
+        NO: "New Orleans",
+        LAR: "Las Angeles Rams",
+        JAX: "Jaxonville",
+        CAR: "Caroline Panthers",
+        ATL: "Atlanta Falcons",
+        CLE: "Cleveland Browns",
+        TB: "Tampa Bay Buccanears",
+        LAC: "Los Angeles Chargers",
+        WAS: "Washington Redskins",
+        DAL: "Dallas Cowboys",
+        ARI: "Arizone Cardinals",
+        SEA: "Seattle Seahawks",
+        IND: "Indianapolis Colds",
+        PIT: "Pittsburg Steelers",
+        BAL: "Baltimore Ravens",
+        NE: "New England Patriots",
+        HOU: "Houston Texans",
+      };
+    if (teamNameMapping[playerId]) {
+      position = 'DEF';
+      playerName = teamNameMapping[playerId];
+    } else if (!playerDetails.full_name && playerId === 'DEF') {
+      playerName = 'Defense';
+    }
+    const points = playerStats.pts_ppr ? Math.round(playerStats.pts_ppr) : '0';
+    const experience = playerDetails.years_exp ? playerDetails.years_exp : 'N/A';
+  
+
+  
+    // Apply FLEX logic only if it's a starter
+    if (isStarter) {
+      if (position === 'QB' && index === totalStarters - 1) {
+        position = 'SF'; 
+      } else if (['WR', 'RB', 'TE'].includes(position) && index >= totalStarters - 3) {
+        position = 'FLEX';
+      }
+    }
+    
+  
+    return (
+      <tr key={playerId}>
+        <td>{playerName}</td>
+        <td>{position}</td>
+        <td>{points}</td>
+        <td>{rank}</td> {}
+        <td>{experience}</td> 
+      </tr>
+    );
+  };
 
   return (
     <div className="page-container">
@@ -187,24 +306,26 @@ function Rosters() {
           <button className="back-button" onClick={() => navigate(-1)}>Back</button>
           <div className="owner-control">
             <label className="change-owner-label">Change Owner:</label>
-            <select className="owner-dropdown" value={selectedOwner} onChange={handleOwnerChange}>
+            <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
               {owners.map(owner => (
                 <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
               ))}
             </select>
             <button onClick={handleEnterButtonClick}>Enter</button>
           </div>
-        <button className="home-button">{() => navigate(StartPage)}Home</button>
+          <button className="home-button" onClick={() => navigate(StartPage)}>Home</button>
         </div>
         <h1 className="title">League Rosters</h1>
-        </div>
-        {ownerRoster ? (
-          <div className="TableWrapper">
-            <h3>{selectedOwner}'s Roster in {leagueId}</h3>
+        <h2 className="league-title">{leagueName}</h2>
+      </div>
+      {ownerRoster ? (
+        <>
+          <div className="roster-section">
+            <h2>Starters</h2>
             <table className="Table">
                 <thead>
                     <tr>
-                    <th>Player ID</th>
+                    <th>Player</th>
                     <th>Position</th>
                     <th>Points</th>
                     <th>Rank</th>
@@ -212,26 +333,77 @@ function Rosters() {
                     </tr>
                 </thead>
                 <tbody>
-                    {ownerRoster && ownerRoster.players && ownerRoster.players.map(playerId => {
-                    const playerDetails = allPlayersInfo[playerId];
-                    const playerStats = playerStats2023[playerId];
-                    return (
-                        <tr key={playerId}>
-                        <td>{playerId}</td>
-                        <td>{playerDetails?.position || 'Unknown'}</td>
-                        <td>{playerStats?.pts_ppr || 'Unknown'}</td>
-                        <td>{playerStats?.rank_ppr || 'Unknown'}</td>
-                        <td>{playerDetails?.years_exp || 'Unknown'}</td>
-                        </tr>
-                    );
-                    })}
+                {displayStarters(ownerRoster)}
                 </tbody>
             </table>
-        </div>
-      ) : <div>Select an owner to view their roster.</div>}
+          </div>
+  
+          <div className="roster-section">
+            <h2>Bench</h2>
+            <table className="Table">
+                <thead>
+                    <tr>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>Points</th>
+                    <th>Rank</th>
+                    <th>Exp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {displayBench(ownerRoster)}
+                </tbody>
+            </table>
+          </div>
+        
+
+          {ownerRoster.reserve && ownerRoster.reserve.length > 0 && (
+          <div className="roster-section">
+            <h2>IR</h2>
+            <table className="Table">
+                <thead>
+                    <tr>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>Points</th>
+                    <th>Rank</th>
+                    <th>Exp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {displayIR(ownerRoster)}
+                </tbody>
+            </table>
+          </div>
+          )}
+  
+          {ownerRoster.taxi && ownerRoster.taxi.length > 0 && (
+            <div className="roster-section">
+              <h2>Taxi</h2>
+              <table className="Table">
+                <thead>
+                    <tr>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>Points</th>
+                    <th>Rank</th>
+                    <th>Exp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {displayTaxi(ownerRoster)}
+                </tbody>
+            </table>
+            </div>
+          )}
+        </>
+      ) : (
+        <div>Select an owner to view their roster.</div>
+      )}
     </div>
   );
   
-}
+      }
+
 
 export default Rosters;

@@ -14,12 +14,13 @@ function StartPage({ setUser }) {
     fetchUser(username).then((userId) => {
       if (userId) {
         setUser({ username, userId });
-        navigate('/user-leagues', { state: { userId } }); // Pass userId in state
+        navigate('/user-leagues', { state: { userId, username } }); // Pass both userId and username in state
       } else {
         alert('No user found with that username.');
       }
     });
   };
+  
 
   return (
     <div className="start-page">

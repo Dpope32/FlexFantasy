@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, useSortBy, useFilters } from 'react-table';
-import { format } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './UserLeagues.css';
 import leaguesImage from './leagues.jpeg';
@@ -8,13 +7,15 @@ import leaguesImage from './leagues.jpeg';
 function UserLeagues() {
   const [leagues, setLeagues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Initialize the user state here
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const goToRostersPage = (leagueId) => {
-    navigate(`/rosters/${leagueId}`);
+  const goToRostersPage = (leagueId, leagueName) => {
+    navigate(`/rosters/${leagueId}`, { state: { leagueName, username: user?.username } });
   };
-
+  
+  
   const BackButton = () => {
     navigate(-1); 
   };
@@ -38,8 +39,10 @@ function UserLeagues() {
 
   useEffect(() => {
     const year = '2023';
-    const userId = location.state && location.state.userId;
-  
+    // This extraction needs to happen inside useEffect or another function where location.state is accessed.
+    const { userId, user } = location.state || {};
+    setUser(user); // Now setUser is defined and can be used.
+
     if (userId) {
       console.log('Fetching data for user ID:', userId);
   
@@ -100,7 +103,7 @@ function UserLeagues() {
         id: 'rosters',
         accessor: (row) => row.name, 
         Cell: ({ row }) => (
-          <button onClick={() => goToRostersPage(row.original.leagueId)}>Rosters</button>
+          <button onClick={() => goToRostersPage(row.original.leagueId, row.original.name)}>Rosters</button>
         ),
       },
     ],
