@@ -1,5 +1,3 @@
-
-
 .owner-dropdown {
   margin-bottom: 20px;
   padding: 10px;
@@ -10,24 +8,25 @@
 
 .page-container {
   width: 100%;
-  max-width: 1200px; /* or any other max-width or width you prefer */
-  margin: 0 auto; /* this will center your container */
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: adds a shadow for some depth */
-  background-color: #335e74; /* or any other color you prefer */
+  min-height: 100vh;
+  max-width: 1600px; 
+  padding: 100px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+  background-color: #212f35; 
+  margin-bottom: 400px;
+  padding-bottom: 300px; 
 }
 
 .controls-container {
   background-color: #28373d;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 70px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #fff;
 }
-
 
 .owner-dropdown {
   padding: 10px;
@@ -40,19 +39,22 @@
 }
 
 .back-button {
-  background-color: #f44336; /* Red color for the button */
+  background-color: #f44336; 
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  margin-left: 20px;
 }
 
 .change-owner-label {
-  margin-right: 10px;
+  margin-right: 5px;
   font-weight: bold;
   color: #fff; /* White color for the text */
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .owner-control {
@@ -67,7 +69,7 @@
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  margin-right: 10px;
+  margin-right: 20px;
   cursor: pointer;
   font-size: 16px;
 }
@@ -75,10 +77,53 @@
 .league-title {
   text-align: center;
   color: #ffffff;
-  background-color: #007bff;
+  background-color: #415e7d;
   padding: 10px;
   border-radius: 5px;
-  margin: 20px 0;
+  margin: 20px 500px;
   font-size: 1.5em;
   font-weight: bold;
+  margin: 20px auto; 
+  max-width: fit-content;
+}
+
+.roster-section {
+  padding: 0 50px;
+}
+
+.league-title-button {
+  background-color: transparent;
+  color: #dcfdff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  padding-right: 30px;
+}
+
+/* This will ensure that headers adjust their size based on the width of the viewport */
+.starters, .bench, .ir, .taxi {
+  font-size: 1.5vw; /* Adjust the font size as needed */
+  border-radius: 5px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: transparent;
+  text-align: left; /* Align text to the left */
+  margin-left: 100px; 
+  width: 12%;
+
+}
+
+.winner-username {
+  text-align: center;
+  color: #9baaf5;
+  padding: 40px;
+  border-radius: 5px;
+  margin: 20px 500px;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 20px auto; 
+  max-width: fit-content;
 }

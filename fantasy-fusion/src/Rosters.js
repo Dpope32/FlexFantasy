@@ -17,7 +17,7 @@ function Rosters() {
   const navigate = useNavigate();
   const leagueName = location.state?.leagueName || 'League';
   const [positionRanks, setPositionRanks] = useState({});
-
+  const [winnerUsername, setWinnerUsername] = useState("Unknown");
 
   useEffect(() => {
     // Fetch all players info
@@ -73,7 +73,13 @@ function Rosters() {
             return res.json();
           })
       );
-  
+      const winnerRosterId = leagueRostersData.metadata?.latest_league_winner_roster_id;
+    let winnerUsername = "Unknown";
+    if (winnerRosterId) {
+      const winnerRoster = leagueRostersData.find(roster => roster.roster_id === winnerRosterId);
+      winnerUsername = winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown";
+    }
+    setWinnerUsername(winnerUsername); 
       const users = await Promise.all(usernamePromises);
       const userMap = users.reduce((acc, user) => {
         acc[user.user_id] = user.username;
@@ -87,7 +93,6 @@ function Rosters() {
   
       setOwners(updatedOwners);
 
-        // Use the initialUsername to find the owner and set them as selected
     const initialOwner = updatedOwners.find(o => o.username === initialUsername);
     setTempSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
     setSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
@@ -100,11 +105,11 @@ function Rosters() {
       setIsLoading(false);
     }
   }
-  
+    //setWinnerUsername(winnerUsername);
+
   const calculatePositionRanks = (playerStats) => {
     const positionScores = {};
-    
-    // Accumulate points for each position
+
     Object.entries(playerStats).forEach(([playerId, stats]) => {
       const position = allPlayersInfo[playerId]?.position || 'DEF';
       if (!positionScores[position]) {
@@ -112,16 +117,18 @@ function Rosters() {
       }
       positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
     });
-    
-    // Sort each position by points in descending order and calculate ranks
+
     const positionRanks = {};
     Object.keys(positionScores).forEach(position => {
+      console.log(`Calculating ranks for position: ${position}`); 
       positionScores[position].sort((a, b) => b.points - a.points)
         .forEach((entry, index) => {
-          positionRanks[entry.playerId] = index + 1; // Rank starts at 1
+          console.log(`Player ID: ${entry.playerId}, Points: ${entry.points}, Rank: ${index + 1}`); 
+          positionRanks[entry.playerId] = index + 1; 
         });
     });
   
+    console.log('Calculated Position Ranks:', positionRanks); 
     return positionRanks;
   };
   
@@ -301,9 +308,16 @@ const sortPlayersByPoints = (playerIds) => {
 
   return (
     <div className="page-container">
+      <h1 className="title">League Rosters</h1>
       <div className="Rosters">
-        <div className="controls-container">
-          <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+      <div className="controls-container">
+        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+        <div className="league-title-container">
+            <button className="league-title-button" onClick={() => { /* Handler for league title click */ }}>
+            {leagueName}
+            </button>
+            <span className="winner-username">2023 Champ: {winnerUsername}</span>
+        </div>
           <div className="owner-control">
             <label className="change-owner-label">Change Owner:</label>
             <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
@@ -313,15 +327,13 @@ const sortPlayersByPoints = (playerIds) => {
             </select>
             <button onClick={handleEnterButtonClick}>Enter</button>
           </div>
-          <button className="home-button" onClick={() => navigate(StartPage)}>Home</button>
+          <button className="home-button" onClick={() => navigate('/')}>Home</button>
         </div>
-        <h1 className="title">League Rosters</h1>
-        <h2 className="league-title">{leagueName}</h2>
       </div>
       {ownerRoster ? (
         <>
           <div className="roster-section">
-            <h2>Starters</h2>
+          <h1 className="starters">Starters</h1>
             <table className="Table">
                 <thead>
                     <tr>
@@ -339,7 +351,7 @@ const sortPlayersByPoints = (playerIds) => {
           </div>
   
           <div className="roster-section">
-            <h2>Bench</h2>
+          <h1 className="bench">Bench</h1>
             <table className="Table">
                 <thead>
                     <tr>
@@ -359,7 +371,7 @@ const sortPlayersByPoints = (playerIds) => {
 
           {ownerRoster.reserve && ownerRoster.reserve.length > 0 && (
           <div className="roster-section">
-            <h2>IR</h2>
+            <h1 className="ir">IR</h1>
             <table className="Table">
                 <thead>
                     <tr>
@@ -379,7 +391,7 @@ const sortPlayersByPoints = (playerIds) => {
   
           {ownerRoster.taxi && ownerRoster.taxi.length > 0 && (
             <div className="roster-section">
-              <h2>Taxi</h2>
+              <h1 className="taxi">Taxi</h1>
               <table className="Table">
                 <thead>
                     <tr>
