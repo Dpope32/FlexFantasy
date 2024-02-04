@@ -1,11 +1,18 @@
 .start-page {
-    text-align: center;
-    padding: 200px;
-    background-color: #282c34;
-    min-height: 100vh;
-    color: white;
-    font-family: 'Arial', sans-serif;
-  }
+  text-align: center;
+  padding: 0px;
+  background-color: #282c34;
+  min-height: 100vh;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  background-image: url('flex-fantasy.jpg'); /* Adjust the path as necessary */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-weight: bold;
+  font-size: 24px;
+}
+
   
   .title {
     font-size: 4rem;
@@ -42,4 +49,22 @@
   .submit-button:hover {
     background-color: #21a1f1;
   }
+
+  .flex-fantasy-image {
+    max-width: 100%;
+    height: auto; /* Adjust as necessary */
+    opacity: 0.0; /* Adjust as necessary for visibility */
+    display: block;
+    margin: 0 auto;
+  }
+
+  .table-container {
+    text-align: left; /* Aligns the inner table to the left */
+  }
+  
+  .Table {
+    margin-left: 0; /* Aligns the table to the left within its container */
+    margin-right: auto; 
+  }
+  
   

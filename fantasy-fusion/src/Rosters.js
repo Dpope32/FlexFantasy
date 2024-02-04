@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
 import StartPage from './StartPage';
+import qbIcon from './qb.png'; 
+import rbIcon from './rb.png'; 
+import wrIcon from './wr.png'; 
+import teIcon from './te.png'; 
+import defIcon from './def.png'; 
+import flexIcon from './flex.png';
+import kIcon from './k.png';
+
+
 
 function Rosters() {
   const { leagueId } = useParams();
@@ -79,6 +88,7 @@ function Rosters() {
       const winnerRoster = leagueRostersData.find(roster => roster.roster_id === winnerRosterId);
       winnerUsername = winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown";
     }
+
     setWinnerUsername(winnerUsername); 
       const users = await Promise.all(usernamePromises);
       const userMap = users.reduce((acc, user) => {
@@ -225,6 +235,17 @@ function Rosters() {
     return taxiPlayerIds.map(playerId => displayPlayerRow(playerId, 0, 0));
   };
 
+    const positionToIconMap = {
+        QB: qbIcon,
+        RB: rbIcon,
+    WR: wrIcon,
+    TE: teIcon,
+    FLEX: flexIcon, 
+    SF: flexIcon, 
+    DEF: defIcon,
+    K: kIcon,
+};
+
 const sortPlayersByPoints = (playerIds) => {
     return playerIds.sort((a, b) => {
       const pointsA = playerStats2023[a]?.pts_ppr !== undefined ? playerStats2023[a]?.pts_ppr : 0;
@@ -236,8 +257,7 @@ const sortPlayersByPoints = (playerIds) => {
   const displayPlayerRow = (playerId, isStarter, index, totalStarters) => {
     const playerDetails = allPlayersInfo[playerId] || {};
     const playerStats = playerStats2023[playerId] || {};
-    const rank = positionRanks[playerId] || 'Unknown';
-    
+    const rank = positionRanks[playerId] || 'Unknown'; 
     let position = playerDetails.position;
     let playerName = playerDetails.full_name;
     const teamNameMapping = {
@@ -282,6 +302,7 @@ const sortPlayersByPoints = (playerIds) => {
     }
     const points = playerStats.pts_ppr ? Math.round(playerStats.pts_ppr) : '0';
     const experience = playerDetails.years_exp ? playerDetails.years_exp : 'N/A';
+    const positionIcon = positionToIconMap[position] || flexIcon;
   
 
   
@@ -295,27 +316,28 @@ const sortPlayersByPoints = (playerIds) => {
     }
     
   
-    return (
-      <tr key={playerId}>
-        <td>{playerName}</td>
-        <td>{position}</td>
-        <td>{points}</td>
-        <td>{rank}</td> {}
-        <td>{experience}</td> 
-      </tr>
-    );
-  };
-
   return (
+    <tr key={playerId}>
+      <td>
+      <img src={positionIcon} alt={playerDetails.position} className="icon" />
+        {' '}{playerName}
+      </td>
+      <td>{points}</td>
+      <td>{rank}</td>
+      <td>{experience}</td>
+    </tr>
+  );
+};
+
+return (
     <div className="page-container">
-      <h1 className="title">League Rosters</h1>
+      <button className="title" onClick={() => { /* Handler for league title click */ }}>
+        {leagueName}
+      </button>
       <div className="Rosters">
-      <div className="controls-container">
-        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+        <div className="controls-container">
+      <button className="home-button" onClick={() => navigate('/')}>Home</button>
         <div className="league-title-container">
-            <button className="league-title-button" onClick={() => { /* Handler for league title click */ }}>
-            {leagueName}
-            </button>
             <span className="winner-username">2023 Champ: {winnerUsername}</span>
         </div>
           <div className="owner-control">
@@ -327,7 +349,7 @@ const sortPlayersByPoints = (playerIds) => {
             </select>
             <button onClick={handleEnterButtonClick}>Enter</button>
           </div>
-          <button className="home-button" onClick={() => navigate('/')}>Home</button>
+          <button className="back-button" onClick={() => navigate(-1)}>Back</button>
         </div>
       </div>
       {ownerRoster ? (
@@ -338,10 +360,14 @@ const sortPlayersByPoints = (playerIds) => {
                 <thead>
                     <tr>
                     <th>Player</th>
-                    <th>Position</th>
-                    <th>Points</th>
-                    <th>Rank</th>
-                    <th>Exp</th>
+                  <th>Points</th>
+                  <th>Rank</th>
+                  <th>Exp</th>
+                  <th>Yards</th>
+                  <th>TDs</th>
+                  <th>PPG</th>
+                  <th>KTC</th>
+                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -356,10 +382,14 @@ const sortPlayersByPoints = (playerIds) => {
                 <thead>
                     <tr>
                     <th>Player</th>
-                    <th>Position</th>
-                    <th>Points</th>
-                    <th>Rank</th>
-                    <th>Exp</th>
+                  <th>Points</th>
+                  <th>Rank</th>
+                  <th>Exp</th>
+                  <th>Yards</th>
+                  <th>TDs</th>
+                  <th>PPG</th>
+                  <th>KTC</th>
+                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -376,10 +406,14 @@ const sortPlayersByPoints = (playerIds) => {
                 <thead>
                     <tr>
                     <th>Player</th>
-                    <th>Position</th>
-                    <th>Points</th>
-                    <th>Rank</th>
-                    <th>Exp</th>
+                  <th>Points</th>
+                  <th>Rank</th>
+                  <th>Exp</th>
+                  <th>Yards</th>
+                  <th>TDs</th>
+                  <th>PPG</th>
+                  <th>KTC</th>
+                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -396,10 +430,14 @@ const sortPlayersByPoints = (playerIds) => {
                 <thead>
                     <tr>
                     <th>Player</th>
-                    <th>Position</th>
-                    <th>Points</th>
-                    <th>Rank</th>
-                    <th>Exp</th>
+                  <th>Points</th>
+                  <th>Rank</th>
+                  <th>Exp</th>
+                  <th>Yards</th>
+                  <th>TDs</th>
+                  <th>PPG</th>
+                  <th>KTC</th>
+                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>

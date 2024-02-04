@@ -49,12 +49,13 @@
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1); 
     width: 100%; 
     margin: auto; 
+    border-radius: 2.5rem;
   }
   
   .Table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #92e5f8; 
+    background-color: #90dced; 
     background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); /* Barely visible gradient */
     table-layout: auto;
     margin: 0 auto; 
@@ -94,6 +95,7 @@
   button {
     background-color: #3a7893; 
     color: white;
+    text-align: left;
     padding: 10px 20px;
     border: none;
     border-radius: 8px; 
@@ -107,10 +109,7 @@
     background-color: #367c39; 
   }
   
-.Table .td {
-    width: 1%;
-  white-space: nowrap;
-}
+
 
 
 .LeaguesImage {

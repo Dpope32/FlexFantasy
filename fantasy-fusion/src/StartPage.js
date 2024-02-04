@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './StartPage.css'; // This will be your custom CSS file for styles
 import { useNavigate } from 'react-router-dom';
+import flexFantasyImage from './flex-fantasy.jpg'; // Make sure the path is correct
+
 
 function StartPage({ setUser }) {
   const [username, setUsername] = useState('');
@@ -24,10 +26,14 @@ function StartPage({ setUser }) {
 
   return (
     <div className="start-page">
-      <h1 className="title">FlexFantasy</h1>
+      <img src={flexFantasyImage} alt="Flex Fantasy" className="flex-fantasy-image" />
+      <div className="table-container">
+        <table className="Table">
+        </table>
+      </div>
       <form onSubmit={handleSubmit} className="username-form">
         <label htmlFor="username" className="username-label">
-          Enter Sleeper Username:
+          Sleeper Username:
         </label>
         <input
           id="username"

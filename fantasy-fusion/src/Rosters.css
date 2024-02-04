@@ -9,12 +9,65 @@
 .page-container {
   width: 100%;
   min-height: 100vh;
-  max-width: 1600px; 
-  padding: 100px;
+  max-width: 2000px;
+  padding: 0px; 
   box-shadow: 0 0 10px rgba(0,0,0,0.1); 
   background-color: #212f35; 
-  margin-bottom: 400px;
   padding-bottom: 300px; 
+}
+
+.Table {
+  margin-left: 0;
+  margin-right: auto;
+  width: auto;
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-size: 1.4em;
+  border: 1px solid #dee2e6;
+  border-radius: 1rem;
+  border-spacing: 0;
+  overflow-x: auto; 
+  box-shadow: 0px 0px 100px rgb(105, 200, 255);
+  padding: 8px;
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  line-height: 1.5;
+  table-layout: fixed;
+  empty-cells: show;
+  background-image: url('logo.svg');
+  opacity: 1.1;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+}
+
+.Table td {
+  font-size:24px;
+}
+
+.Table th {
+  color: rgb(121, 210, 237);
+  line-height: 1.75;
+}
+.Table tr:nth-child(even) {
+  background-color: #d6d6d6;
+  color: rgb(0, 0, 0);
+}
+
+.Table tr:hover {
+  background-color: #aaede6f7; /* Subtle hover effect */
+}
+
+@media (max-width: 768px) {
+  .table th, .table td {
+    padding: 10px; /* Slightly less padding on smaller screens */
+    font-size: 1em; /* Smaller font size on smaller screens */
+  }
+}
+.icon {
+  width: 2em;
+  height: 2em;
+  vertical-align: middle;
 }
 
 .controls-container {
@@ -46,7 +99,7 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .change-owner-label {
@@ -69,7 +122,7 @@
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  margin-right: 20px;
+  margin-left: 20px;
   cursor: pointer;
   font-size: 16px;
 }
@@ -91,27 +144,27 @@
   padding: 0 50px;
 }
 
-.league-title-button {
+.title {
   background-color: transparent;
   color: #dcfdff;
   border: none;
   padding: 10px;
   border-radius: 5px;
-  font-size: 1.5em;
+  font-size: 64px;
   font-weight: bold;
   cursor: pointer;
   padding-right: 30px;
+  margin-bottom: 25px;
 }
 
 /* This will ensure that headers adjust their size based on the width of the viewport */
 .starters, .bench, .ir, .taxi {
-  font-size: 1.5vw; /* Adjust the font size as needed */
+  font-size: 3.0; /* Adjust the font size as needed */
   border-radius: 5px;
   font-weight: bold;
   color: #ffffff;
   background-color: transparent;
   text-align: left; /* Align text to the left */
-  margin-left: 100px; 
   width: 12%;
 
 }
@@ -126,4 +179,15 @@
   font-weight: bold;
   margin: 20px auto; 
   max-width: fit-content;
+}
+
+
+@media (max-width: 768px) {
+  .table {
+    font-size: 14px; /* Smaller font size on smaller screens */
+  }
+  .controls-container,
+  .roster-section {
+    padding: 10px; /* Less padding on smaller screens */
+  }
 }
