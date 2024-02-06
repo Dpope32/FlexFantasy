@@ -66,5 +66,36 @@
     margin-left: 0; /* Aligns the table to the left within its container */
     margin-right: auto; 
   }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .loading-text {
+    font-size: 2em;
+    font-weight: bold;
+    color: #29d;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    animation: pulse 1s infinite ease-in-out;
+  }
   
   

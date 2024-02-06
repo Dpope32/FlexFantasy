@@ -15,8 +15,8 @@ function StartPage({ setUser }) {
     e.preventDefault();
     fetchUser(username).then((userId) => {
       if (userId) {
-        setUser({ username, userId });
-        navigate('/user-leagues', { state: { userId, username } }); // Pass both userId and username in state
+        // Pass the username as part of the navigate state
+        navigate('/user-leagues', { state: { userId, username } }); // No need to call setUser here
       } else {
         alert('No user found with that username.');
       }

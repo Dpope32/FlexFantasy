@@ -7,12 +7,12 @@ import leaguesImage from './leagues.jpeg';
 function UserLeagues() {
   const [leagues, setLeagues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  // Initialize the user state here
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  // Define `userId` and `username` after `location` is defined
+  const { userId, username } = location.state || {};
   const goToRostersPage = (leagueId, leagueName) => {
-    navigate(`/rosters/${leagueId}`, { state: { leagueName, username: user?.username } });
+    navigate(`/rosters/${leagueId}`, { state: { leagueName, username } });
   };
   
   
@@ -41,7 +41,6 @@ function UserLeagues() {
     const year = '2023';
     // This extraction needs to happen inside useEffect or another function where location.state is accessed.
     const { userId, user } = location.state || {};
-    setUser(user); // Now setUser is defined and can be used.
 
     if (userId) {
       console.log('Fetching data for user ID:', userId);
@@ -65,12 +64,12 @@ function UserLeagues() {
           console.error('Error fetching leagues:', error);
           setIsLoading(false);
         });
-    } else {
-      console.log('User ID not available');
-      setIsLoading(false);
-    }
-  }, [location.state]);
-
+      } else {
+        console.log('User ID not available');
+        setIsLoading(false);
+      }
+    }, [userId]); 
+    
   const data = useMemo(() => leagues, [leagues]);
   const columns = useMemo(
     () => [
@@ -119,7 +118,9 @@ function UserLeagues() {
   } = useTable({ columns, data }, useFilters, useSortBy);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loading-container">
+    <div className="loading-text">Loading...</div>
+  </div>;
   }
 
   return (

@@ -6,14 +6,32 @@
   border: 1px solid #ddd;
 }
 
+
+.left-panel {
+  height: auto;
+  width: 250px; /* Adjust the width as necessary */
+  flex-shrink: 0; /* Prevent the sidebar from shrinking */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* Rest of your styles */
+}
+.left-panel-header {
+  color: rgb(59, 209, 255);
+  font-size: 2.2em;
+  font-family: 'Segoe UI'
+}
+
 .page-container {
-  width: 100%;
+  margin-left: 0px; /* Adjust this value to match the new width of the .left-panel *//* This will take the remaining space */
   min-height: 100vh;
+  padding-right: 0; /* Ensure no padding to the right */
+  flex-grow: 1;
+  width: 100%;
   max-width: 2000px;
-  padding: 0px; 
   box-shadow: 0 0 10px rgba(0,0,0,0.1); 
   background-color: #212f35; 
-  padding-bottom: 300px; 
 }
 
 .Table {
@@ -39,6 +57,7 @@
   transition: all 0.3s ease;
   white-space: nowrap;
   scroll-behavior: smooth;
+  display: table;
 }
 
 .Table td {
@@ -71,9 +90,10 @@
 }
 
 .controls-container {
+  width: 100%; 
   background-color: #28373d;
-  padding: 10px;
-  margin-bottom: 70px;
+  margin-bottom: 40px;
+  margin-top: 40px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
@@ -130,11 +150,12 @@
 .league-title {
   text-align: center;
   color: #ffffff;
-  background-color: #415e7d;
-  padding: 10px;
+  padding: 100px; /* Adjust padding as necessary */
   border-radius: 5px;
-  margin: 20px 500px;
-  font-size: 1.5em;
+  background: none; /* No background */
+  border: none; /* No border */
+  box-shadow: none; /* Remove box shadow */
+  font-size: 1.2em;
   font-weight: bold;
   margin: 20px auto; 
   max-width: fit-content;
@@ -144,18 +165,21 @@
   padding: 0 50px;
 }
 
-.title {
-  background-color: transparent;
-  color: #dcfdff;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 64px;
+.title-roster {
+  font-size: 5rem;
   font-weight: bold;
-  cursor: pointer;
-  padding-right: 30px;
-  margin-bottom: 25px;
+  font-style: italic;
+  color: #61dafb;
+  text-shadow: 2px 2px 4px #000000;
+  padding: 50px; /* Add padding */
+  background: none; /* No background */
+  border: none; /* No border */
+  box-shadow: none; /* Remove box shadow */
+  text-transform: uppercase;
+  margin-top: 50px;
+  margin-bottom: 500px;
 }
+
 
 /* This will ensure that headers adjust their size based on the width of the viewport */
 .starters, .bench, .ir, .taxi {
@@ -164,9 +188,8 @@
   font-weight: bold;
   color: #ffffff;
   background-color: transparent;
-  text-align: left; /* Align text to the left */
   width: 12%;
-
+  text-align: center;
 }
 
 .winner-username {
@@ -191,3 +214,72 @@
     padding: 10px; /* Less padding on smaller screens */
   }
 }
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-text {
+  font-size: 2em;
+  font-weight: bold;
+  color: #29d;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.winner-info {
+  display: inline-block;
+  text-align: center;
+}
+
+.year {
+  color: #9baaf5;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.champ {
+  color: #9baaf5;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.winner-username {
+  color: #FF5733; /* Change this to the desired color for the winner's username */
+  font-weight: bold;
+  font-size: 1.8em; /* Increase the font size for prominence */
+  text-transform: uppercase; /* Convert text to uppercase for all caps */
+  animation: pulse 2s infinite; /* Add a pulsing animation */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+

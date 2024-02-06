@@ -22,7 +22,10 @@ function Rosters() {
   const [isLoading, setIsLoading] = useState(true);
   const [tempSelectedOwner, setTempSelectedOwner] = useState('');
   const location = useLocation();
-  const initialUsername = location.state?.username;
+  const initialUsername = location.state?.username.toLowerCase(); // Normalize to lowercase
+  console.log('initialUsername;:', initialUsername); 
+  
+
   const navigate = useNavigate();
   const leagueName = location.state?.leagueName || 'League';
   const [positionRanks, setPositionRanks] = useState({});
@@ -59,63 +62,75 @@ function Rosters() {
   }, [leagueId]);
 
   async function fetchData() {
+  
     if (!leagueId) {
       console.error("League ID is undefined");
       return;
     }
-  
     setIsLoading(true);
     try {
-      const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
+      // Fetch league rosters
+     const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
       if (!resLeagueRosters.ok) throw new Error('Roster data fetch failed');
       const leagueRostersData = await resLeagueRosters.json();
-  
+      setRosters(leagueRostersData); // Add this line to update the rosters state
       const ownerIds = leagueRostersData.map(roster => roster.owner_id);
       const uniqueOwnerIds = Array.from(new Set(ownerIds)); // Remove duplicates
   
-      const usernamePromises = uniqueOwnerIds.map(owner_id => 
+      // Fetch league details to get the winner
+      const resLeagueDetails = await fetch(`http://localhost:5000/league/${leagueId}`);
+      if (!resLeagueDetails.ok) throw new Error('League details fetch failed');
+      const leagueDetailsData = await resLeagueDetails.json();
+    
+      // Process owner IDs to fetch usernames
+      console.log('Unique owner IDs:', ownerIds);
+     
+    
+      // Fetch usernames for owner IDs
+      const users = await Promise.all(uniqueOwnerIds.map(owner_id =>
         fetch(`https://api.sleeper.app/v1/user/${owner_id}`)
           .then(res => {
-            if (!res.ok) {
-              throw new Error(`Failed to fetch username for owner_id ${owner_id}`);
-            }
+            if (!res.ok) throw new Error(`Failed to fetch username for owner_id ${owner_id}`);
             return res.json();
           })
-      );
-      const winnerRosterId = leagueRostersData.metadata?.latest_league_winner_roster_id;
-    let winnerUsername = "Unknown";
-    if (winnerRosterId) {
-      const winnerRoster = leagueRostersData.find(roster => roster.roster_id === winnerRosterId);
-      winnerUsername = winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown";
-    }
-
-    setWinnerUsername(winnerUsername); 
-      const users = await Promise.all(usernamePromises);
+      ));
+  
+      // Map user IDs to usernames
       const userMap = users.reduce((acc, user) => {
-        acc[user.user_id] = user.username;
+        // Normalize usernames to lowercase
+        const normalizedUsername = (user.display_name || user.username).toLowerCase();
+        acc[user.user_id] = normalizedUsername;
         return acc;
       }, {});
+    
+      // Find the winner's username
+      const winnerRosterId = leagueDetailsData.metadata?.latest_league_winner_roster_id;
+      if (winnerRosterId) {
+        const winnerRoster = leagueRostersData.find(roster => roster.roster_id.toString() === winnerRosterId.toString());
+        setWinnerUsername(winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown");
+      }
   
+      // Set the owners state with usernames, normalized to lowercase
       const updatedOwners = leagueRostersData.map(roster => ({
         owner_id: roster.owner_id,
         username: userMap[roster.owner_id] || 'Unknown'
       }));
-  
-      setOwners(updatedOwners);
 
-    const initialOwner = updatedOwners.find(o => o.username === initialUsername);
-    setTempSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
-    setSelectedOwner(initialOwner?.username || updatedOwners[0]?.username);
-      setTempSelectedOwner(updatedOwners[0]?.username || '');
-      setSelectedOwner(updatedOwners[0]?.username || '');
-      setRosters(leagueRostersData);
+      // Find the initial owner
+      const initialOwner = updatedOwners.find(owner => owner.username === initialUsername);
+      setSelectedOwner(initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
+      console.log('Selected owner set to:', initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
+
+      setOwners(updatedOwners); 
+      console.log('Updated owners set:', updatedOwners);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
   }
-    //setWinnerUsername(winnerUsername);
+  
 
   const calculatePositionRanks = (playerStats) => {
     const positionScores = {};
@@ -130,20 +145,17 @@ function Rosters() {
 
     const positionRanks = {};
     Object.keys(positionScores).forEach(position => {
-      console.log(`Calculating ranks for position: ${position}`); 
       positionScores[position].sort((a, b) => b.points - a.points)
         .forEach((entry, index) => {
-          console.log(`Player ID: ${entry.playerId}, Points: ${entry.points}, Rank: ${index + 1}`); 
           positionRanks[entry.playerId] = index + 1; 
         });
     });
   
-    console.log('Calculated Position Ranks:', positionRanks); 
     return positionRanks;
   };
   
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
-    const positionOrder = ['QB', 'RB', 'WR', 'TE', 'FLEX', 'RB', 'RB', 'K', 'DEF'];
+    const positionOrder = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX'];
     const sortedStarters = [];
     const positionCounters = rosterPositions.reduce((acc, position) => {
       if (position !== 'BN') {
@@ -183,30 +195,44 @@ function Rosters() {
     });
   };
   
-    const findBenchPlayers = (roster) => {
+  const findBenchPlayers = (roster) => {
         // Assuming 'players' includes both starters and bench players
         const allPlayers = roster.players || [];
         const starters = roster.starters || [];
         // Filter out starters to get bench players
         return allPlayers.filter(playerId => !starters.includes(playerId));
   };
-
   const handleEnterButtonClick = () => {
-    setSelectedOwner(tempSelectedOwner);
+    // Find the owner object that has the username matching tempSelectedOwner
+    const ownerObject = owners.find(owner => owner.username === tempSelectedOwner);
+    if (ownerObject) {
+      setSelectedOwner(ownerObject.owner_id); // Set selectedOwner to the owner_id, not the username
+      console.log('Set selectedOwner to:', ownerObject.owner_id);
+    } else {
+      console.error('Owner not found for username:', tempSelectedOwner);
+    }
   };
   
-  const handleOwnerChange = (event) => {
-    setTempSelectedOwner(event.target.value);
-  };
+const handleOwnerChange = (event) => {
+  // This captures the username, we need to find the associated owner_id
+  setTempSelectedOwner(event.target.value.toLowerCase());
+  console.log('Temp selected owner changed to:', event.target.value.toLowerCase());
+};
 
   const ownerRoster = rosters.find(roster => {
-    const owner = owners.find(o => o.owner_id === roster.owner_id);
-    return owner?.username === selectedOwner;
+    console.log('Comparing:', roster.owner_id, selectedOwner);
+    return roster.owner_id === selectedOwner; // Remove the parentheses after owner_id and selectedOwner
   });
+
+  if (!ownerRoster) {
+    console.log('No ownerRoster found for selectedOwner:', selectedOwner); // Log when no roster is found
+  }
 
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loading-container">
+    <div className="loading-text">Loading...</div>
+  </div>
   }
 
   if (!rosters.length) {
@@ -322,31 +348,40 @@ const sortPlayersByPoints = (playerIds) => {
       <img src={positionIcon} alt={playerDetails.position} className="icon" />
         {' '}{playerName}
       </td>
-      <td>{points}</td>
       <td>{rank}</td>
+      <td>{points}</td>
       <td>{experience}</td>
     </tr>
   );
 };
 
 return (
+  <>
+    <div className="left-panel">
+      <h2 className="left-panel-header">Flex Fantasy</h2>
+      <button className="my-profile-button">My Profile</button>
+    </div>
     <div className="page-container">
-      <button className="title" onClick={() => { /* Handler for league title click */ }}>
-        {leagueName}
-      </button>
+      <span className="title-roster">
+      {leagueName}
+    </span>
       <div className="Rosters">
         <div className="controls-container">
       <button className="home-button" onClick={() => navigate('/')}>Home</button>
         <div className="league-title-container">
-            <span className="winner-username">2023 Champ: {winnerUsername}</span>
+        <span className="winner-info">
+          <span className="year">2023 </span>
+          <span className="champ">Champ:</span>
+          <span className="winner-username">{winnerUsername}</span>
+        </span>
         </div>
           <div className="owner-control">
             <label className="change-owner-label">Change Owner:</label>
             <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
-              {owners.map(owner => (
-                <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
-              ))}
-            </select>
+            {owners.map(owner => (
+              <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
+            ))}
+          </select>
             <button onClick={handleEnterButtonClick}>Enter</button>
           </div>
           <button className="back-button" onClick={() => navigate(-1)}>Back</button>
@@ -360,14 +395,14 @@ return (
                 <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
+                  <th>Points</th>
                   <th>Exp</th>
-                  <th>Yards</th>
+                  {/* <th>Yards</th>
                   <th>TDs</th>
                   <th>PPG</th>
                   <th>KTC</th>
-                  <th>Age</th>
+                  <th>Age</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -382,14 +417,14 @@ return (
                 <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
+                  <th>Points</th>
                   <th>Exp</th>
-                  <th>Yards</th>
-                  <th>TDs</th>
+                  {/* <th>Yards</th> */}
+                  {/* <th>TDs</th>
                   <th>PPG</th>
                   <th>KTC</th>
-                  <th>Age</th>
+                  <th>Age</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -406,14 +441,14 @@ return (
                 <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
+                  <th>Points</th>
                   <th>Exp</th>
-                  <th>Yards</th>
+                  {/* <th>Yards</th>
                   <th>TDs</th>
                   <th>PPG</th>
                   <th>KTC</th>
-                  <th>Age</th>
+                  <th>Age</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -430,14 +465,14 @@ return (
                 <thead>
                     <tr>
                     <th>Player</th>
+                    <th>Rank</th>
                   <th>Points</th>
-                  <th>Rank</th>
                   <th>Exp</th>
-                  <th>Yards</th>
+                  {/* <th>Yards</th>
                   <th>TDs</th>
                   <th>PPG</th>
                   <th>KTC</th>
-                  <th>Age</th>
+                  <th>Age</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -451,6 +486,7 @@ return (
         <div>Select an owner to view their roster.</div>
       )}
     </div>
+    </>
   );
   
       }
