@@ -11,18 +11,12 @@
   position: relative;
   font-weight: bold;
   font-size: 24px;
+  zoom: 75%;
 }
-
-  
-  .title {
-    font-size: 4rem;
-    font-weight: bold;
-    font-style: italic;
-    color: #61dafb;
-  }
   
   .username-form {
     margin-top: 20px;
+    margin-bottom: 500px;
   }
   
   .username-label {
@@ -52,10 +46,11 @@
 
   .flex-fantasy-image {
     max-width: 100%;
-    height: auto; /* Adjust as necessary */
+    height: 1000px; /* Adjust as necessary */
     opacity: 0.0; /* Adjust as necessary for visibility */
     display: block;
     margin: 0 auto;
+    padding-bottom: 200px;
   }
 
   .table-container {

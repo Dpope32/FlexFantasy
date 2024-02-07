@@ -6,21 +6,29 @@
   border: 1px solid #ddd;
 }
 
+.my-profile-button {
+  text-align: left;
+  padding: 10 20;
+  margin-right: 80px;
+}
 
 .left-panel {
   height: auto;
-  width: 250px; /* Adjust the width as necessary */
+  width: 300px; /* Adjust the width as necessary */
   flex-shrink: 0; /* Prevent the sidebar from shrinking */
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
+  margin-right: 5px;
   /* Rest of your styles */
 }
 .left-panel-header {
   color: rgb(59, 209, 255);
   font-size: 2.2em;
-  font-family: 'Segoe UI'
+  font-family: 'Segoe UI';
+  display: flex;
+  margin-left: 10px;
 }
 
 .page-container {
@@ -49,7 +57,7 @@
   padding: 8px;
   font-family: 'Arial', sans-serif;
   font-size: 24px;
-  line-height: 1.5;
+  line-height: 50px;
   table-layout: fixed;
   empty-cells: show;
   background-image: url('logo.svg');
@@ -58,10 +66,13 @@
   white-space: nowrap;
   scroll-behavior: smooth;
   display: table;
+  text-align: left;
 }
 
 .Table td {
   font-size:24px;
+  margin: 0px;
+  text-align: left;
 }
 
 .Table th {
@@ -84,9 +95,10 @@
   }
 }
 .icon {
-  width: 2em;
-  height: 2em;
+  width: 1.5em;
+  height: 1.5em;
   vertical-align: middle;
+  margin: 0px;
 }
 
 .controls-container {
@@ -110,6 +122,24 @@
   background-color: white;
   color: black;
 }
+
+.container {
+  display: flex;
+  height: 100vh; /* Adjust if you want a different height */
+}
+
+.username-header {
+  text-align: center;
+  color: #ffffff; /* Keep your preferred text color */
+  font-size: 2.2em;
+  margin: 0px 0;
+  font-weight: bold;
+  padding: 15px; /* Adjust padding as needed */
+  background-color: #333bd5; /* This is just an example color, choose what fits your design */
+  display: inline-block; /* This will make the background only as wide as the content */
+  border-radius: 10px; /* Optional: if you want rounded corners */
+}
+
 
 .back-button {
   background-color: #f44336; 
@@ -182,7 +212,7 @@
 
 
 /* This will ensure that headers adjust their size based on the width of the viewport */
-.starters, .bench, .ir, .taxi {
+.starters, .sharers, .bench, .ir, .taxi {
   font-size: 3.0; /* Adjust the font size as needed */
   border-radius: 5px;
   font-weight: bold;
@@ -281,5 +311,26 @@
   100% {
     transform: scale(1);
   }
+}
+
+
+.roster-container {
+  display: flex; /* This will lay out children side by side */
+  justify-content: space-between; /* This will add space between the two tables */
+}
+
+/* Additional responsive design to handle smaller screens */
+@media (max-width: 768px) {
+  .roster-container {
+    flex-direction: column; /* Stack the tables on smaller screens */
+  }
+}
+.left-roster-section {
+  width: 100%;
+}
+
+.right-roster-section {
+width: 100%;
+margin-right: 50px;
 }
 
