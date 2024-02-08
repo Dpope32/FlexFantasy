@@ -23,12 +23,12 @@ function Rosters() {
   const [tempSelectedOwner, setTempSelectedOwner] = useState('');
   const location = useLocation();
   const initialUsername = location.state?.username.toLowerCase(); 
-
   const navigate = useNavigate();
   const leagueName = location.state?.leagueName || 'League';
   const [positionRanks, setPositionRanks] = useState({});
   const [winnerUsername, setWinnerUsername] = useState("Unknown");
-  
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
 
   useEffect(() => {
     fetch('http://127.0.0.1:5000/players/nfl')
@@ -49,6 +49,7 @@ function Rosters() {
         return response.json();
       })
       .then(data => {
+        console.log('Player stats for Josh Allen:', data['6744']); // Replace '33' with the correct ID if it's different
         setPlayerStats2023(data);
         const positionRanks = calculatePositionRanks(data);
         setPositionRanks(positionRanks); 
@@ -57,6 +58,38 @@ function Rosters() {
   
     fetchData();
   }, [leagueId]);
+
+  const calculatePositionRanks = (playerStats) => {
+    const positionScores = {};
+  
+    Object.entries(playerStats).forEach(([playerId, stats]) => {
+      const position = allPlayersInfo[playerId]?.position || 'DEF';
+      if (!positionScores[position]) {
+        positionScores[position] = [];
+      }
+      positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
+    });
+  
+    const positionRanks = {};
+    Object.keys(positionScores).forEach(position => {
+      // Make sure we have an array to work with
+      if (positionScores[position] && Array.isArray(positionScores[position])) {
+        positionScores[position].sort((a, b) => b.points - a.points)
+          .forEach((entry, index) => {
+            positionRanks[entry.playerId] = index + 1; 
+          });
+      }
+    });
+    console.log('Specific stats for Josh Allen:', playerStats['6744']);
+    // Check if Josh Allen's data exists before attempting to log it
+    if (positionScores.QB && positionScores.QB.some(entry => entry.playerId === '6744')) {
+      console.log('Rank for Josh Allen before sorting:', positionScores['QB'].find(p => p.playerId === '6744'));
+    } else {
+      console.log('Josh Allen not found in positionScores.QB', positionScores.QB);
+    }
+    
+    return positionRanks;
+  };
 
   async function fetchData() {
   
@@ -76,8 +109,6 @@ function Rosters() {
       const resLeagueDetails = await fetch(`http://localhost:5000/league/${leagueId}`);
       if (!resLeagueDetails.ok) throw new Error('League details fetch failed');
       const leagueDetailsData = await resLeagueDetails.json();
-    
-      console.log('Unique owner IDs:', ownerIds);
      
       const users = await Promise.all(uniqueOwnerIds.map(owner_id =>
         fetch(`https://api.sleeper.app/v1/user/${owner_id}`)
@@ -92,6 +123,7 @@ function Rosters() {
         acc[user.user_id] = normalizedUsername;
         return acc;
       }, {});
+      
 
       const winnerRosterId = leagueDetailsData.metadata?.latest_league_winner_roster_id;
       if (winnerRosterId) {
@@ -107,7 +139,6 @@ function Rosters() {
       setSelectedOwner(initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
 
       setOwners(updatedOwners); 
-      console.log('Updated owners set:', updatedOwners);
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -116,27 +147,7 @@ function Rosters() {
     }
   }
   
-  const calculatePositionRanks = (playerStats) => {
-    const positionScores = {};
-
-    Object.entries(playerStats).forEach(([playerId, stats]) => {
-      const position = allPlayersInfo[playerId]?.position || 'DEF';
-      if (!positionScores[position]) {
-        positionScores[position] = [];
-      }
-      positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
-    });
-
-    const positionRanks = {};
-    Object.keys(positionScores).forEach(position => {
-      positionScores[position].sort((a, b) => b.points - a.points)
-        .forEach((entry, index) => {
-          positionRanks[entry.playerId] = index + 1; 
-        });
-    });
   
-    return positionRanks;
-  };
   
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
     const positionOrder = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX'];
@@ -190,7 +201,6 @@ function Rosters() {
     const ownerObject = owners.find(owner => owner.username === tempSelectedOwner);
     if (ownerObject) {
       setSelectedOwner(ownerObject.owner_id); 
-      console.log('Set selectedOwner to:', ownerObject.owner_id);
     } else {
       console.error('Owner not found for username:', tempSelectedOwner);
     }
@@ -198,7 +208,6 @@ function Rosters() {
   
 const handleOwnerChange = (event) => {
   setTempSelectedOwner(event.target.value.toLowerCase());
-  console.log('Temp selected owner changed to:', event.target.value.toLowerCase());
 };
 
 const capitalizeUsername = (username) => {
@@ -211,12 +220,10 @@ const displayOwnerUsernameHeader = () => {
 };
 
   const ownerRoster = rosters.find(roster => {
-    console.log('Comparing:', roster.owner_id, selectedOwner);
     return roster.owner_id === selectedOwner; 
   });
 
   if (!ownerRoster) {
-    console.log('No ownerRoster found for selectedOwner:', selectedOwner);
   }
 
   if (isLoading) {
@@ -319,7 +326,21 @@ const sortPlayersByPoints = (playerIds) => {
     const points = playerStats.pts_ppr ? Math.round(playerStats.pts_ppr) : '0';
     const experience = playerDetails.years_exp ? playerDetails.years_exp : 'N/A';
     const positionIcon = positionToIconMap[position] || flexIcon;
-  
+    const handleClick = () => {
+      const playerData = {
+        full_name: playerDetails.full_name,
+        rank: rank,
+        points: playerStats.pts_ppr,
+        experience: playerDetails.years_exp,
+        yards: playerStats.yards, 
+        touchdowns: playerStats.touchdowns, 
+        ppg: playerStats.ppg, 
+        ktc: playerStats.ktc, 
+        age: playerDetails.age, 
+      };
+      setModalContent(playerData); 
+      setShowModal(true); 
+    };
 
     if (isStarter) {
       if (position === 'QB' && index === totalStarters - 1) {
@@ -329,18 +350,16 @@ const sortPlayersByPoints = (playerIds) => {
       }
     }
     
-  return (
-    <tr key={playerId}>
-      <td>
-      <img src={positionIcon} alt={playerDetails.position} className="icon" />
-        {' '}{playerName}
-      </td>
-      <td>{rank}</td>
-      <td>{points}</td>
-      <td>{experience}</td>
-    </tr>
-  );
-};
+    return (
+      <tr key={playerId} onClick={handleClick}>
+        <td>
+          <img src={positionIcon} alt={playerDetails.position} className="icon" />
+          {playerName}
+        </td>
+        <td>{rank}</td>
+      </tr>
+    );
+  };
 
 const calculateExposure = () => {
   let playerExposure = {};
@@ -369,7 +388,6 @@ const displaySharersTable = () => (
     <thead>
       <tr>
         <th>Player</th>
-        <th>Position</th>
         <th>Exposure</th>
       </tr>
     </thead>
@@ -377,7 +395,6 @@ const displaySharersTable = () => (
       {sharersData.map((item, index) => (
         <tr key={index}>
           <td>{item.player}</td>
-          <td>{item.position}</td>
           <td>{item.exposure}</td>
         </tr>
       ))}
@@ -403,6 +420,7 @@ return (
               <span className="winner-username">{winnerUsername}</span>
             </span>
           </div>
+          <h2 className="username-header">{displayOwnerUsernameHeader()}</h2>
           <div className="owner-control">
             <label className="change-owner-label">Change Owner:</label>
             <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
@@ -416,23 +434,17 @@ return (
         </div>
         {ownerRoster ? (
           <>
-            <h2 className="username-header">{displayOwnerUsernameHeader()}'s Roster</h2>
             <div className="roster-container">
+            <div className="left-container">
               <div className="left-roster-section"> 
                 <div className="roster-section">
+                {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
                   <h1 className="starters">Starters</h1>
                   <table className="Table">
                   <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
-                  <th>Exp</th>
-                  <th>Yards</th>
-                  <th>TDs</th>
-                  <th>PPG</th>
-                  <th>KTC</th>
-                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -446,14 +458,7 @@ return (
                   <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
-                  <th>Exp</th>
-                  <th>Yards</th>
-                  <th>TDs</th>
-                  <th>PPG</th>
-                  <th>KTC</th>
-                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -468,14 +473,7 @@ return (
                     <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
-                  <th>Exp</th>
-                  <th>Yards</th>
-                  <th>TDs</th>
-                  <th>PPG</th>
-                  <th>KTC</th>
-                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -491,14 +489,7 @@ return (
                     <thead>
                     <tr>
                     <th>Player</th>
-                  <th>Points</th>
                   <th>Rank</th>
-                  <th>Exp</th>
-                  <th>Yards</th>
-                  <th>TDs</th>
-                  <th>PPG</th>
-                  <th>KTC</th>
-                  <th>Age</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -508,6 +499,8 @@ return (
                   </div>
                 )}
               </div>
+              </div>
+              <div className="right-container">
               <div className="right-roster-section"> 
                 <div className="roster-section">
                   <h1 className="sharers">Sharers</h1>
@@ -516,6 +509,7 @@ return (
                   </table>
                 </div>
               </div>
+            </div>
             </div>
           </>
         ) : (
@@ -526,5 +520,25 @@ return (
   </>
 );
 }
+
+const PlayerModal = ({ player, onClose }) => {
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content" style={{ transform: 'scale(2)' }}>
+        <h2>{player.full_name}</h2>
+        <p>Rank: {player.rank}</p>
+        <p>Points: {player.points}</p>
+        <p>Experience: {player.experience}</p>
+        <p>Yards: {player.yards}</p>
+        <p>Touchdowns: {player.touchdowns}</p>
+        <p>Points Per Game: {player.ppg}</p>
+        <p>Keep Trade Cut Value: {player.ktc}</p>
+        <p>Age: {player.age}</p>
+        <button onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+};
+
 export default Rosters;
 
