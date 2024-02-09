@@ -13,7 +13,6 @@ import kIcon from './k.png';
 
 
 function Rosters() {
-  const { leagueId } = useParams();
   const [rosters, setRosters] = useState([]);
   const [allPlayersInfo, setAllPlayersInfo] = useState({});
   const [playerStats2023, setPlayerStats2023] = useState({});
@@ -24,12 +23,28 @@ function Rosters() {
   const location = useLocation();
   const initialUsername = location.state?.username.toLowerCase(); 
   const navigate = useNavigate();
-  const leagueName = location.state?.leagueName || 'League';
   const [positionRanks, setPositionRanks] = useState({});
   const [winnerUsername, setWinnerUsername] = useState("Unknown");
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+  const [userLeagues, setUserLeagues] = useState([]);
+  const [leagueName, setLeagueName] = useState(location.state?.leagueName || 'League');
+const [leagueId, setLeagueId] = useState(useParams().leagueId);
 
+
+  useEffect(() => {
+    if (selectedOwner) {
+      setIsLoading(true);
+      fetch(`http://127.0.0.1:5000/user/${selectedOwner}/leagues/2023`)
+        .then(response => response.json())
+        .then(data => {
+          setUserLeagues(data);
+        })
+        .catch(error => console.error('Error fetching leagues:', error))
+        .finally(() => setIsLoading(false));
+    }
+  }, [selectedOwner]);
+  
   useEffect(() => {
     fetch('http://127.0.0.1:5000/players/nfl')
       .then(response => {
@@ -58,6 +73,16 @@ function Rosters() {
   
     fetchData();
   }, [leagueId]);
+
+  useEffect(() => {
+    // Assuming you've already fetched allPlayersInfo and playerStats2023
+  
+    if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
+      const newRanks = calculatePositionRanks(playerStats2023);
+      setPositionRanks(newRanks);
+    }
+  }, [allPlayersInfo, playerStats2023]); // This effect depends on allPlayersInfo and playerStats2023
+  
 
   const calculatePositionRanks = (playerStats) => {
     const positionScores = {};
@@ -189,15 +214,12 @@ function Rosters() {
   };
   
   const findBenchPlayers = (roster) => {
-        // Assuming 'players' includes both starters and bench players
         const allPlayers = roster.players || [];
         const starters = roster.starters || [];
-        // Filter out starters to get bench players
         return allPlayers.filter(playerId => !starters.includes(playerId));
   };
 
   const handleEnterButtonClick = () => {
-
     const ownerObject = owners.find(owner => owner.username === tempSelectedOwner);
     if (ownerObject) {
       setSelectedOwner(ownerObject.owner_id); 
@@ -223,8 +245,7 @@ const displayOwnerUsernameHeader = () => {
     return roster.owner_id === selectedOwner; 
   });
 
-  if (!ownerRoster) {
-  }
+ 
 
   if (isLoading) {
     return <div className="loading-container">
@@ -258,7 +279,42 @@ const displayOwnerUsernameHeader = () => {
     return taxiPlayerIds.map(playerId => displayPlayerRow(playerId, 0, 0));
   };
 
-    const positionToIconMap = {
+  const navigateToRoster = (leagueId, leagueName) => {
+    // Set league name and ID
+    setLeagueName(leagueName); // Assuming you have a state setter for leagueName
+    setLeagueId(leagueId); // Assuming you have a state setter for leagueId
+  
+    // Fetch the roster for the new league
+    setIsLoading(true);
+    fetch(`http://localhost:5000/league/${leagueId}/rosters`)
+      .then(response => response.json())
+      .then(data => {
+        setRosters(data);
+        const ownerRoster = data.find(roster => roster.owner_id === selectedOwner);
+        if (ownerRoster) {
+          // Your logic to set the owner's roster
+        }
+        navigate(`/rosters/${leagueId}`);
+      })
+      .catch(error => console.error('Error switching leagues:', error))
+      .finally(() => setIsLoading(false));
+  };
+  
+  
+
+  const displayUserLeagues = () => {
+    return userLeagues.map((league, index) => (
+      <tr key={index} onClick={() => navigateToRoster(league.league_id, league.name)}>
+        <td>{league.name}</td>
+      </tr>
+    ));
+  };
+  
+  
+
+
+
+  const positionToIconMap = {
       QB: qbIcon,
       RB: rbIcon,
       WR: wrIcon,
@@ -283,7 +339,8 @@ const sortPlayersByPoints = (playerIds) => {
     const rank = positionRanks[playerId] || 'Unknown'; 
     let position = playerDetails.position;
     let playerName = playerDetails.full_name;
-    const teamNameMapping = {
+
+  const teamNameMapping = {
         MIN: "Minnesota Vikings",
         LV: "Las Vegas Raiders",
         KC: "Kansas City Chiefs",
@@ -323,8 +380,7 @@ const sortPlayersByPoints = (playerIds) => {
     } else if (!playerDetails.full_name && playerId === 'DEF') {
       playerName = 'Defense';
     }
-    const points = playerStats.pts_ppr ? Math.round(playerStats.pts_ppr) : '0';
-    const experience = playerDetails.years_exp ? playerDetails.years_exp : 'N/A';
+
     const positionIcon = positionToIconMap[position] || flexIcon;
     const handleClick = () => {
       const playerData = {
@@ -349,6 +405,7 @@ const sortPlayersByPoints = (playerIds) => {
         position = 'FLEX';
       }
     }
+    
     
     return (
       <tr key={playerId} onClick={handleClick}>
@@ -392,12 +449,12 @@ const displaySharersTable = () => (
       </tr>
     </thead>
     <tbody>
-      {sharersData.map((item, index) => (
-        <tr key={index}>
-          <td>{item.player}</td>
-          <td>{item.exposure}</td>
-        </tr>
-      ))}
+    {sharersData.map((item, index) => (
+  <tr key={item.playerId}> 
+    <td>{item.player}</td>
+    <td>{item.exposure}</td>
+  </tr>
+))}
     </tbody>
   </table>
 );
@@ -407,9 +464,16 @@ return (
     <div className="left-panel">
       <h2 className="left-panel-header">Flex Fantasy</h2>
       <button className="my-profile-button">My Profile</button>
+      <button className="model-button">Model</button>
+      <button className="button-3-button">Button 3</button>
+      <button className="button-4-button">Button 4</button>
+      <button className="button-5-button">Button 5</button>
+      <button className="button-6-button">Button 6</button>
+      <button className="settings-button">Settings</button>
     </div>
-    <div className="page-container">
+    <div className="pages-container">
       <span className="title-roster">{leagueName}</span>
+      
       <div className="Rosters">
         <div className="controls-container">
           <button className="home-button" onClick={() => navigate('/')}>Home</button>
@@ -500,7 +564,8 @@ return (
                 )}
               </div>
               </div>
-              <div className="right-container">
+
+              <div className="middle-container">
               <div className="right-roster-section"> 
                 <div className="roster-section">
                   <h1 className="sharers">Sharers</h1>
@@ -509,7 +574,25 @@ return (
                   </table>
                 </div>
               </div>
+
             </div>
+            <div className="right-container">
+          <div className="roster-section user-leagues-section">
+            <h1 className="user-leagues">Leagues</h1>
+            <table className="Table">
+                    <thead>
+                    <tr>
+                    <th>{displayOwnerUsernameHeader()}s Other Leagues</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {displayUserLeagues(selectedOwner)}
+                </tbody>
+                    </table>
+          </div>
+        </div>
+
+
             </div>
           </>
         ) : (
