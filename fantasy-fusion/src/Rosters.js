@@ -12,14 +12,18 @@ import kIcon from './k.png';
 
 
 
+
 function Rosters() {
   const [rosters, setRosters] = useState([]);
   const [allPlayersInfo, setAllPlayersInfo] = useState({});
+  const [scoringSettings, setScoringSettings] = useState({});
   const [playerStats2023, setPlayerStats2023] = useState({});
+  const [formattedScoring, setFormattedScoring] = useState("");
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [tempSelectedOwner, setTempSelectedOwner] = useState('');
+  const [scoringString, setScoringString] = useState("");
   const location = useLocation();
   const initialUsername = location.state?.username.toLowerCase(); 
   const navigate = useNavigate();
@@ -74,6 +78,17 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
     fetchData();
   }, [leagueId]);
 
+  useEffect(() => {
+    fetch(`https://api.sleeper.app/v1/league/${leagueId}`)
+      .then(response => response.json())
+      .then(data => {
+        setScoringSettings(data.scoring_settings);
+        // Use setScoringString to update the scoringString state with the formatted string
+        setScoringString(formatScoringSettings(data.scoring_settings));
+      })
+      .catch(error => console.error('Error fetching league details:', error));
+  }, [leagueId]);
+  
   useEffect(() => {
     // Assuming you've already fetched allPlayersInfo and playerStats2023
   
@@ -172,7 +187,32 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
     }
   }
   
+  function formatScoringSettings(settings) {
+    const formatMap = {
+      'rec': 'PPR',
+      'bonus_rec_te': 'TEP',
+      'st_td': 'QB'
+    };
   
+    let formattedSettings = [];
+  
+    // Go through each key in formatMap to see if it exists in settings
+    for (let key in formatMap) {
+      if (settings.hasOwnProperty(key)) {
+        // Convert the value to a readable format
+        let value = settings[key];
+        if (key === 'rec' && value === 1) {
+          formattedSettings.push(formatMap[key]);
+        } else if (key === 'bonus_rec_te' && value > 0) {
+          formattedSettings.push(`${formatMap[key]} ${value}`);
+        } else if (key === 'st_td' && value === 6) {
+          formattedSettings.push(`${formatMap[key]}${value}`);
+        }
+      }
+    }
+  
+    return formattedSettings.join(' + ');
+  }
   
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
     const positionOrder = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX'];
@@ -336,9 +376,9 @@ const sortPlayersByPoints = (playerIds) => {
   const displayPlayerRow = (playerId, isStarter, index, totalStarters) => {
     const playerDetails = allPlayersInfo[playerId] || {};
     const playerStats = playerStats2023[playerId] || {};
-    const rank = positionRanks[playerId] || 'Unknown'; 
+    let rank = positionRanks[playerId] || 'N/A'; // Changed from 'Unknown' to 'N/A'
+    let playerName = playerDetails.full_name || '(empty)'; // Changed from 'Unknown' to '(empty)'
     let position = playerDetails.position;
-    let playerName = playerDetails.full_name;
 
   const teamNameMapping = {
         MIN: "Minnesota Vikings",
@@ -408,9 +448,9 @@ const sortPlayersByPoints = (playerIds) => {
     
     
     return (
-      <tr key={playerId} onClick={handleClick}>
+      <tr key={playerId || `empty-${index}`} onClick={handleClick}>
         <td>
-          <img src={positionIcon} alt={playerDetails.position} className="icon" />
+          <img src={positionIcon} alt={playerDetails.position || 'Empty'} className="icon" />
           {playerName}
         </td>
         <td>{rank}</td>
@@ -418,57 +458,14 @@ const sortPlayersByPoints = (playerIds) => {
     );
   };
 
-const calculateExposure = () => {
-  let playerExposure = {};
-  rosters.forEach((roster) => {
-    roster.players.forEach((playerId) => {
-      playerExposure[playerId] = (playerExposure[playerId] || 0) + 1;
-    });
-  });
-
-  const playerExposureArray = Object.entries(playerExposure).map(([playerId, count]) => {
-    return {
-      playerId,
-      exposure: ((count / rosters.length) * 100).toFixed(2) + '%',
-      player: allPlayersInfo[playerId]?.full_name || 'Unknown Player',
-      position: allPlayersInfo[playerId]?.position || 'Unknown Position',
-    };
-  });
-
-  return playerExposureArray;
-};
-
-const sharersData = calculateExposure();
-
-const displaySharersTable = () => (
-  <table className="Table">
-    <thead>
-      <tr>
-        <th>Player</th>
-        <th>Exposure</th>
-      </tr>
-    </thead>
-    <tbody>
-    {sharersData.map((item, index) => (
-  <tr key={item.playerId}> 
-    <td>{item.player}</td>
-    <td>{item.exposure}</td>
-  </tr>
-))}
-    </tbody>
-  </table>
-);
 
 return (
   <>
     <div className="left-panel">
       <h2 className="left-panel-header">Flex Fantasy</h2>
+      <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
       <button className="my-profile-button">My Profile</button>
       <button className="model-button">Model</button>
-      <button className="button-3-button">Button 3</button>
-      <button className="button-4-button">Button 4</button>
-      <button className="button-5-button">Button 5</button>
-      <button className="button-6-button">Button 6</button>
       <button className="settings-button">Settings</button>
     </div>
     <div className="pages-container">
@@ -476,7 +473,10 @@ return (
       
       <div className="Rosters">
         <div className="controls-container">
-          <button className="home-button" onClick={() => navigate('/')}>Home</button>
+        <div className="scoring-settings-display">
+    <h2>Scoring Settings</h2>
+    <p>{scoringString}</p>
+  </div>
           <div className="league-title-container">
             <span className="winner-info">
               <span className="year">2023 </span>
@@ -484,7 +484,6 @@ return (
               <span className="winner-username">{winnerUsername}</span>
             </span>
           </div>
-          <h2 className="username-header">{displayOwnerUsernameHeader()}</h2>
           <div className="owner-control">
             <label className="change-owner-label">Change Owner:</label>
             <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
@@ -494,7 +493,6 @@ return (
             </select>
             <button onClick={handleEnterButtonClick}>Enter</button>
           </div>
-          <button className="back-button" onClick={() => navigate(-1)}>Back</button>
         </div>
         {ownerRoster ? (
           <>
@@ -565,17 +563,7 @@ return (
               </div>
               </div>
 
-              <div className="middle-container">
-              <div className="right-roster-section"> 
-                <div className="roster-section">
-                  <h1 className="sharers">Sharers</h1>
-                  <table className="Table">
-                  {displaySharersTable()}
-                  </table>
-                </div>
-              </div>
 
-            </div>
             <div className="right-container">
           <div className="roster-section user-leagues-section">
             <h1 className="user-leagues">Leagues</h1>

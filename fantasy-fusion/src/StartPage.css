@@ -1,23 +1,29 @@
 .start-page {
   text-align: center;
-  padding: 0px;
-  background-color: #282c34;
+  padding: 0;
+  background-color: #1b1d23;
   min-height: 100vh;
-  color: white;
+  color: rgb(121, 252, 254);
   font-family: 'Arial', sans-serif;
-  background-image: url('flex-fantasy.jpg'); /* Adjust the path as necessary */
+  background-image: url('flex-fantasy.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: top left; /* Align the top of the image with the top of the container */
+  background-repeat: no-repeat;
   position: relative;
   font-weight: bold;
-  font-size: 24px;
-  zoom: 75%;
+  font-size: 32px;
+  display: flex;
+  align-items: center; /* This will vertically center the username form */
+  justify-content: center;
+  overflow: hidden; /* Hide the overflow to remove black space at the bottom */
 }
-  
-  .username-form {
-    margin-top: 20px;
-    margin-bottom: 500px;
-  }
+.username-form {
+  position: absolute; /* Position absolutely within the start-page */
+  bottom: 40%; /* Adjust as necessary to place it below the Flex Fantasy circle */
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5); /* Optional: adds a translucent background */
+  border-radius: 10px; /* Optional: rounds the corners */
+}
   
   .username-label {
     margin-right: 10px;
@@ -30,9 +36,6 @@
   }
   
   .submit-button {
-    font-size: 1.2rem;
-    padding: 10px 20px;
-    cursor: pointer;
     background-color: #61dafb;
     color: #282c34;
     border: none;
@@ -44,13 +47,30 @@
     background-color: #21a1f1;
   }
 
+  .flex-fantasy-title {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 62px; /* Adjust the size as necessary */
+    text-shadow: 2px 2px 8px #0071b3ef; /* Optional: adds a shadow to make the text stand out */
+  }
+  .left-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #112240;
+    padding: 1em;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
   .flex-fantasy-image {
     max-width: 100%;
-    height: 1000px; /* Adjust as necessary */
-    opacity: 0.0; /* Adjust as necessary for visibility */
-    display: block;
-    margin: 0 auto;
-    padding-bottom: 200px;
+    height: auto; /* Change to auto so the image's height scales with its width */
+    opacity: 1; /* Adjust the opacity back to fully visible if necessary */
+    zoom: 55%;
   }
 
   .table-container {

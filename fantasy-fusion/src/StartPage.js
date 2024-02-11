@@ -26,6 +26,16 @@ function StartPage({ setUser }) {
 
   return (
     <div className="start-page">
+          <div className="left-panel">
+      <h2 className="left-panel-header">Flex Fantasy</h2>
+      <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
+      <button className="my-profile-button">My Profile</button>
+      <button className="model-button">Model</button>
+      {/* <button className="button-4-button">Button 4</button>
+      <button className="button-5-button">Button 5</button>
+      <button className="button-6-button">Button 6</button> */}
+      <button className="settings-button">Settings</button>
+    </div>
       <img src={flexFantasyImage} alt="Flex Fantasy" className="flex-fantasy-image" />
       <div className="table-container">
         <table className="Table">

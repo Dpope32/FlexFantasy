@@ -186,16 +186,24 @@
   margin-bottom: 400px;
   padding-bottom: 300px; 
   margin-left: 270px;
-  zoom: 100%;
+  zoom: 90%;
+}
+
+.scoring-settings-display {
+  padding: 15px;
+  margin: 10px;
+  background-color: #0A192F;
+  color: white;
+  border-radius: 5px;
 }
 
 
-
 .Table {
+  max-width: none;
   margin-left: 0;
   margin-right: auto;
   width: auto;
-  border-collapse: collapse;
+  border-collapse: separate;
   margin: 0 auto;
   font-size: 1.4em;
   border: 1px solid #000000;
@@ -223,11 +231,15 @@
   margin: 0px;
   text-align: left;
   cursor: pointer;
+  border-bottom: 1px solid #ddd; 
 }
 
 .Table th {
-  color: rgb(121, 210, 237);
+  background-color: #0A192F; 
+  color: #fff;
   line-height: 1.75;
+  font-size: 1.2em;
+  font-size: 1.2em;
 }
 .Table tr:nth-child(even) {
   background-color: #b8d3dd;
@@ -280,7 +292,7 @@
 .username-header {
   text-align: auto;
   color: #4aedff; 
-  font-size: 2.0em;
+  font-size: 2.5em;
   margin: 0px 0;
   font-weight: bold;
   padding: 10px; 
@@ -288,6 +300,20 @@
   display: inline-block; 
   border-radius: 10px; 
   text-transform: uppercase; 
+}
+
+.user-leagues {
+  font-size: 2em; /* Smaller than starters */
+  color: #ecf0f1; /* Soft light text color for readability */
+  background-color: transparent; /* No background */
+  padding: 10px; /* Less padding */
+  margin-bottom: 10px; /* Less space before the next section */
+}
+
+.Table.leagues-table {
+  font-size: 1em; /* Smaller font size for table entries */
+  border: 1px solid #7f8c8d; /* More subdued border color */
+  box-shadow: none; /* No shadow */
 }
 
 .back-button {
@@ -315,17 +341,6 @@
   gap: 10px;
 }
 
-.home-button {
-  background-color: #327b82; /* Green color for new button */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  margin-left: 20px;
-  cursor: pointer;
-  font-size: 24px;
-}
-
 .roster-section {
   padding: 0 50px 20px; /* Add padding to the bottom */
   margin-bottom: 20px; 
@@ -344,20 +359,24 @@
   margin-bottom: 50px;
 }
 
-.starters, .sharers, .bench, .ir, .taxi, .user-leagues {
-  font-size: 3em; 
-  border-radius: 5px;
-  font-weight: bold;
-  color: #000000;
-  background-color: transparent;
-  width: 10%;
-  text-align: center;
+.starters, .bench, .ir, .taxi {
+  font-size: 3em; /* Larger font size */
+  color: #32d3ff; /* Bright color for visibility */
+  background-color: #0A192F; /* Dark background for contrast */
+  padding: 20px; /* More padding for emphasis */
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 20px;
+}
+.Table.starters-table {
+  font-size: 1.4em; /* Larger font size for table entries */
+  border: 2px solid #32d3ff; /* Solid border for emphasis */
+  box-shadow: 0 0 15px #32d3ff; /* Shadow for depth */
 }
 
 .winner-username {
   text-align: center;
   color: #9baaf5;
-  padding: 40px;
+  padding: 50px;
   border-radius: 5px;
   margin: 20px 500px;
   font-size: 1.5em;
@@ -416,24 +435,20 @@
   background: linear-gradient(to top, #ffffff 0%, #507c90 100%);
   height: fit-content;
   margin-right: 100px;
+  margin-left: 400px;
 }
 .right-container {
   padding: 0px; 
   border-radius: 10px;
-  background: linear-gradient(to top, #ffffff 0%, #507c90 100%);
+  background: linear-gradient(to top, #3c65d6 0%, #507c90 100%);
   width: auto;
   margin-left: 100px;
 }
-.middle-container {
-  padding: 0px; 
-  border-radius: 10px;
-  background: linear-gradient(to top, #ffffff 0%, #507c90 100%);
-  width: auto;
-}
 
 .roster-container {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: .4fr .25fr; /* Starters table takes twice the space of Leagues */
+  gap: 20px; /* Space between tables */
 }
 
 

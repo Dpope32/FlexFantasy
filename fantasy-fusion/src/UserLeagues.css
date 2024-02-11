@@ -1,12 +1,28 @@
 /* UserLeagues.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+.owner-header {
+  font-weight: bold;
+  color: #4D9FEC; 
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1rem;
+  padding: 1.5rem;
+  border: 2px solid #4D9FEC; 
+  border-radius: 5px;
+  background-color: #1B2A41; 
+}
+
 .App {
-    background-color: #60676f; 
-    min-height: 100vh; 
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    justify-content: center; 
-  }
+  background-color: #081324;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: 'Orbitron', sans-serif;
+}
 
   .page-container {
     width: 100%;
@@ -24,39 +40,51 @@
     padding: 20px;
     box-sizing: border-box; 
   }
+
+.left-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #112240;
+    padding: 1em;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
   
+.username-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  background-color: #1B2A41;
+  color: #29d;
+  font-size: 1.5em;
+  margin: 10px;
+  border-radius: 5px;
+}
+
 .UserLeagues {
     padding: 50px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    padding: 20px;
   }
   
-  .BackButton {
-    margin-bottom: 20px;
-    cursor: pointer;
-    background-color: #64a2ff; 
-    color: rgb(255, 255, 255);
-    border: none;
-    padding: 10px 20px;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 0.9em;
-    border-radius: 4px;
-    border-radius: 8px; 
-  }
   
   .TableWrapper {
     overflow-x: auto;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1); 
-    width: 100%; 
-    margin: auto; 
-    border-radius: 2.5rem;
-  }
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5);
+    border-radius: 5px;
+}
+
   
   .Table {
     width: 100%;
+    margin-bottom: 20px;
     border-collapse: collapse;
     background-color: #90dced; 
-    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); /* Barely visible gradient */
+    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); 
     table-layout: auto;
     margin: 0 auto; 
     background-image: url('logo.svg');
@@ -67,12 +95,16 @@
     display: table;
     text-align: left;
     line-height: 20px;
+    margin: 10px; 
+    max-width: 45%; 
+    flex: 1 1 auto; 
   }   
+
   
   th, td {
     padding: 12px 15px;
-    border: 2px solid #141b1c;
-    text-align: center;
+    border: 1px solid #324A5F;
+    text-align: left;
     overflow: hidden;
     font-size: 1.0em; 
     text-overflow: ellipsis;
@@ -81,14 +113,15 @@
   }
   
   th {
-    background-color: #444; 
-    color: white;
+    background-color: #1B2A41;
+    color: #E3E3E3;
     text-transform: uppercase;
-    font-weight: bold; 
+    font-weight: 600;
   }
   
   td {
     color: 222; 
+    background-color: #12314a2d;
   }
   
   tr:nth-child(even) {
@@ -101,41 +134,58 @@
   }
   
   button {
-    background-color: #3a7893; 
-    color: white;
-    text-align: left;
-    padding: 10px 20px;
+    background-color: #4D9FEC;
+    color: #0A192F;
+    padding: 10px 15px;
     border: none;
-    border-radius: 8px; 
+    border-radius: 3px;
     cursor: pointer;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 0.85em;
-  }
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
   
-  button:hover {
-    background-color: #367c39; 
-  }
-  
+button:hover {
+  background-color: #2577A9;
+}
 
 
+  .TablesContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 100px;
+  }
+  
+  .Table1Container {
+    margin-right: 100px; 
+  }
+  .Table2Container {
+    margin-right: 0px; 
+  }
+
+th, td {
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
 
 .LeaguesImage {
     display: block;
-    max-width: 80%; 
+    margin-left : 800px;
+    max-width: 35%; 
     height: auto; 
-    margin: 0 auto 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
     border-radius: 8px; 
   }
 
-  .HeaderTitle {
+  .header-title {
+    text-align: center;
     font-size: 2em;
     font-weight: bold;
     background: linear-gradient(45deg, #4D9FEC, #e8e8e8);
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent; 
+    color: #E3E3E3;
     animation: glow 1s ease-in-out infinite alternate;
   }
 
@@ -148,4 +198,19 @@
     }
   }
   
+.sharers {
+  font-size: 3em; 
+  border-radius: 5px;
+  font-weight: bold;
+  color: #000000;
+  background-color: transparent;
+  width: 10%;
+  text-align: center;
+}
   
+.headers-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
