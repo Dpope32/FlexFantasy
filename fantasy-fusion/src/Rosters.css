@@ -242,7 +242,7 @@
   font-size: 1.2em;
 }
 .Table tr:nth-child(even) {
-  background-color: #b8d3dd;
+  background-color: rgb(131, 177, 194);
   color: rgb(0, 0, 0);
 }
 
