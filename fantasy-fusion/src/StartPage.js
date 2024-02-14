@@ -37,10 +37,6 @@ function StartPage({ setUser }) {
       <button className="settings-button">Settings</button>
     </div>
       <img src={flexFantasyImage} alt="Flex Fantasy" className="flex-fantasy-image" />
-      <div className="table-container">
-        <table className="Table">
-        </table>
-      </div>
       <form onSubmit={handleSubmit} className="username-form">
         <label htmlFor="username" className="username-label">
           Sleeper Username:

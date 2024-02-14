@@ -1,4 +1,17 @@
+/* UserLeagues.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
 
+.owners-header {
+  font-weight: bold;
+  color: #4D9FEC; 
+  top: 0;
+  right: 0;
+  margin: 1rem;
+  padding: 1.5rem;
+  border: 2px solid #4D9FEC; 
+  border-radius: 5px;
+  background-color: #1B2A41; 
+}
 
 .owner-dropdown {
   margin-bottom: 20px;
@@ -103,6 +116,17 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
+button {
+  background-color: #4990d3;
+  color: #ffffff;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
 .button-5-button:hover {
   background-color: #c0392b;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
@@ -147,7 +171,11 @@
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
 }
 
-
+.left-roster-section, .right-roster-section {
+  display: flex;
+  flex-direction: column;
+  width: 50%; /* Adjust width as needed */
+}
 
 .left-panel {
   position: fixed;
@@ -180,7 +208,7 @@
 .pages-container {
   width: 100%;
   min-height: 100vh;
-  padding: 100px;
+  padding: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1); 
   background-color: #162024; 
   margin-bottom: 400px;
@@ -190,7 +218,7 @@
 }
 
 .scoring-settings-display {
-  padding: 15px;
+  padding: 10px;
   margin: 10px;
   background-color: #0A192F;
   color: white;
@@ -210,8 +238,8 @@
   border-radius: 1rem;
   border-spacing: 0;
   overflow-x: auto; 
-  box-shadow: 0px 0px 100px rgb(105, 200, 255);
-  padding: 8px;
+  box-shadow: 0px 0px 100px rgb(31, 53, 125);
+  padding: 15px;
   font-family: 'Arial', sans-serif;
   font-size: 24px;
   line-height: 30px;
@@ -224,6 +252,7 @@
   scroll-behavior: smooth;
   display: table;
   text-align: left;
+
 }
 
 .Table td {
@@ -266,12 +295,12 @@
 }
 
 .controls-container {
-  width: 90%; 
+  width: 95%; 
   background-color: #28373d;
   margin-left: 120px;
   margin-right: 2070px;
   margin-bottom: 40px;
-  margin-top: 80px;
+  margin-top: 0px;
   border-radius: 5px;
   display: flex;
   justify-content: space-evenly;
@@ -302,18 +331,20 @@
   text-transform: uppercase; 
 }
 
-.user-leagues {
-  font-size: 2em; /* Smaller than starters */
-  color: #ecf0f1; /* Soft light text color for readability */
-  background-color: transparent; /* No background */
-  padding: 10px; /* Less padding */
-  margin-bottom: 10px; /* Less space before the next section */
+.user-leagues-section {
+  grid-column: span 2; /* Leagues section will span across both columns */
+  width: 100%;
+  display: block;
+  margin-top: 0;
+  padding-top: 0;
 }
 
+
+
 .Table.leagues-table {
-  font-size: 1em; /* Smaller font size for table entries */
-  border: 1px solid #7f8c8d; /* More subdued border color */
-  box-shadow: none; /* No shadow */
+  font-size: 1em; 
+  border: 1px solid #7f8c8d; 
+  box-shadow: none; 
 }
 
 .back-button {
@@ -330,7 +361,7 @@
 .change-owner-label {
   margin-right: 5px;
   font-weight: bold;
-  color: #ffffff; /* White color for the text */
+  color: #ffffff; 
   font-size: 2em;
   font-weight: bold;
 }
@@ -359,14 +390,19 @@
   margin-bottom: 50px;
 }
 
-.starters, .bench, .ir, .taxi {
-  font-size: 3em; /* Larger font size */
-  color: #32d3ff; /* Bright color for visibility */
-  background-color: #0A192F; /* Dark background for contrast */
-  padding: 20px; /* More padding for emphasis */
-  border-radius: 10px; /* Rounded corners */
+
+
+.starters,.bench, .ir, .taxi, .user-leagues {
+  font-size: 3em; 
+  color: #32d3ff; 
+  background-color: #0A192F;
+  padding: 20px; 
+  border-radius: 50px; 
   margin-bottom: 20px;
+  width: auto;
+  box-shadow: 0px 0px 100px rgb(31, 53, 125);
 }
+
 .Table.starters-table {
   font-size: 1.4em; /* Larger font size for table entries */
   border: 2px solid #32d3ff; /* Solid border for emphasis */
@@ -389,7 +425,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  zoom: 140%;
 }
 
 .loading-text {
@@ -398,7 +434,7 @@
   color: #29d;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  animation: pulse 1s infinite ease-in-out;
+  animation: pulse .5s infinite ease-in-out;
 }
 
 .winner-info {
@@ -429,32 +465,52 @@
 
 
 .left-container {
+    display: grid;
+  grid-template-columns: 1fr 1fr;
   background-color: #83a4cc; 
   padding: 0px; 
   border-radius: 10px; 
-  background: linear-gradient(to top, #ffffff 0%, #507c90 100%);
-  height: fit-content;
+  background: linear-gradient(to top, #49b4ce 0%, #89b8ce 100%);
   margin-right: 100px;
-  margin-left: 400px;
+  margin-left: 220px;
+  width: fit-content;
+  height: fit-content;
+  margin-bottom: 100px;
 }
 .right-container {
-  padding: 0px; 
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
+  margin-left: 300px;
   border-radius: 10px;
   background: linear-gradient(to top, #3c65d6 0%, #507c90 100%);
-  width: auto;
-  margin-left: 100px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.column {
+  padding-right: 70px;
+  padding-left: 40px;
+  padding-bottom: 100px;
 }
 
 .roster-container {
   display: grid;
-  grid-template-columns: .4fr .25fr; /* Starters table takes twice the space of Leagues */
-  gap: 20px; /* Space between tables */
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  grid-template-rows: auto auto; /* Rows for each section */
+  gap: 20px; /* Space between sections */
+  margin: 10px 0px; 
+  width: 95%; 
+  padding: 20px; 
 }
 
 
 @media (max-width: 768px) {
   .roster-container {
-    flex-direction: column;
+    grid-template-columns: 1fr; /* Stacks grid items in one column */
+  }
+  .left-container {
+    margin-left: 0; /* Resets margin on smaller screens */
   }
 }
 
@@ -472,94 +528,97 @@
 }
 
 .modal-content {
-  background: linear-gradient(to top right, #2c3e50, #3498db); /* Stylish gradient background */
-  padding: 2rem; /* Responsive padding */
-  border-radius: 25px; /* Elegant border radius */
-  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5); /* Strong shadow for depth */
-  max-width: 640px; /* Suitable max width */
-  width: auto; /* Auto width for smaller devices */
-  color: #ecf0f1; /* Soft light text color for readability */
-  text-align: center; /* Center text alignment */
+  background: linear-gradient(to top right, #2c3e50, #3498db); 
+  padding: 2rem; 
+  border-radius: 25px; 
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5); 
+  height: 900px;
+  max-width: 1000px; 
+  width: 90%;
+  color: #ecf0f1; 
+  text-align: center; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem; /* Spacing between items */
-  transition: all 0.3s ease; /* Smooth transition for all effects */
-  transform: translateY(-50px) scale(1.05); /* Slight upward and scale effect */
-  opacity: 0; /* Start with modal invisible */
-  animation: slideFade 0.5s forwards; /* Animation for slide in and fade */
+  gap: 1rem; 
+  transition: all 0.3s ease; 
+  transform: scale(1);
+  opacity: 0; 
+  animation: slideFade 0.5s forwards; 
 }
 
 @keyframes slideFade {
   to {
-    transform: translateY(0) scale(1); /* End at natural state */
-    opacity: 1; /* Fully visible */
+    transform: translateY(0) scale(1); 
+    opacity: 1; 
   }
 }
 
-.modal-content h1, .modal-content p {
-  margin: 0.5rem 0; /* Margin for text elements */
+.modal-content h2, .modal-content p {
+  margin: 0.5rem 0; 
 }
 
-.modal-content h1 {
-  font-size: 2.5rem; /* Larger font size for title */
+.modal-content h2 {
+  font-size: 3.5rem; /* Significantly larger font size for the player name */
   margin-bottom: 1rem;
+  color: #000000; /* Brighter color for emphasis */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for depth */
 }
 
 .modal-content p {
-  font-size: 1.25rem; /* Comfortable font size for content */
+  font-size: 1.5rem; /* Slightly larger font size for content */
+  margin: 0.25rem 0;
 }
 
 .modal-content button {
-  background-color: #e74c3c; /* Bold button color */
+  background-color: #e74c3c; 
   color: white;
   border: none;
-  padding: 1rem 2rem; /* Larger button padding */
-  font-size: 1.25rem; /* Larger font size for button */
-  border-radius: 20px; /* Rounded button edges */
+  padding: 1rem 2rem; 
+  font-size: 1.25rem; 
+  border-radius: 20px; 
   cursor: pointer;
-  transition: background-color 0.2s; /* Smooth background color transition */
+  transition: background-color 0.2s; 
 }
 
 .modal-content button:hover {
-  background-color: #c0392b; /* Darken button color on hover */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); /* Button shadow on hover */
+  background-color: #c0392b; 
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); 
 }
 
-/* Responsive design for various screen sizes */
 @media (max-width: 768px) {
   .modal-content {
-    width: 80%; /* Wider modal on small screens */
-    padding: 1.5rem; /* Adjust padding */
-    border-radius: 15px; /* Adjust border radius */
+    width: 80%; 
+    padding: 1.5rem; 
+    border-radius: 15px; 
   }
 
   .modal-content h1 {
-    font-size: 2rem; /* Smaller font size for title */
+    font-size: 2rem; 
   }
 
   .modal-content p {
-    font-size: 1rem; /* Smaller font size for content */
+    font-size: 1rem; 
   }
 }
 
 @media (max-width: 480px) {
   .modal-content {
-    width: 95%; /* Full width modal on extra small screens */
-    padding: 1rem; /* Smaller padding */
-    border-radius: 10px; /* Smaller border radius */
+    width: 95%; 
+    padding: 1rem; 
+    border-radius: 10px; 
   }
 
   .modal-content h1 {
-    font-size: 1.75rem; /* Smaller title for very small screens */
+    font-size: 1.75rem; 
   }
 
   .modal-content p {
-    font-size: 0.9rem; /* Smaller content font for very small screens */
+    font-size: 0.9rem; 
   }
 }
 
 
 button:hover {
-  background-color: #cc8400; /* Darker shade on hover */
+  background-color: #cc8400; 
 }

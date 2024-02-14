@@ -188,26 +188,30 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
   }
   
   function formatScoringSettings(settings) {
-    const formatMap = {
-      'rec': 'PPR',
-      'bonus_rec_te': 'TEP',
-      'st_td': 'QB'
-    };
-  
     let formattedSettings = [];
   
-    // Go through each key in formatMap to see if it exists in settings
-    for (let key in formatMap) {
-      if (settings.hasOwnProperty(key)) {
-        // Convert the value to a readable format
+    
+    // Define the base scoring type based on the 'rec' setting
+    if (settings.rec === 1.0) {
+      formattedSettings.push('PPR');
+    } else if (settings.rec === 0.5) {
+      formattedSettings.push('0.5 PPR');
+    } else {
+      formattedSettings.push('Non-PPR');
+    }
+  
+    // Define a map of other settings you want to include
+    const additionalSettingsMap = {
+      'bonus_rec_te': 'TEP', // Tight End Premium
+      'st_td': 'QB'         // QB scoring
+    };
+  
+    // Go through each key in the additionalSettingsMap to see if it exists in settings
+    for (let key in additionalSettingsMap) {
+      if (settings.hasOwnProperty(key) && settings[key] > 0) {
         let value = settings[key];
-        if (key === 'rec' && value === 1) {
-          formattedSettings.push(formatMap[key]);
-        } else if (key === 'bonus_rec_te' && value > 0) {
-          formattedSettings.push(`${formatMap[key]} ${value}`);
-        } else if (key === 'st_td' && value === 6) {
-          formattedSettings.push(`${formatMap[key]}${value}`);
-        }
+        let suffix = key === 'st_td' ? value : ''; // Include the value in the string for 'st_td'
+        formattedSettings.push(`${additionalSettingsMap[key]}${suffix}`);
       }
     }
   
@@ -453,143 +457,144 @@ const sortPlayersByPoints = (playerIds) => {
           <img src={positionIcon} alt={playerDetails.position || 'Empty'} className="icon" />
           {playerName}
         </td>
-        <td>{rank}</td>
+        <td>#{rank}</td>
       </tr>
     );
   };
 
 
-return (
-  <>
-    <div className="left-panel">
-      <h2 className="left-panel-header">Flex Fantasy</h2>
-      <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
-      <button className="my-profile-button">My Profile</button>
-      <button className="model-button">Model</button>
-      <button className="settings-button">Settings</button>
-    </div>
-    <div className="pages-container">
-      <span className="title-roster">{leagueName}</span>
-      
-      <div className="Rosters">
-        <div className="controls-container">
-        <div className="scoring-settings-display">
-    <h2>Scoring Settings</h2>
-    <p>{scoringString}</p>
-  </div>
-          <div className="league-title-container">
-            <span className="winner-info">
-              <span className="year">2023 </span>
-              <span className="champ">Champ:</span>
-              <span className="winner-username">{winnerUsername}</span>
-            </span>
-          </div>
-          <div className="owner-control">
-            <label className="change-owner-label">Change Owner:</label>
-            <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
-              {owners.map(owner => (
-                <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
-              ))}
-            </select>
-            <button onClick={handleEnterButtonClick}>Enter</button>
-          </div>
-        </div>
-        {ownerRoster ? (
-          <>
-            <div className="roster-container">
-            <div className="left-container">
-              <div className="left-roster-section"> 
-                <div className="roster-section">
-                {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
-                  <h1 className="starters">Starters</h1>
-                  <table className="Table">
-                  <thead>
-                    <tr>
-                    <th>Player</th>
-                  <th>Rank</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {displayStarters(ownerRoster)}
-                </tbody>
-                  </table>
-                </div>
-                <div className="roster-section">
-                  <h1 className="bench">Bench</h1>
-                  <table className="Table">
-                  <thead>
-                    <tr>
-                    <th>Player</th>
-                  <th>Rank</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {displayBench(ownerRoster)}
-                </tbody>
-                  </table>
-                </div>
-                {ownerRoster.reserve && ownerRoster.reserve.length > 0 && (
-                  <div className="roster-section">
-                    <h1 className="ir">IR</h1>
-                    <table className="Table">
-                    <thead>
-                    <tr>
-                    <th>Player</th>
-                  <th>Rank</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {displayIR(ownerRoster)}
-                </tbody>
-                    </table>
-                  </div>
-                )}
-                {ownerRoster.taxi && ownerRoster.taxi.length > 0 && (
-                  <div className="roster-section">
-                    <h1 className="taxi">Taxi</h1>
-                    <table className="Table">
-                    <thead>
-                    <tr>
-                    <th>Player</th>
-                  <th>Rank</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {displayTaxi(ownerRoster)}
-                </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-              </div>
-
-
-            <div className="right-container">
-          <div className="roster-section user-leagues-section">
-            <h1 className="user-leagues">Leagues</h1>
-            <table className="Table">
-                    <thead>
-                    <tr>
-                    <th>{displayOwnerUsernameHeader()}s Other Leagues</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {displayUserLeagues(selectedOwner)}
-                </tbody>
-                    </table>
-          </div>
-        </div>
-
-
-            </div>
-          </>
-        ) : (
-          <div>Select an owner to view their roster.</div>
-        )}
+  return (
+    <>
+      <div className="left-panel">
+        <h2 className="left-panel-header">Flex Fantasy</h2>
+        <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
+        <button className="my-profile-button">My Profile</button>
+        <button className="model-button">Model</button>
+        <button className="settings-button">Settings</button>
       </div>
-    </div>
-  </>
-);
+      <div className="pages-container">
+        <span className="title-roster">{leagueName}</span>
+        <div className="Rosters">
+          <div className="controls-container">
+            <h1 className="owners-header">Owner: {displayOwnerUsernameHeader()}</h1>
+            <div className="scoring-settings-display">
+              <h2>Scoring Settings: {scoringString}</h2>
+            </div>
+            <div className="league-title-container">
+              <span className="winner-info">
+                <span className="year">2023 </span>
+                <span className="champ">Champ:</span>
+                <span className="winner-username">{winnerUsername}</span>
+              </span>
+            </div>
+            <div className="owner-control">
+              <label className="change-owner-label">Change Owner:</label>
+              <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
+                {owners.map(owner => (
+                  <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
+                ))}
+              </select>
+              <button onClick={handleEnterButtonClick}>Enter</button>
+            </div>
+          </div>
+          
+          {ownerRoster ? (
+            <div className="roster-container">
+              <div className="left-container">
+                {/* Column 1 */}
+                <div className="column">
+                  <div className="starters-and-ir">
+                  {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
+                    <h1 className="starters">Starters</h1>
+                    <table className="Table">
+                      <thead>
+                        <tr>
+                          <th>Player</th>
+                          <th>Rank</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {displayStarters(ownerRoster)}
+                      </tbody>
+                    </table>
+                    </div>
+                  {ownerRoster.reserve && ownerRoster.reserve.length > 0 && (
+                    <div className="starters-and-ir">
+                    
+                      <h1 className="ir">IR</h1>
+                      <table className="Table">
+                        <thead>
+                          <tr>
+                            <th>Player</th>
+                            <th>Rank</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {displayIR(ownerRoster)}
+                        </tbody>
+                      </table>
+                    
+                    </div>
+                  )}
+                </div>
+                {/* Column 2 */}
+                <div className="column">
+                <div className="starters-and-ir">
+                    <h1 className="bench">Bench</h1>
+                    <table className="Table">
+                      <thead>
+                        <tr>
+                          <th>Player</th>
+                          <th>Rank</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {displayBench(ownerRoster)}
+                      </tbody>
+                    </table>
+                  </div>
+                  {ownerRoster.taxi && ownerRoster.taxi.length > 0 && (
+                    <div className="starters-and-ir">
+                      <h1 className="taxi">Taxi</h1>
+                      <table className="Table">
+                        <thead>
+                          <tr>
+                            <th>Player</th>
+                            <th>Rank</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {displayTaxi(ownerRoster)}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="right-container">
+                <div className="user-leagues-section">
+                  <h1 className="user-leagues">Leagues</h1>
+                  <table className="Table">
+                    <thead>
+                      <tr>
+                        <th>{displayOwnerUsernameHeader()}s Other Leagues</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {displayUserLeagues(selectedOwner)}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>Select an owner to view their roster.</div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+  
 }
 
 const PlayerModal = ({ player, onClose }) => {
