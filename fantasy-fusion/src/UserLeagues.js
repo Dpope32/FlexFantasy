@@ -25,7 +25,7 @@ function UserLeagues() {
   };
 
   const parseScoringSettings = (settings) => {
-    let scoring = 'Non-PPR'; // Default scoring
+    let scoring = 'Non-PPR'; 
     if (settings.rec === 1.0) {
       scoring = 'PPR';
     } else if (settings.rec === 0.5) {
@@ -99,58 +99,33 @@ function UserLeagues() {
     
     const fetchAllRostersAndPlayers = async () => {
       setIsLoading(true);
-      console.log('Fetching all rosters and players...');
       try {
-        // Fetching the leagues for the given user
+        // Fetch leagues for the given user for the specified year
         const leaguesResponse = await fetch(`https://api.sleeper.app/v1/user/${userId}/leagues/nfl/${year}`);
-        if (!leaguesResponse.ok) {
-          throw new Error('Failed to fetch leagues');
-        }
         const leaguesData = await leaguesResponse.json();
-        console.log(`Leagues for user ${userId}:`, leaguesData);
     
-        // Fetching all rosters for each league
+        // For each league, fetch rosters and filter by username
         const rostersPromises = leaguesData.map(league => fetch(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`));
         const rostersResponses = await Promise.all(rostersPromises);
-        const rostersData = await Promise.all(
-          rostersResponses.map(async (res) => {
-            if (!res.ok) {
-              throw new Error('Failed to fetch rosters for league');
-            }
-            return await res.json();
-          })
-        );
-        console.log('Rosters data:', rostersData);
+        let filteredRosters = [];
     
-        // Flatten rosters from all leagues into one array
-        const allRosters = rostersData.flat();
-        setAllRosters(allRosters);
-    
-        // Counting player exposure
-        let playerExposure = {};
-        allRosters.forEach(roster => {
-          if (roster.players) {
-            roster.players.forEach(playerId => {
-              playerExposure[playerId] = (playerExposure[playerId] || 0) + 1;
-            });
-          }
-        });
-        console.log('Player exposure:', playerExposure);
-    
-        // Fetch all players info
-        const playersInfoResponse = await fetch('https://api.sleeper.app/v1/players/nfl');
-        if (!playersInfoResponse.ok) {
-          throw new Error('Failed to fetch player info');
+        for (const response of rostersResponses) {
+          const rostersData = await response.json();
+          // Filter rosters by checking if the owner_id matches the user's id (You might need additional logic to map username to owner_id)
+          const userRosters = rostersData.filter(roster => roster.owner_id === userId); // Adjust this condition based on your data structure
+          filteredRosters = filteredRosters.concat(userRosters);
         }
-        const playersInfoData = await playersInfoResponse.json();
-        setAllPlayersInfo(playersInfoData);
-        console.log('Players info data:', playersInfoData);
+    
+        setAllRosters(filteredRosters);
+    
+        // Additional processing can be continued here as needed...
       } catch (error) {
         console.error('Error fetching all rosters and players info:', error);
       } finally {
         setIsLoading(false);
       }
     };
+
     useEffect(() => {
       // Assuming you've already fetched allPlayersInfo and playerStats2023
     
@@ -182,65 +157,59 @@ function UserLeagues() {
             });
         }
       });
-      console.log('Specific stats for Josh Allen:', playerStats['6744']);
-      // Check if Josh Allen's data exists before attempting to log it
-      if (positionScores.QB && positionScores.QB.some(entry => entry.playerId === '6744')) {
-        console.log('Rank for Josh Allen before sorting:', positionScores['QB'].find(p => p.playerId === '6744'));
-      } else {
-        console.log('Josh Allen not found in positionScores.QB', positionScores.QB);
-      }
+
       
       return positionRanks;
     };
   
     useEffect(() => {
       if (userId) {
-        fetchAllRostersAndPlayers();
-      }
-    }, [userId, year]);
-// Modify the player exposure calculation
-const calculateExposure = () => {
-  let playerExposure = {};
-  let leaguesProcessed = []; // To track which leagues have been processed successfully
-  console.log('Calculating exposure with rosters:', allRosters);
-
-  if (allRosters) {
-    allRosters.forEach((roster) => {
-      if (roster && roster.players) {
-        leaguesProcessed.push(roster.league_id); // Track successful processing
-        roster.players.forEach((playerId) => {
-          if (playerId != null) {
-            playerExposure[playerId] = (playerExposure[playerId] || 0) + 1;
-          }
+        fetchAllRostersAndPlayers().then(() => {
+          console.log(calculateExposure()); // Log the exposure details after fetching rosters
         });
       }
-    });
-  }
-
-  console.log('Leagues processed:', [...new Set(leaguesProcessed)]); // Log unique league IDs
+    }, [userId, year]);
     
-    const playerExposureArray = Object.entries(playerExposure)
-      .map(([playerId, count]) => {
-        const playerInfo = allPlayersInfo[playerId];
-        if (playerInfo && playerInfo.full_name) {
-          return {
-            playerId,
-            exposure: ((count / allRosters.length) * 100).toFixed(2),
-            player: playerInfo.full_name,
-            position: playerInfo.position || 'Unknown Position',
-          };
-        }
-        return null;
-      })
-      .filter(entry => entry && entry.player !== 'Unknown Player')
-      .sort((a, b) => parseFloat(b.exposure) - parseFloat(a.exposure)) // This line sorts by exposure in descending order
-      .slice(0, 100); // This limits the array to the top 100 players
 
-        
-          console.log('Exposure array:', playerExposureArray);
-        
-          return playerExposureArray;
+
+    const calculateExposure = () => {
+      let playerExposure = {};
+      let playerLeagues = {}; // Object to track leagues for each player
+      let leaguesProcessed = new Set(); // Correctly initialize leaguesProcessed
+      console.log('Leagues:', leagues);
+    
+      allRosters.forEach(roster => {
+        if (roster.players) {
+          leaguesProcessed.add(roster.league_id);
+          const leagueName = leagues.find(league => league.leagueId === roster.league_id)?.name || "Unknown League";
+          roster.players.forEach(playerId => {
+            if (!playerLeagues[playerId]) {
+              playerLeagues[playerId] = [];
+            }
+            playerLeagues[playerId].push(leagueName); // Add league name to the player's leagues list
+            playerExposure[playerId] = (playerExposure[playerId] || 0) + 1;
+          });
+        }
+      });
+    
+      const uniqueLeaguesCount = leagues.length; // Assuming 'leagues' is an array of all leagues
+    
+      const playerExposureArray = Object.entries(playerExposure).map(([playerId, count]) => {
+        const playerInfo = allPlayersInfo[playerId];
+        return {
+          playerId,
+          exposure: ((count / uniqueLeaguesCount) * 100).toFixed(2),
+          player: playerInfo?.full_name || 'Unknown Player',
+          position: playerInfo?.position || 'Unknown Position',
+          leagues: playerLeagues[playerId] || [], // Include the leagues in the result
         };
+      }).filter(player => player.player !== 'Unknown Player');
+    
+      return playerExposureArray.sort((a, b) => b.exposure - a.exposure);
+    };
+    
+    
+
         
         const displayOwnerUsernameHeader = () => {
           const owner = username;
@@ -263,13 +232,31 @@ const calculateExposure = () => {
                 {sharersData.map((item, index) => (
                   <tr key={item.playerId} onClick={() => handlePlayerClick(item.playerId)}>
                     <td>{item.player}</td>
-                    <td>{item.exposure}%</td>
+                    <td onClick={(event) => handleExposureClick(event, item.playerId)}>{item.exposure}%</td>
+
                   </tr>
                 ))}
               </tbody>
             </table>
           );
         };
+
+        const handleExposureClick = (event, playerId) => {
+          event.stopPropagation(); // This stops the event from bubbling up
+          console.log(`Exposure clicked for player ID: ${playerId}`);
+          const playerExposureDetails = calculateExposure().find(p => p.playerId === playerId);
+          if (playerExposureDetails) {
+            console.log(playerExposureDetails.leagues); // This should log the leagues array to the console
+            const modalContent = {
+              player: allPlayersInfo[playerId]?.full_name || "Unknown Player",
+              leagues: playerExposureDetails.leagues,
+            };
+            setModalContent(modalContent);
+            setShowModal(true);
+          }
+        };
+
+        
         
         const handlePlayerClick = (playerId) => {
           const playerDetails = allPlayersInfo[playerId];
@@ -401,23 +388,38 @@ const calculateExposure = () => {
       </div>
   );
 }
+const PlayerModal = ({ content, onClose }) => {
+  if (!content) {
+    return (
+      <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal-content">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-const PlayerModal = ({ player, onClose }) => {
+  const { full_name, leagues } = content; // Assuming content contains 'full_name' and 'leagues'
+
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" style={{ transform: 'scale(2)' }}>
-        <h2>{player.full_name}</h2>
-        <p>Rank: {player.rank}</p>
-        <p>Points: {player.points}</p>
-        <p>Experience: {player.experience}</p>
-        <p>Yards: {player.yards}</p>
-        <p>Touchdowns: {player.touchdowns}</p>
-        <p>Points Per Game: {player.ppg}</p>
-        <p>Keep Trade Cut Value: {player.ktc}</p>
-        <p>Age: {player.age}</p>
+        <h2>{full_name}</h2>
+        {leagues && (
+          <>
+            <h3>Leagues:</h3>
+            <ul>
+              {leagues.map((league, index) => (
+                <li key={index}>{league}</li>
+              ))}
+            </ul>
+          </>
+        )}
         <button onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
+
+
 export default UserLeagues;
