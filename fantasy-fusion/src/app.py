@@ -36,7 +36,6 @@ def fetch_user_leagues(user_id, year):
     if response.status_code == 200:
         return response.json()
     else:
-        # It's better to log errors instead of printing them
         app.logger.error(f"Error fetching leagues for user {user_id} for year {year}: {response.status_code}, {response.text}")
         return None
         

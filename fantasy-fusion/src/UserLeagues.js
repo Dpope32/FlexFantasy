@@ -2,9 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, useSortBy, useFilters } from 'react-table';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './UserLeagues.css';
-// import leaguesImage from './leagues.jpeg';
-
-
 function UserLeagues() {
   const year = '2023';
   const [playerStats2023, setPlayerStats2023] = useState({});
@@ -40,13 +37,9 @@ function UserLeagues() {
   const parseTradeDeadline = (tradeDeadline) => {
     return tradeDeadline === 99 ? "None" : `Week ${tradeDeadline}`;
   };
-
   useEffect(() => {
     const { userId, user } = location.state || {};
-
     if (userId) {
-      console.log('Fetching data for user ID:', userId);
-      
     fetch('http://127.0.0.1:5000/stats/nfl/regular/2023')
     .then(response => {
       if (!response.ok) {
@@ -76,7 +69,7 @@ function UserLeagues() {
         .then(response => response.json())
         .then(data => {
           const transformedData = data.map(league => ({
-            leagueId: league.league_id, // Include leagueId in the data
+            leagueId: league.league_id, 
             name: league.name !== "Leagues will be posted here!" ? league.name : null,
             size: league.total_rosters,
             benchSpots: league.roster_positions.filter(pos => pos === "BN").length,
@@ -100,25 +93,19 @@ function UserLeagues() {
     const fetchAllRostersAndPlayers = async () => {
       setIsLoading(true);
       try {
-        // Fetch leagues for the given user for the specified year
         const leaguesResponse = await fetch(`https://api.sleeper.app/v1/user/${userId}/leagues/nfl/${year}`);
         const leaguesData = await leaguesResponse.json();
-    
-        // For each league, fetch rosters and filter by username
         const rostersPromises = leaguesData.map(league => fetch(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`));
         const rostersResponses = await Promise.all(rostersPromises);
         let filteredRosters = [];
     
         for (const response of rostersResponses) {
           const rostersData = await response.json();
-          // Filter rosters by checking if the owner_id matches the user's id (You might need additional logic to map username to owner_id)
-          const userRosters = rostersData.filter(roster => roster.owner_id === userId); // Adjust this condition based on your data structure
+          const userRosters = rostersData.filter(roster => roster.owner_id === userId); 
           filteredRosters = filteredRosters.concat(userRosters);
         }
     
         setAllRosters(filteredRosters);
-    
-        // Additional processing can be continued here as needed...
       } catch (error) {
         console.error('Error fetching all rosters and players info:', error);
       } finally {
@@ -127,18 +114,14 @@ function UserLeagues() {
     };
 
     useEffect(() => {
-      // Assuming you've already fetched allPlayersInfo and playerStats2023
-    
       if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
         const newRanks = calculatePositionRanks(playerStats2023);
         setPositionRanks(newRanks);
       }
-    }, [allPlayersInfo, playerStats2023]); // This effect depends on allPlayersInfo and playerStats2023
+    }, [allPlayersInfo, playerStats2023]); 
     
-  
     const calculatePositionRanks = (playerStats) => {
       const positionScores = {};
-    
       Object.entries(playerStats).forEach(([playerId, stats]) => {
         const position = allPlayersInfo[playerId]?.position || 'DEF';
         if (!positionScores[position]) {
@@ -149,7 +132,6 @@ function UserLeagues() {
     
       const positionRanks = {};
       Object.keys(positionScores).forEach(position => {
-        // Make sure we have an array to work with
         if (positionScores[position] && Array.isArray(positionScores[position])) {
           positionScores[position].sort((a, b) => b.points - a.points)
             .forEach((entry, index) => {
@@ -157,25 +139,21 @@ function UserLeagues() {
             });
         }
       });
-
-      
       return positionRanks;
     };
   
     useEffect(() => {
       if (userId) {
         fetchAllRostersAndPlayers().then(() => {
-          console.log(calculateExposure()); // Log the exposure details after fetching rosters
+          console.log(calculateExposure()); 
         });
       }
     }, [userId, year]);
     
-
-
     const calculateExposure = () => {
       let playerExposure = {};
-      let playerLeagues = {}; // Object to track leagues for each player
-      let leaguesProcessed = new Set(); // Correctly initialize leaguesProcessed
+      let playerLeagues = {};
+      let leaguesProcessed = new Set();
       console.log('Leagues:', leagues);
     
       allRosters.forEach(roster => {
@@ -186,14 +164,13 @@ function UserLeagues() {
             if (!playerLeagues[playerId]) {
               playerLeagues[playerId] = [];
             }
-            playerLeagues[playerId].push(leagueName); // Add league name to the player's leagues list
+            playerLeagues[playerId].push(leagueName); 
             playerExposure[playerId] = (playerExposure[playerId] || 0) + 1;
           });
         }
       });
     
-      const uniqueLeaguesCount = leagues.length; // Assuming 'leagues' is an array of all leagues
-    
+      const uniqueLeaguesCount = leagues.length; 
       const playerExposureArray = Object.entries(playerExposure).map(([playerId, count]) => {
         const playerInfo = allPlayersInfo[playerId];
         return {
@@ -201,23 +178,20 @@ function UserLeagues() {
           exposure: ((count / uniqueLeaguesCount) * 100).toFixed(2),
           player: playerInfo?.full_name || 'Unknown Player',
           position: playerInfo?.position || 'Unknown Position',
-          leagues: playerLeagues[playerId] || [], // Include the leagues in the result
+          leagues: playerLeagues[playerId] || [], 
         };
       }).filter(player => player.player !== 'Unknown Player');
     
       return playerExposureArray.sort((a, b) => b.exposure - a.exposure);
     };
     
-    
-
-        
         const displayOwnerUsernameHeader = () => {
           const owner = username;
           return owner ? (username) : '';
         };
   
         const displaySharersTable = () => {
-          const sharersData = calculateExposure(); // Calculate the data for the sharers table
+          const sharersData = calculateExposure(); 
         
           return (
             <table className="Table">
@@ -241,42 +215,39 @@ function UserLeagues() {
           );
         };
 
-        const handleExposureClick = (event, playerId) => {
-          event.stopPropagation(); // This stops the event from bubbling up
-          console.log(`Exposure clicked for player ID: ${playerId}`);
-          const playerExposureDetails = calculateExposure().find(p => p.playerId === playerId);
-          if (playerExposureDetails) {
-            console.log(playerExposureDetails.leagues); // This should log the leagues array to the console
-            const modalContent = {
-              player: allPlayersInfo[playerId]?.full_name || "Unknown Player",
-              leagues: playerExposureDetails.leagues,
-            };
-            setModalContent(modalContent);
-            setShowModal(true);
-          }
-        };
+  const handleExposureClick = (event, playerId) => {
+    event.stopPropagation(); 
+    console.log(`Exposure clicked for player ID: ${playerId}`);
+    const playerExposureDetails = calculateExposure().find(p => p.playerId === playerId);
+    if (playerExposureDetails) {
+      const modalContent = {
+        player: allPlayersInfo[playerId]?.full_name || "Unknown Player",
+        leagues: playerExposureDetails.leagues,
+      };
+      setModalContent(modalContent);
+      setShowModal(true);
+    }
+  };
 
-        
-        
-        const handlePlayerClick = (playerId) => {
-          const playerDetails = allPlayersInfo[playerId];
-          const playerStats = playerStats2023[playerId];
-          const rank = positionRanks[playerId] || 'N/A';
-          
-          const playerData = {
-            full_name: playerDetails.full_name,
-            rank: rank,
-            points: playerStats.pts_ppr,
-            experience: playerDetails.years_exp,
-            yards: playerStats.yards, 
-            touchdowns: playerStats.touchdowns, 
-            ppg: playerStats.ppg, 
-            ktc: playerStats.ktc, 
-            age: playerDetails.age, 
-          };
-          setModalContent(playerData);
-          setShowModal(true);
-        };
+  const handlePlayerClick = (playerId) => {
+    const playerDetails = allPlayersInfo[playerId];
+    const playerStats = playerStats2023[playerId];
+    const rank = positionRanks[playerId] || 'N/A';
+    
+    const playerData = {
+      full_name: playerDetails.full_name,
+      rank: rank,
+      points: playerStats.pts_ppr,
+      experience: playerDetails.years_exp,
+      yards: playerStats.yards, 
+      touchdowns: playerStats.touchdowns, 
+      ppg: playerStats.ppg, 
+      ktc: playerStats.ktc, 
+      age: playerDetails.age, 
+    };
+    setModalContent(playerData);
+    setShowModal(true);
+  };
  
   const data = useMemo(() => leagues, [leagues]);
   const columns = useMemo(
@@ -317,8 +288,6 @@ function UserLeagues() {
     prepareRow,
   } = useTable({ columns, data }, useFilters, useSortBy);
 
-
-
   if (isLoading) {
     return (
       <div className="loading-container">
@@ -326,15 +295,13 @@ function UserLeagues() {
       </div>
     );
   }
-
   return ( 
-    
     <div className="UserLeagues">
           <div className="left-panel">
             <h2 className="left-panel-header">Flex Fantasy</h2>
             <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
             <button className="my-profile-button">My Profile</button>
-            <button className="model-button">Model</button>
+            <button className="model-button" onClick={() => navigate('/model')}>Model</button>
             <button className="settings-button">Settings</button>
           </div>
           <div className="main-content">
@@ -347,10 +314,6 @@ function UserLeagues() {
         <div className="Table2Container">
         <h2 className="header-title">Leagues</h2>
           <div className="headers-container"></div>
-
-      {/* <img src={leaguesImage} alt="Leagues" className="LeaguesImage" /> */}
-
-        
         <table {...getTableProps()} className="Table">
           <thead>
             {headerGroups.map(headerGroup => (
@@ -382,10 +345,9 @@ function UserLeagues() {
           </tbody>
         </table>
       </div>
-
-        </div>
-      </div>
-      </div>
+    </div>
+  </div>
+</div>
   );
 }
 const PlayerModal = ({ content, onClose }) => {
@@ -398,9 +360,7 @@ const PlayerModal = ({ content, onClose }) => {
       </div>
     );
   }
-
-  const { full_name, leagues } = content; // Assuming content contains 'full_name' and 'leagues'
-
+  const { full_name, leagues } = content; 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" style={{ transform: 'scale(2)' }}>

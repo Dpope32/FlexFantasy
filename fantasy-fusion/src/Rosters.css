@@ -174,14 +174,14 @@ button {
 .left-roster-section, .right-roster-section {
   display: flex;
   flex-direction: column;
-  width: 50%; /* Adjust width as needed */
+  width: 50%; 
 }
 
 .left-panel {
   position: fixed;
   height: auto;
-  width: 220px; /* Adjust the width as necessary */
-  flex-shrink: 0; /* Prevent the sidebar from shrinking */
+  width: 220px; 
+  flex-shrink: 0; 
   position: fixed;
   text-align: center;
   top: 0;
@@ -191,7 +191,7 @@ button {
   background: linear-gradient(to right, #2c3e50, #102a3c);
   color: #ecf0f1;
   padding: 1rem;
-  border-radius: 0 25px 25px 0; /* Only round the right side corners */
+  border-radius: 0 25px 25px 0; 
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   opacity: 100%;
 }
@@ -332,7 +332,7 @@ button {
 }
 
 .user-leagues-section {
-  grid-column: span 2; /* Leagues section will span across both columns */
+  grid-column: span 2; 
   width: 100%;
   display: block;
   margin-top: 0;
@@ -373,7 +373,7 @@ button {
 }
 
 .roster-section {
-  padding: 0 50px 20px; /* Add padding to the bottom */
+  padding: 0 50px 20px; 
   margin-bottom: 20px; 
 }
 
@@ -404,9 +404,9 @@ button {
 }
 
 .Table.starters-table {
-  font-size: 1.4em; /* Larger font size for table entries */
-  border: 2px solid #32d3ff; /* Solid border for emphasis */
-  box-shadow: 0 0 15px #32d3ff; /* Shadow for depth */
+  font-size: 1.4em; 
+  border: 2px solid #32d3ff; 
+  box-shadow: 0 0 15px #32d3ff; 
 }
 
 .winner-username {
@@ -496,9 +496,9 @@ button {
 
 .roster-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Two columns */
-  grid-template-rows: auto auto; /* Rows for each section */
-  gap: 20px; /* Space between sections */
+  grid-template-columns: repeat(2, 1fr); 
+  grid-template-rows: auto auto; 
+  gap: 20px; 
   margin: 10px 0px; 
   width: 95%; 
   padding: 20px; 
@@ -507,10 +507,10 @@ button {
 
 @media (max-width: 768px) {
   .roster-container {
-    grid-template-columns: 1fr; /* Stacks grid items in one column */
+    grid-template-columns: 1fr; 
   }
   .left-container {
-    margin-left: 0; /* Resets margin on smaller screens */
+    margin-left: 0; 
   }
 }
 
@@ -520,7 +520,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(10, 10, 10, 0.9); /* Dark, semi-transparent backdrop */
+  background-color: rgba(10, 10, 10, 0.9); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -559,14 +559,14 @@ button {
 }
 
 .modal-content h2 {
-  font-size: 3.5rem; /* Significantly larger font size for the player name */
+  font-size: 3.5rem; 
   margin-bottom: 1rem;
-  color: #000000; /* Brighter color for emphasis */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for depth */
+  color: #000000; 
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
 }
 
 .modal-content p {
-  font-size: 1.5rem; /* Slightly larger font size for content */
+  font-size: 1.5rem; 
   margin: 0.25rem 0;
 }
 

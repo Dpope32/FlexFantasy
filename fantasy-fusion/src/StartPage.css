@@ -7,22 +7,22 @@
   font-family: 'Arial', sans-serif;
   background-image: url('flex-fantasy.jpg');
   background-size: cover;
-  background-position: top left; /* Align the top of the image with the top of the container */
+  background-position: top left; 
   background-repeat: no-repeat;
   position: relative;
   font-weight: bold;
   font-size: 32px;
   display: flex;
-  align-items: center; /* This will vertically center the username form */
+  align-items: center; 
   justify-content: center;
-  overflow: hidden; /* Hide the overflow to remove black space at the bottom */
+  overflow: hidden; 
 }
 .username-form {
-  position: absolute; /* Position absolutely within the start-page */
-  bottom: 40%; /* Adjust as necessary to place it below the Flex Fantasy circle */
+  position: absolute; 
+  bottom: 40%; 
   padding: 20px;
-  background: rgba(0, 0, 0, 0.5); /* Optional: adds a translucent background */
-  border-radius: 10px; /* Optional: rounds the corners */
+  background: rgba(0, 0, 0, 0.5); 
+  border-radius: 10px; 
 }
   
   .username-label {
@@ -52,8 +52,8 @@
     top: 20px;
     left: 20px;
     font-family: 'Orbitron', sans-serif;
-    font-size: 62px; /* Adjust the size as necessary */
-    text-shadow: 2px 2px 8px #0071b3ef; /* Optional: adds a shadow to make the text stand out */
+    font-size: 62px; 
+    text-shadow: 2px 2px 8px #0071b3ef; 
   }
   .left-panel {
     position: fixed;
@@ -68,17 +68,17 @@
 
   .flex-fantasy-image {
     max-width: 100%;
-    height: auto; /* Change to auto so the image's height scales with its width */
-    opacity: 1; /* Adjust the opacity back to fully visible if necessary */
+    height: auto;
+    opacity: 1; 
     zoom: 55%;
   }
 
   .table-container {
-    text-align: left; /* Aligns the inner table to the left */
+    text-align: left; 
   }
   
   .Table {
-    margin-left: 0; /* Aligns the table to the left within its container */
+    margin-left: 0; 
     margin-right: auto; 
   }
 

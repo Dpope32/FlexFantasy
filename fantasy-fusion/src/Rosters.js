@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
-import StartPage from './StartPage';
 import qbIcon from './qb.png'; 
 import rbIcon from './rb.png'; 
 import wrIcon from './wr.png'; 
@@ -9,9 +8,6 @@ import teIcon from './te.png';
 import defIcon from './def.png'; 
 import flexIcon from './flex.png';
 import kIcon from './k.png';
-
-
-
 
 function Rosters() {
   const [rosters, setRosters] = useState([]);
@@ -34,7 +30,6 @@ function Rosters() {
   const [userLeagues, setUserLeagues] = useState([]);
   const [leagueName, setLeagueName] = useState(location.state?.leagueName || 'League');
 const [leagueId, setLeagueId] = useState(useParams().leagueId);
-
 
   useEffect(() => {
     if (selectedOwner) {
@@ -68,13 +63,11 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
         return response.json();
       })
       .then(data => {
-        console.log('Player stats for Josh Allen:', data['6744']); // Replace '33' with the correct ID if it's different
         setPlayerStats2023(data);
         const positionRanks = calculatePositionRanks(data);
         setPositionRanks(positionRanks); 
       })
       .catch(error => console.error('Error fetching player stats:', error));
-  
     fetchData();
   }, [leagueId]);
 
@@ -83,21 +76,17 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
       .then(response => response.json())
       .then(data => {
         setScoringSettings(data.scoring_settings);
-        // Use setScoringString to update the scoringString state with the formatted string
         setScoringString(formatScoringSettings(data.scoring_settings));
       })
       .catch(error => console.error('Error fetching league details:', error));
   }, [leagueId]);
   
   useEffect(() => {
-    // Assuming you've already fetched allPlayersInfo and playerStats2023
-  
     if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
       const newRanks = calculatePositionRanks(playerStats2023);
       setPositionRanks(newRanks);
     }
-  }, [allPlayersInfo, playerStats2023]); // This effect depends on allPlayersInfo and playerStats2023
-  
+  }, [allPlayersInfo, playerStats2023]); 
 
   const calculatePositionRanks = (playerStats) => {
     const positionScores = {};
@@ -112,7 +101,6 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
   
     const positionRanks = {};
     Object.keys(positionScores).forEach(position => {
-      // Make sure we have an array to work with
       if (positionScores[position] && Array.isArray(positionScores[position])) {
         positionScores[position].sort((a, b) => b.points - a.points)
           .forEach((entry, index) => {
@@ -120,19 +108,10 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
           });
       }
     });
-    console.log('Specific stats for Josh Allen:', playerStats['6744']);
-    // Check if Josh Allen's data exists before attempting to log it
-    if (positionScores.QB && positionScores.QB.some(entry => entry.playerId === '6744')) {
-      console.log('Rank for Josh Allen before sorting:', positionScores['QB'].find(p => p.playerId === '6744'));
-    } else {
-      console.log('Josh Allen not found in positionScores.QB', positionScores.QB);
-    }
-    
     return positionRanks;
   };
 
   async function fetchData() {
-  
     if (!leagueId) {
       console.error("League ID is undefined");
       return;
@@ -164,7 +143,6 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
         return acc;
       }, {});
       
-
       const winnerRosterId = leagueDetailsData.metadata?.latest_league_winner_roster_id;
       if (winnerRosterId) {
         const winnerRoster = leagueRostersData.find(roster => roster.roster_id.toString() === winnerRosterId.toString());
@@ -177,9 +155,7 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
 
       const initialOwner = updatedOwners.find(owner => owner.username === initialUsername);
       setSelectedOwner(initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
-
       setOwners(updatedOwners); 
-
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -189,9 +165,6 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
   
   function formatScoringSettings(settings) {
     let formattedSettings = [];
-  
-    
-    // Define the base scoring type based on the 'rec' setting
     if (settings.rec === 1.0) {
       formattedSettings.push('PPR');
     } else if (settings.rec === 0.5) {
@@ -199,25 +172,21 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
     } else {
       formattedSettings.push('Non-PPR');
     }
-  
-    // Define a map of other settings you want to include
     const additionalSettingsMap = {
-      'bonus_rec_te': 'TEP', // Tight End Premium
-      'st_td': 'QB'         // QB scoring
+      'bonus_rec_te': 'TEP', 
+      'st_td': 'QB'  
     };
-  
-    // Go through each key in the additionalSettingsMap to see if it exists in settings
     for (let key in additionalSettingsMap) {
       if (settings.hasOwnProperty(key) && settings[key] > 0) {
         let value = settings[key];
-        let suffix = key === 'st_td' ? value : ''; // Include the value in the string for 'st_td'
+        let suffix = key === 'st_td' ? value : ''; 
         formattedSettings.push(`${additionalSettingsMap[key]}${suffix}`);
       }
     }
   
     return formattedSettings.join(' + ');
   }
-  
+
   const sortStarters = (starterIds, rosterPositions, allPlayersInfo) => {
     const positionOrder = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX'];
     const sortedStarters = [];
@@ -289,8 +258,6 @@ const displayOwnerUsernameHeader = () => {
     return roster.owner_id === selectedOwner; 
   });
 
- 
-
   if (isLoading) {
     return <div className="loading-container">
     <div className="loading-text">Loading...</div>
@@ -324,11 +291,8 @@ const displayOwnerUsernameHeader = () => {
   };
 
   const navigateToRoster = (leagueId, leagueName) => {
-    // Set league name and ID
-    setLeagueName(leagueName); // Assuming you have a state setter for leagueName
-    setLeagueId(leagueId); // Assuming you have a state setter for leagueId
-  
-    // Fetch the roster for the new league
+    setLeagueName(leagueName); 
+    setLeagueId(leagueId); 
     setIsLoading(true);
     fetch(`http://localhost:5000/league/${leagueId}/rosters`)
       .then(response => response.json())
@@ -336,7 +300,6 @@ const displayOwnerUsernameHeader = () => {
         setRosters(data);
         const ownerRoster = data.find(roster => roster.owner_id === selectedOwner);
         if (ownerRoster) {
-          // Your logic to set the owner's roster
         }
         navigate(`/rosters/${leagueId}`);
       })
@@ -345,7 +308,6 @@ const displayOwnerUsernameHeader = () => {
   };
   
   
-
   const displayUserLeagues = () => {
     return userLeagues.map((league, index) => (
       <tr key={index} onClick={() => navigateToRoster(league.league_id, league.name)}>
@@ -353,10 +315,6 @@ const displayOwnerUsernameHeader = () => {
       </tr>
     ));
   };
-  
-  
-
-
 
   const positionToIconMap = {
       QB: qbIcon,
@@ -380,8 +338,8 @@ const sortPlayersByPoints = (playerIds) => {
   const displayPlayerRow = (playerId, isStarter, index, totalStarters) => {
     const playerDetails = allPlayersInfo[playerId] || {};
     const playerStats = playerStats2023[playerId] || {};
-    let rank = positionRanks[playerId] || 'N/A'; // Changed from 'Unknown' to 'N/A'
-    let playerName = playerDetails.full_name || '(empty)'; // Changed from 'Unknown' to '(empty)'
+    let rank = positionRanks[playerId] || 'N/A'; 
+    let playerName = playerDetails.full_name || '(empty)';
     let position = playerDetails.position;
 
   const teamNameMapping = {
@@ -441,7 +399,6 @@ const sortPlayersByPoints = (playerIds) => {
       setModalContent(playerData); 
       setShowModal(true); 
     };
-
     if (isStarter) {
       if (position === 'QB' && index === totalStarters - 1) {
         position = 'SF'; 
@@ -449,8 +406,6 @@ const sortPlayersByPoints = (playerIds) => {
         position = 'FLEX';
       }
     }
-    
-    
     return (
       <tr key={playerId || `empty-${index}`} onClick={handleClick}>
         <td>
@@ -461,15 +416,13 @@ const sortPlayersByPoints = (playerIds) => {
       </tr>
     );
   };
-
-
   return (
     <>
       <div className="left-panel">
         <h2 className="left-panel-header">Flex Fantasy</h2>
         <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
         <button className="my-profile-button">My Profile</button>
-        <button className="model-button">Model</button>
+        <button className="model-button" onClick={() => navigate('/model')}>Model</button>
         <button className="settings-button">Settings</button>
       </div>
       <div className="pages-container">
@@ -496,8 +449,7 @@ const sortPlayersByPoints = (playerIds) => {
               </select>
               <button onClick={handleEnterButtonClick}>Enter</button>
             </div>
-          </div>
-          
+          </div>   
           {ownerRoster ? (
             <div className="roster-container">
               <div className="left-container">
@@ -537,7 +489,6 @@ const sortPlayersByPoints = (playerIds) => {
                     </div>
                   )}
                 </div>
-                {/* Column 2 */}
                 <div className="column">
                 <div className="starters-and-ir">
                     <h1 className="bench">Bench</h1>
@@ -594,7 +545,6 @@ const sortPlayersByPoints = (playerIds) => {
       </div>
     </>
   );
-  
 }
 
 const PlayerModal = ({ player, onClose }) => {
