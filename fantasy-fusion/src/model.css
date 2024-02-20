@@ -1,10 +1,56 @@
 /* Model.css */
 .model-page {
-    text-align: center;
-    padding: 20px;
-    color: rgb(121, 252, 254);
-    font-family: 'Arial', sans-serif;
-  }
-  
+  text-align: center;
+  padding: 20px;
+  color: #79fcfe;
+  font-family: 'Arial', sans-serif;
+}
 
-  
+input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.suggestions-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-align: left;
+  position: absolute;
+  background-color: #fff;
+  width: 200px; /* Adjust width as per your input size */
+  border-radius: 0 0 5px 5px;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+.suggestions-list li:hover {
+  background-color: #f2f2f2;
+}

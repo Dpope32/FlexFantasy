@@ -416,6 +416,7 @@ const sortPlayersByPoints = (playerIds) => {
       </tr>
     );
   };
+  
   return (
     <>
       <div className="left-panel">
@@ -520,12 +521,13 @@ const sortPlayersByPoints = (playerIds) => {
                       </table>
                     </div>
                   )}
+
                 </div>
+                
               </div>
               <div className="right-container">
-                <div className="user-leagues-section">
-                  <h1 className="user-leagues">Leagues</h1>
-                  <table className="Table">
+              <div className="other-leagues-section">
+                <table className="Table">
                     <thead>
                       <tr>
                         <th>{displayOwnerUsernameHeader()}s Other Leagues</th>
@@ -535,9 +537,9 @@ const sortPlayersByPoints = (playerIds) => {
                       {displayUserLeagues(selectedOwner)}
                     </tbody>
                   </table>
+                  </div>
                 </div>
-              </div>
-            </div>
+                </div>
           ) : (
             <div>Select an owner to view their roster.</div>
           )}

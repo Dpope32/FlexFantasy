@@ -350,36 +350,25 @@ function UserLeagues() {
 </div>
   );
 }
-const PlayerModal = ({ content, onClose }) => {
-  if (!content) {
-    return (
-      <div className="modal-backdrop" onClick={onClose}>
-        <div className="modal-content">
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  const { full_name, leagues } = content; 
+const PlayerModal = ({ player, onClose }) => {
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop">
       <div className="modal-content" style={{ transform: 'scale(2)' }}>
-        <h2>{full_name}</h2>
-        {leagues && (
-          <>
-            <h3>Leagues:</h3>
-            <ul>
-              {leagues.map((league, index) => (
-                <li key={index}>{league}</li>
-              ))}
-            </ul>
-          </>
-        )}
+        <h2>{player.full_name}</h2>
+        <p>Rank: {player.rank}</p>
+        <p>Points: {player.points}</p>
+        <p>Experience: {player.experience}</p>
+        <p>Yards: {player.yards}</p>
+        <p>Touchdowns: {player.touchdowns}</p>
+        <p>Points Per Game: {player.ppg}</p>
+        <p>Keep Trade Cut Value: {player.ktc}</p>
+        <p>Age: {player.age}</p>
         <button onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
+
 
 
 export default UserLeagues;

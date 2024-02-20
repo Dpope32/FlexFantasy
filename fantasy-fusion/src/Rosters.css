@@ -174,7 +174,7 @@ button {
 .left-roster-section, .right-roster-section {
   display: flex;
   flex-direction: column;
-  width: 50%; 
+  width: 100%; 
 }
 
 .left-panel {
@@ -231,14 +231,12 @@ button {
   margin-left: 0;
   margin-right: auto;
   width: auto;
-  border-collapse: separate;
-  margin: 0 auto;
   font-size: 1.4em;
   border: 1px solid #000000;
   border-radius: 1rem;
   border-spacing: 0;
   overflow-x: auto; 
-  box-shadow: 0px 0px 100px rgb(31, 53, 125);
+  box-shadow: 0px 0px 100px rgb(36, 57, 124);
   padding: 15px;
   font-family: 'Arial', sans-serif;
   font-size: 24px;
@@ -331,20 +329,10 @@ button {
   text-transform: uppercase; 
 }
 
-.user-leagues-section {
-  grid-column: span 2; 
+.other-leagues-section {
   width: 100%;
-  display: block;
-  margin-top: 0;
-  padding-top: 0;
-}
-
-
-
-.Table.leagues-table {
-  font-size: 1em; 
-  border: 1px solid #7f8c8d; 
-  box-shadow: none; 
+  display: flex;
+  padding: 50px;
 }
 
 .back-button {
@@ -372,10 +360,7 @@ button {
   gap: 10px;
 }
 
-.roster-section {
-  padding: 0 50px 20px; 
-  margin-bottom: 20px; 
-}
+
 
 .title-roster {
   font-size: 8rem;
@@ -393,21 +378,16 @@ button {
 
 
 .starters,.bench, .ir, .taxi, .user-leagues {
-  font-size: 3em; 
+  font-size: 2em; 
   color: #32d3ff; 
   background-color: #0A192F;
   padding: 20px; 
-  border-radius: 50px; 
+  border-radius: 30px; 
   margin-bottom: 20px;
-  width: auto;
+  width: 50%;
   box-shadow: 0px 0px 100px rgb(31, 53, 125);
 }
 
-.Table.starters-table {
-  font-size: 1.4em; 
-  border: 2px solid #32d3ff; 
-  box-shadow: 0 0 15px #32d3ff; 
-}
 
 .winner-username {
   text-align: center;
@@ -465,13 +445,11 @@ button {
 
 
 .left-container {
-    display: grid;
+  display: grid;
   grid-template-columns: 1fr 1fr;
   background-color: #83a4cc; 
   padding: 0px; 
   border-radius: 10px; 
-  background: linear-gradient(to top, #49b4ce 0%, #89b8ce 100%);
-  margin-right: 100px;
   margin-left: 220px;
   width: fit-content;
   height: fit-content;
@@ -479,9 +457,8 @@ button {
 }
 .right-container {
   padding-left: 50px;
-  padding-right: 50px;
+  padding-right: 190px;
   padding-bottom: 50px;
-  margin-left: 300px;
   border-radius: 10px;
   background: linear-gradient(to top, #3c65d6 0%, #507c90 100%);
   width: fit-content;
