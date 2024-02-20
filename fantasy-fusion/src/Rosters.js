@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Model from './Model';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
 import qbIcon from './qb.png'; 

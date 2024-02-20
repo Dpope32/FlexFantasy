@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import Model from './Model';
 import { useTable, useSortBy, useFilters } from 'react-table';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './UserLeagues.css';

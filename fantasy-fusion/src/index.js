@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import './index.css'; // Make sure this path is correct
+import App from './App'; // Make sure this path is correct
+import reportWebVitals from './reportWebVitals'; // Make sure this path is correct
 import { BrowserRouter as Router } from 'react-router-dom';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,3 +16,4 @@ ReactDOM.render(
 );
 
 reportWebVitals();
+
