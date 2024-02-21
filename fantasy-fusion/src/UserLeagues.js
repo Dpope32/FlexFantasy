@@ -176,6 +176,7 @@ function UserLeagues() {
         const playerInfo = allPlayersInfo[playerId];
         return {
           playerId,
+          num: playerLeagues[playerId].length, // Number of leagues the player is found in
           exposure: ((count / uniqueLeaguesCount) * 100).toFixed(2),
           player: playerInfo?.full_name || 'Unknown Player',
           position: playerInfo?.position || 'Unknown Position',
@@ -186,35 +187,38 @@ function UserLeagues() {
       return playerExposureArray.sort((a, b) => b.exposure - a.exposure);
     };
     
-        const displayOwnerUsernameHeader = () => {
-          const owner = username;
-          return owner ? (username) : '';
-        };
+    
+const displayOwnerUsernameHeader = () => {
+  const owner = username;
+  return owner ? (username) : '';
+};
   
-        const displaySharersTable = () => {
-          const sharersData = calculateExposure(); 
-        
-          return (
-            <table className="Table">
-              <thead>
-              {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
-                <tr>
-                  <th>Player</th>
-                  <th>Exposure</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sharersData.map((item, index) => (
-                  <tr key={item.playerId} onClick={() => handlePlayerClick(item.playerId)}>
-                    <td>{item.player}</td>
-                    <td onClick={(event) => handleExposureClick(event, item.playerId)}>{item.exposure}%</td>
+const displaySharersTable = () => {
+  const sharersData = calculateExposure(); 
 
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        };
+  return (
+    <table className="Table">
+      <thead>
+      {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
+        <tr>
+          <th>Player</th>
+          <th>Num</th> {/* New Column for Num */}
+          <th>Exposure</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sharersData.map((item, index) => (
+          <tr key={item.playerId} onClick={() => handlePlayerClick(item.playerId)}>
+            <td>{item.player}</td>
+            <td>{item.num}</td> {/* Display the Num value here */}
+            <td onClick={(event) => handleExposureClick(event, item.playerId)}>{item.exposure}%</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+        
 
   const handleExposureClick = (event, playerId) => {
     event.stopPropagation(); 

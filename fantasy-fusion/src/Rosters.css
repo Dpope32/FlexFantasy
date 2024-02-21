@@ -243,7 +243,6 @@ button {
   line-height: 30px;
   table-layout: fixed;
   empty-cells: show;
-  background-image: url('logo.svg');
   opacity: 1.5;
   transition: all 0.7s ease;
   white-space: nowrap;
@@ -378,13 +377,13 @@ button {
 
 
 .starters,.bench, .ir, .taxi, .user-leagues {
-  font-size: 2em; 
+  font-size: 1.5em; 
   color: #32d3ff; 
   background-color: #0A192F;
   padding: 20px; 
   border-radius: 30px; 
   margin-bottom: 20px;
-  width: 50%;
+  width: 30%;
   box-shadow: 0px 0px 100px rgb(31, 53, 125);
 }
 

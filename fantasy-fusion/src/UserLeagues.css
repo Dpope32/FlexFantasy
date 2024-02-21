@@ -81,13 +81,12 @@
   
   .Table {
     width: 100%;
+    color: white;
     margin-bottom: 20px;
     border-collapse: collapse;
-    background-color: #77a2ab; 
-    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); 
+    background-color: #0f2235; 
     table-layout: auto;
     margin: 0 auto; 
-    background-image: url('logo.svg');
     opacity: 1.5;
     transition: all 0.7s ease;
     white-space: nowrap;
