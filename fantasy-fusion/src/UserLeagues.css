@@ -4,18 +4,19 @@
 .owner-header {
   font-weight: bold;
   color: #4D9FEC; 
-  position: absolute;
+  position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   margin: 1rem;
   padding: 1.5rem;
   border: 2px solid #4D9FEC; 
-  border-radius: 5px;
+  border-radius: 25px;
   background-color: #1B2A41; 
+  margin-left: 250px;
 }
 
 .App {
-  background-color: #081324;
+  background: linear-gradient(to top left, rgba(24, 45, 103, 0.969) 50%, rgb(12, 31, 59) 100%); 
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -57,7 +58,7 @@
   top: 0;
   right: 0;
   padding: 10px;
-  background-color: #1B2A41;
+  background-color: #1d3861;
   color: #29d;
   font-size: 1.5em;
   margin: 10px;
@@ -68,7 +69,7 @@
     padding: 50px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
-    padding: 20px;
+    zoom: 75%;
   }
   
   
@@ -84,7 +85,7 @@
     margin-bottom: 20px;
     border-collapse: collapse;
     background-color: #77a2ab; 
-    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); 
+    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0, 0, 0, 0.577) 100%); 
     table-layout: auto;
     margin: 0 auto; 
     background-image: url('logo.svg');
@@ -103,7 +104,7 @@
   
   th, td {
     padding: 12px 15px;
-    border: 1px solid #324A5F;
+    border: 1px solid #1d2e3e;
     text-align: left;
     overflow: hidden;
     font-size: 1.0em; 
@@ -113,7 +114,7 @@
   }
   
   th {
-    background-color: #1B2A41;
+    background-color: #29497a;
     color: #E3E3E3;
     text-transform: uppercase;
     font-weight: 600;
@@ -153,7 +154,7 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-top: 100px;
+    margin-top: 10px;
   }
   
   .Table1Container {
@@ -178,17 +179,6 @@ th, td {
     border-radius: 8px; 
   }
 
-  .header-title {
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    background: linear-gradient(45deg, #4D9FEC, #e8e8e8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: #E3E3E3;
-    animation: glow 1s ease-in-out infinite alternate;
-  }
-
   @keyframes glow {
     from {
       text-shadow: 0 0 10px #4D9FEC;
@@ -198,14 +188,19 @@ th, td {
     }
   }
   
-.sharers {
-  font-size: 3em; 
+.header-title {
+  font-size: 4em; 
   border-radius: 5px;
   font-weight: bold;
-  color: #000000;
-  background-color: transparent;
-  width: 10%;
+  color: #3ec9d5;
+  width: 100%;
   text-align: center;
+  background: linear-gradient(45deg, #163857, #e8e8e8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #E3E3E3;
+  animation: glow 1s ease-in-out infinite alternate;
+  padding-top: 50px;
 }
   
 .headers-container {
