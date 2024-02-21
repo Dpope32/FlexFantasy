@@ -82,11 +82,10 @@
   
   .Table {
     width: 100%;
-    color: white;
+    color: rgb(0, 0, 0);
     margin-bottom: 20px;
     border-collapse: collapse;
-    background-color: #77a2ab; 
-    background-image: linear-gradient(to top left, rgba(255,255,255,0) 25%, rgba(0,0,0,0.05) 100%); 
+    background-color: #3a7099; 
     table-layout: auto;
     margin: 0 auto; 
     opacity: 1.5;
@@ -170,14 +169,6 @@ th, td {
   text-overflow: ellipsis; 
 }
 
-.LeaguesImage {
-    display: block;
-    margin-left : 800px;
-    max-width: 35%; 
-    height: auto; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    border-radius: 8px; 
-  }
 
   @keyframes glow {
     from {
