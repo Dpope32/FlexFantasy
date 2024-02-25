@@ -211,7 +211,7 @@ const displaySharersTable = () => {
           <tr key={item.playerId} onClick={() => handlePlayerClick(item.playerId)}>
             <td>{item.player}</td>
             <td>{item.num}</td> {/* Display the Num value here */}
-            <td onClick={(event) => handleExposureClick(event, item.playerId)}>{item.exposure}%</td>
+            <td >{item.exposure}%</td>
           </tr>
         ))}
       </tbody>
@@ -219,20 +219,6 @@ const displaySharersTable = () => {
   );
 };
         
-
-  const handleExposureClick = (event, playerId) => {
-    event.stopPropagation(); 
-    console.log(`Exposure clicked for player ID: ${playerId}`);
-    const playerExposureDetails = calculateExposure().find(p => p.playerId === playerId);
-    if (playerExposureDetails) {
-      const modalContent = {
-        player: allPlayersInfo[playerId]?.full_name || "Unknown Player",
-        leagues: playerExposureDetails.leagues,
-      };
-      setModalContent(modalContent);
-      setShowModal(true);
-    }
-  };
 
   const handlePlayerClick = (playerId) => {
     const playerDetails = allPlayersInfo[playerId];

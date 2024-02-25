@@ -504,23 +504,27 @@ button {
 }
 
 .modal-content {
-  background: linear-gradient(to top right, #2c3e50, #3498db); 
-  padding: 2rem; 
+  background: linear-gradient(135deg, #1f2833, #3a506b);
+  padding: 3rem; 
   border-radius: 25px; 
-  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5); 
+  border: 2px solid #0b0c10;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.8);
   height: 900px;
   max-width: 1000px; 
   width: 90%;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   color: #ecf0f1; 
-  text-align: center; 
+  text-align: left; 
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   gap: 1rem; 
-  transition: all 0.3s ease; 
+  transition: all 0.3s ease-in-out;
   transform: scale(1);
   opacity: 0; 
   animation: slideFade 0.5s forwards; 
+  line-height: 1.6; /* Improve readability with more line height */
+  letter-spacing: 0.5px; /* Slightly spread out the letters */
 }
 
 @keyframes slideFade {
@@ -535,31 +539,113 @@ button {
 }
 
 .modal-content h2 {
-  font-size: 3.5rem; 
-  margin-bottom: 1rem;
-  color: #000000; 
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+  font-size: 3.5rem; /* Large font size for player's name */
+  margin: 1rem 0; /* Spacing above and below the title */
+  font-family: 'Orbitron', sans-serif; /* Sci-fi style font similar to the inspiration */
+  text-transform: uppercase; /* UPPERCASE letters */
+  color: #45a29e; /* Teal color for the title, stands out against the cyan text */
+}
+.modal-content p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.9rem;
 }
 
-.modal-content p {
-  font-size: 1.5rem; 
-  margin: 0.25rem 0;
+.modal-content p.label {
+  color: #45A29E; /* Different color for labels */
+  font-weight: bold; /* Bold for better visibility */
 }
 
 .modal-content button {
-  background-color: #e74c3c; 
-  color: white;
-  border: none;
-  padding: 1rem 2rem; 
-  font-size: 1.25rem; 
-  border-radius: 20px; 
+  background-color: #66fcf1; /* Cyan button background to match the text */
+  color: #0b0c10; /* Dark text color for contrast */
+  border: 1px solid #45a29e; /* Teal border to tie it to the title */
+  padding: 1rem 2rem; /* Comfortable padding */
+  font-size: 1.25rem; /* Readable font size */
+  border-radius: 5px; /* Slightly rounded corners for the button */
   cursor: pointer;
-  transition: background-color 0.2s; 
+  transition: background-color 0.2s, transform 0.2s;
+  width: 20%;
+  outline: none; /* Removes the outline to keep the design clean */
 }
 
 .modal-content button:hover {
-  background-color: #c0392b; 
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); 
+  background-color: #0b0c10; /* Dark background on hover */
+  color: #66fcf1; /* Cyan text color on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+.modal-content, .modal-content button:focus {
+  /* New hover and focus state for better interaction */
+  background-color: #1abc9c; /* A complementary color for the button */
+  transform: translateY(-2px);
+  outline: none; /* Ensures that clicking the button doesn't show an outline */
+}
+
+body {
+  font-family: 'Orbitron', sans-serif; /* Ensuring the font is consistent */
+  background: #0b0c10; /* Dark background for the entire page */
+  color: #c5c6c7; /* Off-white text color for readability */
+}
+
+/* Style the labels differently to make them stand out */
+.modal-content .label {
+  text-transform: uppercase; /* Capitalize the labels */
+  letter-spacing: 1px; /* More spacing for uppercase letters */
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.stats-grid .label {
+  text-align: right;
+  padding-right: 1rem;
+  color: #45A29E;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.stats-grid .value {
+  text-align: left;
+  padding-left: 1rem;
+  color: #ecf0f1;
+}
+
+.modal-content h2 {
+  margin-bottom: 2rem;
+  color: #66fcf1;
+  animation: fadeInDown 1s both;
+}
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+.modal-content button {
+  align-self: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .stats-grid .label {
+    padding: 0;
+  }
+  .stats-grid .value {
+    padding: 0;
+  }
 }
 
 @media (max-width: 768px) {

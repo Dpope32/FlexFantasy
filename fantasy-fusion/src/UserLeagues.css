@@ -16,7 +16,7 @@
 }
 
 .App {
-  background: linear-gradient(to top left, rgba(24, 45, 103, 0.969) 50%, rgb(12, 31, 59) 100%); 
+  background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%); 
   min-height: 100vh;
   display: flex;
   flex-direction: column;

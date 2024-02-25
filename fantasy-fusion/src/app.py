@@ -1,14 +1,129 @@
 from flask import Flask, jsonify
+from flask_sqlalchemy import SQLAlchemy
 import requests
 from functools import lru_cache
 from flask_cors import CORS
+import os
+import logging
+import psycopg2
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
+db = SQLAlchemy(app)
 CORS(app)
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/')
 def index():
     return "Welcome to the Fantasy Fusion API!"
+
+class NFLStatsBase(db.Model):
+    __abstract__ = True
+    rank = db.Column(db.Integer, primary_key=True)
+    player = db.Column(db.Text, nullable=False)
+    tm = db.Column(db.Text)
+    fantpos = db.Column(db.Text)
+    age = db.Column(db.Integer)
+    g = db.Column(db.Integer)
+    gs = db.Column(db.Integer)
+    cmp = db.Column(db.Integer)
+    att = db.Column(db.Integer)
+    yds = db.Column(db.Integer)
+    td = db.Column(db.Integer)
+    int = db.Column(db.Integer)
+    att_rushing = db.Column(db.Integer)
+    yds_rushing = db.Column(db.Integer)
+    ya = db.Column(db.Float)
+    td_rushing = db.Column(db.Integer)
+    tgt = db.Column(db.Integer)
+    rec = db.Column(db.Integer)
+    yds_receiving = db.Column(db.Integer)
+    yr = db.Column(db.Float)
+    td_receiving = db.Column(db.Integer)
+    fmb = db.Column(db.Integer)
+    fl = db.Column(db.Integer)
+    td_other = db.Column(db.Integer)
+    twopm = db.Column(db.Integer)
+    twopp = db.Column(db.Integer)
+    fantpt = db.Column(db.Integer)
+    ppr = db.Column(db.Float)
+    vbd = db.Column(db.Integer)
+    posrank = db.Column(db.Integer)
+    ovrank = db.Column(db.Integer)
+    sleeper_player_id = db.Column(db.Integer)
+
+
+class NFLStats2017(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2017'
+
+class NFLStats2018(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2018'
+
+class NFLStats2019(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2019'
+
+class NFLStats2020(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2020'
+
+class NFLStats2021(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2021'
+
+class NFLStats2022(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2022'
+
+class NFLStats2023(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2023'
+
+from flask import Flask, jsonify, current_app
+# Other imports...
+
+@app.route('/api/stats/2023', methods=['GET'])
+def get_2023_stats():
+    try:
+        stats = NFLStats2023.query.limit(5).all()  # Adjust this as needed
+        app.logger.info(f"Fetched {len(stats)} records from NFLStats2023.")
+        
+        # Serialize the data for JSON response
+        stats_list = [
+            {'player': stat.player, 'yards': stat.yds, 'touchdowns': stat.td, 'ppg': stat.ppr / stat.g if stat.g else 0}
+            for stat in stats
+        ]
+        return jsonify(stats_list)
+    except Exception as e:
+        app.logger.error(f"Failed to fetch 2023 stats: {e}")
+        return jsonify({'error': 'Failed to fetch data'}), 500
+
+
+@app.route('/api/stats/2023/player/<int:sleeper_player_id>', methods=['GET'])
+
+def get_player_stats_by_id(sleeper_player_id):
+    logging.debug("Received request for player with sleeper_player_id: %s", sleeper_player_id)
+
+    try:
+        # Check database connection and query construction
+        logging.debug("Constructing database query for sleeper_player_id: %s", sleeper_player_id)
+        player_stats = NFLStats2023.query.filter_by(sleeper_player_id=int(sleeper_player_id)).first()
+
+
+        logging.debug("Query result: %s", player_stats)
+
+        if player_stats:
+            # Found the player, return their stats
+            return jsonify({
+                'player': player_stats.player,
+                'yards': player_stats.yds,
+                'touchdowns': player_stats.td,
+                'ppg': player_stats.ppr / player_stats.g if player_stats.g else 0
+            })
+        else:
+            # No player found with that ID
+            return jsonify({'error': 'Player not found with sleeper_player_id={}'.format(sleeper_player_id)}), 404
+
+    except Exception as e:
+        logging.error(f"Failed to fetch player stats for ID {sleeper_player_id}: {e}")
+        raise  # Re-raise the exception to allow for further debugging
+
+
 
 @app.route('/user/<username>', methods=['GET'])
 def get_user_id(username):

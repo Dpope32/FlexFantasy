@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Model from './Model';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
 import qbIcon from './qb.png'; 
@@ -15,7 +14,6 @@ function Rosters() {
   const [allPlayersInfo, setAllPlayersInfo] = useState({});
   const [scoringSettings, setScoringSettings] = useState({});
   const [playerStats2023, setPlayerStats2023] = useState({});
-  const [formattedScoring, setFormattedScoring] = useState("");
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +29,7 @@ function Rosters() {
   const [userLeagues, setUserLeagues] = useState([]);
   const [leagueName, setLeagueName] = useState(location.state?.leagueName || 'League');
 const [leagueId, setLeagueId] = useState(useParams().leagueId);
+
 
   useEffect(() => {
     if (selectedOwner) {
@@ -119,16 +118,19 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
     }
     setIsLoading(true);
     try {
-
-     const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
+      // Fetch league rosters
+      const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
       if (!resLeagueRosters.ok) throw new Error('Roster data fetch failed');
       const leagueRostersData = await resLeagueRosters.json();
-      setRosters(leagueRostersData);
-      const ownerIds = leagueRostersData.map(roster => roster.owner_id);
-      const uniqueOwnerIds = Array.from(new Set(ownerIds));
+      
+      // Fetch league details
       const resLeagueDetails = await fetch(`http://localhost:5000/league/${leagueId}`);
       if (!resLeagueDetails.ok) throw new Error('League details fetch failed');
       const leagueDetailsData = await resLeagueDetails.json();
+
+      setRosters(leagueRostersData);
+      const ownerIds = leagueRostersData.map(roster => roster.owner_id);
+      const uniqueOwnerIds = Array.from(new Set(ownerIds));
      
       const users = await Promise.all(uniqueOwnerIds.map(owner_id =>
         fetch(`https://api.sleeper.app/v1/user/${owner_id}`)
@@ -143,26 +145,27 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
         acc[user.user_id] = normalizedUsername;
         return acc;
       }, {});
-      
-      const winnerRosterId = leagueDetailsData.metadata?.latest_league_winner_roster_id;
-      if (winnerRosterId) {
-        const winnerRoster = leagueRostersData.find(roster => roster.roster_id.toString() === winnerRosterId.toString());
-        setWinnerUsername(winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown");
-      }
-      const updatedOwners = leagueRostersData.map(roster => ({
-        owner_id: roster.owner_id,
-        username: userMap[roster.owner_id] || 'Unknown'
-      }));
 
-      const initialOwner = updatedOwners.find(owner => owner.username === initialUsername);
-      setSelectedOwner(initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
-      setOwners(updatedOwners); 
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setIsLoading(false);
+
+    const winnerRosterId = leagueDetailsData.metadata?.latest_league_winner_roster_id;
+    if (winnerRosterId) {
+      const winnerRoster = leagueRostersData.find(roster => roster.roster_id.toString() === winnerRosterId.toString());
+      setWinnerUsername(winnerRoster ? userMap[winnerRoster.owner_id] : "Unknown");
     }
+    const updatedOwners = leagueRostersData.map(roster => ({
+      owner_id: roster.owner_id,
+      username: userMap[roster.owner_id] || 'Unknown'
+    }));
+
+    const initialOwner = updatedOwners.find(owner => owner.username === initialUsername);
+    setSelectedOwner(initialOwner ? initialOwner.owner_id : updatedOwners[0].owner_id);
+    setOwners(updatedOwners);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    setIsLoading(false);
   }
+}
   
   function formatScoringSettings(settings) {
     let formattedSettings = [];
@@ -272,6 +275,7 @@ const displayOwnerUsernameHeader = () => {
     const totalStarters = roster.starters.length;
     return roster.starters.map((playerId, index) => {
       const playerDetails = allPlayersInfo[playerId];
+      const playerStats = allPlayersInfo[playerId];
       return displayPlayerRow(playerId, true, index, totalStarters, playerDetails);
     });
   };
@@ -383,23 +387,47 @@ const sortPlayersByPoints = (playerIds) => {
     } else if (!playerDetails.full_name && playerId === 'DEF') {
       playerName = 'Defense';
     }
-
     const positionIcon = positionToIconMap[position] || flexIcon;
-    const handleClick = () => {
-      const playerData = {
-        full_name: playerDetails.full_name,
-        rank: rank,
-        points: playerStats.pts_ppr,
-        experience: playerDetails.years_exp,
-        yards: playerStats.yards, 
-        touchdowns: playerStats.touchdowns, 
-        ppg: playerStats.ppg, 
-        ktc: playerStats.ktc, 
-        age: playerDetails.age, 
-      };
-      setModalContent(playerData); 
-      setShowModal(true); 
+
+
+    const handleClick = async (playerId) => {
+      try {
+        // Fetch player statistics from your PostgreSQL database via your API
+        const statsUrl = `http://127.0.0.1:5000/api/stats/2023/player/${playerId}`;
+        const statsResponse = await fetch(statsUrl);
+        if (!statsResponse.ok) {
+          throw new Error(`HTTP error! Status: ${statsResponse.status}`);
+        }
+        const statsData = await statsResponse.json();
+    
+        // Fetch player information from the allPlayersInfo state variable
+        const playerDetails = allPlayersInfo[playerId];
+    
+        // Calculate rank from the positionRanks state variable
+        const rank = positionRanks[playerId] || 'N/A';
+    
+        // Construct the final data object for the modal
+        const playerData = {
+          ...playerDetails,  // Data from the allPlayersInfo state variable
+          ...statsData,      // Data from your own API
+          rank,              // Rank calculated from positionRanks
+          points: parseFloat((playerDetails.pts_ppr || statsData.ppg).toFixed(2)), // Points rounded to 2 decimal places
+          experience: playerDetails.years_exp || 'N/A',
+          ktc: playerDetails.ktc || 'N/A',
+          age: playerDetails.age || 'N/A',
+          ppg: parseFloat((playerDetails.pts_ppr / playerDetails.g || statsData.ppg).toFixed(2)) // Points per game rounded to 2 decimal places
+        };
+        
+        // Update modal content and show modal
+        setModalContent(playerData);
+        setShowModal(true);
+      } catch (error) {
+        console.error('Failed to fetch player stats:', error);
+      }
     };
+    
+    
+
     if (isStarter) {
       if (position === 'QB' && index === totalStarters - 1) {
         position = 'SF'; 
@@ -408,7 +436,7 @@ const sortPlayersByPoints = (playerIds) => {
       }
     }
     return (
-      <tr key={playerId || `empty-${index}`} onClick={handleClick}>
+       <tr key={playerId || `empty-${index}`} onClick={() => handleClick(playerId)}>
         <td>
           <img src={positionIcon} alt={playerDetails.position || 'Empty'} className="icon" />
           {playerName}
@@ -549,25 +577,30 @@ const sortPlayersByPoints = (playerIds) => {
     </>
   );
 }
-
 const PlayerModal = ({ player, onClose }) => {
   return (
     <div className="modal-backdrop">
-      <div className="modal-content" style={{ transform: 'scale(2)' }}>
-        <h2>{player.full_name}</h2>
-        <p>Rank: {player.rank}</p>
-        <p>Points: {player.points}</p>
-        <p>Experience: {player.experience}</p>
-        <p>Yards: {player.yards}</p>
-        <p>Touchdowns: {player.touchdowns}</p>
-        <p>Points Per Game: {player.ppg}</p>
-        <p>Keep Trade Cut Value: {player.ktc}</p>
-        <p>Age: {player.age}</p>
+      <div className="modal-content">
+        <h2>{player.full_name || player.player}</h2>
+        <div className="stats-grid">
+          <p className="label">Rank:</p> <p className="value">{player.rank}</p>
+          <p className="label">Points:</p> <p className="value">{player.points?.toFixed(2) || player.ppg?.toFixed(2)}</p>
+          <p className="label">Experience:</p> <p className="value">{player.experience}</p>
+          <p className="label">Yards:</p> <p className="value">{player.yards}</p>
+          <p className="label">Touchdowns:</p> <p className="value">{player.touchdowns}</p>
+          <p className="label">Points Per Game:</p> <p className="value">{player.ppg?.toFixed(2)}</p>
+          <p className="label">Keep Trade Cut Value:</p> <p className="value">{player.ktc}</p>
+          <p className="label">Age:</p> <p className="value">{player.age}</p>
+        </div>
         <button onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
+
+
+
+
 
 export default Rosters;
 

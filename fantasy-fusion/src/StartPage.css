@@ -1,7 +1,7 @@
 .start-page {
   text-align: center;
   padding: 0;
-  background-color: #1b1d23;
+  background-color: #000000;
   min-height: 100vh;
   color: rgb(121, 252, 254);
   font-family: 'Arial', sans-serif;
@@ -11,7 +11,7 @@
   background-repeat: no-repeat;
   position: relative;
   font-weight: bold;
-  font-size: 32px;
+  font-size: 24px;
   display: flex;
   align-items: center; 
   justify-content: center;
@@ -19,10 +19,15 @@
 }
 .username-form {
   position: absolute; 
-  bottom: 40%; 
+  bottom: 30%; 
+  left: 42.5%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.5); 
+  background: rgba(0, 0, 0, 0.75); /* Enhance readability */
   border-radius: 10px; 
+  align-items: center; 
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
 }
   
   .username-label {
@@ -30,16 +35,18 @@
   }
   
   .username-input {
+    width: 70%;
     margin-right: 10px;
     font-size: 1.2rem;
     padding: 10px;
+    margin-top: 10px;
   }
   
   .submit-button {
     background-color: #61dafb;
     color: #282c34;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     transition: all 0.2s ease-in-out;
   }
   
@@ -66,11 +73,20 @@
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
 }
 
+.content {
+  margin-left: 100px; /* Offset content by the width of the left panel */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content vertically */
+  justify-content: center;
+}
+
   .flex-fantasy-image {
     max-width: 100%;
     height: auto;
-    opacity: 1; 
+    opacity: 0; 
     zoom: 55%;
+    margin-left: 500px;
   }
 
   .table-container {
