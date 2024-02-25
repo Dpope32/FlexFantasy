@@ -411,13 +411,13 @@ const sortPlayersByPoints = (playerIds) => {
           ...playerDetails,  // Data from the allPlayersInfo state variable
           ...statsData,      // Data from your own API
           rank,              // Rank calculated from positionRanks
-          points: parseFloat((playerDetails.pts_ppr || statsData.ppg).toFixed(2)), // Points rounded to 2 decimal places
+          points: playerStats.pts_ppr, // Assuming pts_ppr is the total points
           experience: playerDetails.years_exp || 'N/A',
           ktc: playerDetails.ktc || 'N/A',
           age: playerDetails.age || 'N/A',
           ppg: parseFloat((playerDetails.pts_ppr / playerDetails.g || statsData.ppg).toFixed(2)) // Points per game rounded to 2 decimal places
         };
-        
+        console.log(statsData.ppr);
         // Update modal content and show modal
         setModalContent(playerData);
         setShowModal(true);
