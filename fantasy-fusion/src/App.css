@@ -1,11 +1,11 @@
 .App {
   text-align: center;
-  zoom: 70%;
-  background-color: rgb(12, 17, 31);
+  zoom: 100%;
+  background: linear-gradient(to right, #588395, #1a3543, #0b1d25); /* Example gradient background */
 }
 
 .App-logo {
-  height: 40vmin;
+  height: auto;
   pointer-events: none;
 }
 

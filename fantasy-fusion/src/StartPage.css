@@ -16,6 +16,7 @@
   align-items: center; 
   justify-content: center;
   overflow: hidden; 
+  zoom: 70%
 }
 .username-form {
   position: absolute; 

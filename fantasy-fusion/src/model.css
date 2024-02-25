@@ -1,56 +1,138 @@
 /* Model.css */
+html {
+  font-size: 16px;
+}
+
+body, html {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(to right, #618ea1, #203a43, #2c5364); /* Example gradient background */
+}
+
 .model-page {
   text-align: center;
   padding: 20px;
-  color: #79fcfe;
+  color: #17113e;
   font-family: 'Arial', sans-serif;
+  zoom: 70%;
 }
 
 input {
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-}
-
-button {
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  background-color: #4CAF50;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-button:hover {
-  background-color: #45a049;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 0.3rem;
+  border: 2px solid #61dafb; /* React blue border */
+  font-size: 1rem;
+  width: 20rem; /* Larger width for input */
+  color: #203541;
 }
 
 .suggestions-list {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  text-align: left;
   position: absolute;
-  background-color: #fff;
-  width: 200px; /* Adjust width as per your input size */
-  border-radius: 0 0 5px 5px;
+  width: 20rem; /* Match the width of the input field */
+  top: 2.5rem; /* Position it below the input */
+  left: 50%;
+  transform: translateX(-50%); /* Center it below the input field */
+  background: #fff;
+  z-index: 10;
+  border-radius: 0.3rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Hide overflow for border radius */
 }
 
 .suggestions-list li {
-  padding: 10px;
+  padding: 0.5rem;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
+  transition: background-color 0.2s; /* Smooth background transition */
+}
+
+.suggestions-list li:hover {
+  background-color: #f9f9f9; /* Light grey background on hover */
+}
+
+.suggestions-list li:nth-child(odd) {
+  background-color: #73d9f2;
 }
 
 .suggestions-list li:last-child {
   border-bottom: none;
 }
 
-.suggestions-list li:hover {
-  background-color: #f2f2f2;
+.model-page table {
+  width: 100%; /* Full width */
+  margin-top: 1rem;
+  border-spacing: 0; /* Remove spacing */
+}
+
+.model-page th, .model-page td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 24px; /* Slightly smaller font for data cells */
+}
+
+.model-page th {
+  background-color: #203541; /* Green headers for contrast */
+  color: white;
+  font-size: 16px; /* Larger font for headers */
+}
+.model-page tbody tr:nth-child(odd) {
+  background-color: #68c2d7;
+}
+
+.model-page tbody tr:hover {
+  background-color: #ddd;
+}
+
+input, button {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+.player-name-container {
+  background-color: #4CAF50; /* Adjust to your color scheme */
+  color: white;
+  padding: 15px 30px;
+  display: inline-block;
+  border-radius: 5px;
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.player-name-container h2 {
+  margin: 0; /* Removing default margin */
+}
+
+.chart-container {
+  margin-left: 370px;
+  margin-top: 20px; /* Adjust as needed */
+  margin-bottom: 50px;
+  border: 1px solid #ddd; /* Optional border */
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.1); /* Optional shadow for depth */
+  padding: 20px; /* Optional padding */
+  border-radius: 8px; /* Optional border radius for rounded corners */
+}
+
+.player-info {
+  color: #ffffff; /* White text */
+  font-size: 20px; /* Larger font size */
+  text-align: center; /* Center the text */
+  margin-top: 20px; /* Space above the player info */
+}
+
+.player-info h2 {
+  font-size: 4rem; /* Larger font size for the player name */
+  margin-bottom: 0.5rem; /* Space between the name and position */
+}
+
+.player-info p {
+  font-size: 1.5rem; /* Slightly smaller font size for the position */
 }

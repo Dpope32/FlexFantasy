@@ -1,11 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from functools import lru_cache
 from flask_cors import CORS
 import os
 import logging
-import psycopg2
+from sqlalchemy.exc import SQLAlchemyError
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
@@ -74,7 +75,6 @@ class NFLStats2022(NFLStatsBase):
 class NFLStats2023(NFLStatsBase):
     __tablename__ = 'nfl_stats_2023'
 
-from flask import Flask, jsonify, current_app
 # Other imports...
 
 @app.route('/api/stats/2023', methods=['GET'])
@@ -95,7 +95,6 @@ def get_2023_stats():
 
 
 @app.route('/api/stats/2023/player/<int:sleeper_player_id>', methods=['GET'])
-
 def get_player_stats_by_id(sleeper_player_id):
     logging.debug("Received request for player with sleeper_player_id: %s", sleeper_player_id)
 
@@ -122,6 +121,62 @@ def get_player_stats_by_id(sleeper_player_id):
     except Exception as e:
         logging.error(f"Failed to fetch player stats for ID {sleeper_player_id}: {e}")
         raise  # Re-raise the exception to allow for further debugging
+
+
+@app.route('/api/players/search', methods=['GET'])
+def search_players():
+    search_term = request.args.get('name', '').strip() + "%"  # Prepare the search term for matching the beginning
+    
+    logging.debug(f"Searching for players with name starting with: {search_term}")
+
+    try:
+        results = []
+        tables = [NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
+        
+        for table in tables:
+            # Use `startswith` to match the beginning of the player's name
+            players = table.query.filter(table.player.startswith(search_term)).all()
+            logging.debug(f"Found {len(players)} players in {table.__tablename__} starting with {search_term}")
+            for player in players:
+                results.append({
+                    'year': table.__tablename__[-4:],  # Extract the year from the table name
+                    'player': player.player,
+                    'team': player.tm,
+                    'position': player.fantpos,
+                    # Include other fields as necessary
+                })
+
+        return jsonify(results)
+    except Exception as e:
+        logging.error(f"Failed to search for players: {e}")
+        return jsonify({'error': 'Failed to search for players'}), 500
+
+@app.route('/api/player/stats', methods=['GET'])
+def get_player_stats():
+    player_name = request.args.get('name', '').strip()
+    try:
+        results = {}
+        # List of your table classes
+        tables = [NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
+        
+        for table in tables:
+            # Query for the player stats in each table
+            player_stats = table.query.filter_by(player=player_name).first()
+            if player_stats:
+                # Serialize all fields except sleeper_player_id and remove null values
+                stats_dict = {column.name: getattr(player_stats, column.name)
+                              for column in player_stats.__table__.columns
+                              if column.name != 'sleeper_player_id' and getattr(player_stats, column.name) is not None}
+                
+                # Add this year's stats to the results dictionary
+                results[table.__tablename__[-4:]] = stats_dict
+        
+        return jsonify(results)
+    except Exception as e:
+        logging.error(f"Failed to fetch stats for player {player_name}: {e}")
+        return jsonify({'error': 'Failed to fetch player stats'}), 500
+
+
 
 
 
