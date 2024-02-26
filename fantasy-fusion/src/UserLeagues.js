@@ -3,6 +3,7 @@ import Model from './Model';
 import { useTable, useSortBy, useFilters } from 'react-table';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './UserLeagues.css';
+
 function UserLeagues() {
   const year = '2023';
   const [playerStats2023, setPlayerStats2023] = useState({});

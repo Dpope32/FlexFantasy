@@ -16,8 +16,20 @@
   align-items: center; 
   justify-content: center;
   overflow: hidden; 
-  zoom: 70%
+  zoom: 60%
 }
+
+
+.App {
+  background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%); 
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: 'Orbitron', sans-serif;
+}
+
 .username-form {
   position: absolute; 
   bottom: 30%; 
@@ -75,7 +87,6 @@
 }
 
 .content {
-  margin-left: 100px; /* Offset content by the width of the left panel */
   display: flex;
   flex-direction: column;
   align-items: center; /* Center content vertically */
@@ -86,7 +97,7 @@
     max-width: 100%;
     height: auto;
     opacity: 0; 
-    zoom: 55%;
+    zoom: 65%;
     margin-left: 500px;
   }
 

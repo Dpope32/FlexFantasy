@@ -112,7 +112,6 @@ input, button {
 }
 
 .chart-container {
-  margin-left: 370px;
   margin-top: 20px; /* Adjust as needed */
   margin-bottom: 50px;
   border: 1px solid #ddd; /* Optional border */
@@ -124,7 +123,7 @@ input, button {
 .player-info {
   color: #ffffff; /* White text */
   font-size: 20px; /* Larger font size */
-  text-align: center; /* Center the text */
+  text-align: left; /* Center the text */
   margin-top: 20px; /* Space above the player info */
 }
 

@@ -74,6 +74,18 @@ function Model() {
     const posrankData = years.map(year => playerStats[year].posrank);
     const tdData = years.map(year => playerStats[year].td);
     const ydsData = years.map(year => playerStats[year].yds);
+    const gamesData = years.map(year => playerStats[year].gs); // Use 'gs' for games played
+  
+    // Calculate points per game using 'gs'
+    const ppgData = fantptData.map((totalPoints, index) => {
+      const games = gamesData[index];
+      return games ? (totalPoints / games).toFixed(2) : 0; // Avoid division by zero
+    });
+    // Find the maximum pos_rank for inversion
+    const maxPosRank = Math.max(...posrankData);
+  
+    // Invert pos_rank values by subtracting from the maxPosRank
+    const invertedPosRankData = posrankData.map(rank => maxPosRank - rank + 1); // +1 ensures that the lowest rank is not zero
   
     return {
       labels: years,
@@ -87,7 +99,7 @@ function Model() {
         },
         {
           label: 'Position Rank',
-          data: posrankData,
+          data: invertedPosRankData,
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           yAxisID: 'y1',
@@ -105,6 +117,13 @@ function Model() {
           borderColor: 'rgb(255, 206, 86)',
           backgroundColor: 'rgba(255, 206, 86, 0.2)',
           yAxisID: 'y3',
+        },
+        {
+          label: 'Points Per Game',
+          data: ppgData,
+          borderColor: 'rgb(123, 239, 178)',
+          backgroundColor: 'rgba(123, 239, 178, 0.2)',
+          yAxisID: 'y4', // Assign the new y-axis here
         },
       ],
     };
@@ -138,6 +157,9 @@ function Model() {
         position: 'right',
         ticks: {
           color: '#fff', // Set the color to white
+          suggestedMin: 0,
+          suggestedMax: 100, // Adjust this based on the range of your PPG data
+          
           font: {
             size: 20, // Set the font size to 20
           },
@@ -167,6 +189,8 @@ function Model() {
         position: 'right',
         ticks: {
           color: '#fff', // Set the color to white
+          suggestedMin: 0,
+          suggestedMax: 5000, // Adjust this based on the range of your PPG data
           font: {
             size: 20, // Set the font size to 20
           },
@@ -174,6 +198,24 @@ function Model() {
         grid: {
           drawOnChartArea: false,
         },
+      },
+      y4: { // Add this new y-axis for PPG
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: {
+          display: true,
+          text: 'PPG'
+        },
+        ticks: {
+          color: '#fff',
+          font: {
+            size: 20,
+          },
+          // You can adjust the suggestedMin and suggestedMax to scale your data appropriately
+          suggestedMin: 0,
+          suggestedMax: 30, // Adjust this based on the range of your PPG data
+        }
       },
     },
     plugins: {
@@ -199,19 +241,26 @@ function Model() {
     return mostRecentStats ? mostRecentStats.fantpos : null; // or a default value
   };
 
-  const renderStatsGrid = (playerStats) => {
-    // First, check if playerStats is an object and has at least one key
-    if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
-      // Determine which columns have only '0' values
-      const firstKey = Object.keys(playerStats)[0];
-      if (playerStats[firstKey]) { // Check if the first key's value is not null or undefined
-        const excludedColumns = new Set(['td_other', 'td_receiving', 'td_rushing', 'fantpos', 'player', 'twopm']);
-        const columnsToRender = Object.keys(playerStats[Object.keys(playerStats)[0]])
-          .filter(col => !excludedColumns.has(col) && 
-            !Object.keys(playerStats).every(year => playerStats[year][col] === 0)
-          );
-  
-        // Rows for each year
+  const renderStatsGrid = (playerStats, position) => {
+    // Determine which columns to render based on the position
+    const excludedColumns = new Set(['g', 'vbd', 'twopp', 'td_other', 'td_receiving', 'td_rushing', 'fantpos', 'player', 'twopm']);
+    
+    // Add additional exclusions for quarterbacks
+    if (position === 'QB') {
+      excludedColumns.add('yds_receiving');
+      excludedColumns.add('target');
+    }
+   // Check if playerStats is an object and has at least one key
+   if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
+    // Get the first key to inspect available stats
+    const firstKey = Object.keys(playerStats)[0];
+    if (playerStats[firstKey]) {
+      // Exclude unwanted columns
+      const columnsToRender = Object.keys(playerStats[firstKey])
+        .filter(col => !excludedColumns.has(col) && 
+          !Object.keys(playerStats).every(year => playerStats[year][col] === 0)
+        );
+
         const rows = Object.keys(playerStats).map(year => (
           <tr key={year}>
             <th>{year}</th>
@@ -227,7 +276,7 @@ function Model() {
               <tr>
                 <th>Year</th>
                 {columnsToRender.map(col => (
-                  <th key={col}>{col.toUpperCase()}</th>
+                  <th key={col}>{col === 'att_rushing' ? 'Rushes' : col.toUpperCase()}</th> // Rename 'att_rushing' to 'Rushes'
                 ))}
               </tr>
             </thead>
@@ -269,12 +318,11 @@ function Model() {
         </ul>
       )}
       </div>
-    {selectedPlayer && (
-      <div className="player-info">
-        <h2>{selectedPlayer}</h2> 
-        <p>{getMostRecentFantpos(playerStats) || 'Position not available'}</p>
-      </div>
-    )}
+      {selectedPlayer && (
+  <div className="player-info">
+    <h2>{`${selectedPlayer} - ${getMostRecentFantpos(playerStats) || 'Position not available'}`}</h2>
+  </div>
+)}
     {selectedPlayer && hasStats && (
       <div className="chart-container" style={{ position: 'relative', height: '40vh', width: '80vw' }}>
         <Line 

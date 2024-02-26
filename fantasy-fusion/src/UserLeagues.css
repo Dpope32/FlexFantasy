@@ -15,16 +15,6 @@
   margin-left: 250px;
 }
 
-.App {
-  background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%); 
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  font-family: 'Orbitron', sans-serif;
-}
-
   .page-container {
     width: 100%;
     min-height: 100vh;
@@ -69,7 +59,7 @@
     padding: 50px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
-    zoom: 75%;
+    zoom: 65%;
   }
   
   
@@ -154,13 +144,14 @@ button:hover {
     justify-content: space-between;
     align-items: flex-start;
     margin-top: 10px;
+    margin-left: 300px;
   }
   
   .Table1Container {
     margin-right: 100px; 
   }
   .Table2Container {
-    margin-right: 0px; 
+    margin-right: 200px; 
   }
 
 th, td {
