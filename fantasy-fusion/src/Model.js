@@ -11,6 +11,7 @@ function Model() {
   const [suggestions, setSuggestions] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const navigate = useNavigate();
+  
 
   const uniqueSuggestions = (data) => {
     const seen = new Set();
@@ -123,7 +124,7 @@ function Model() {
           data: ppgData,
           borderColor: 'rgb(123, 239, 178)',
           backgroundColor: 'rgba(123, 239, 178, 0.2)',
-          yAxisID: 'y4', // Assign the new y-axis here
+          yAxisID: 'ppg', // Assign the new y-axis here
         },
       ],
     };
@@ -242,25 +243,47 @@ function Model() {
   };
 
   const renderStatsGrid = (playerStats, position) => {
-    // Determine which columns to render based on the position
-    const excludedColumns = new Set(['g', 'vbd', 'twopp', 'td_other', 'td_receiving', 'td_rushing', 'fantpos', 'player', 'twopm']);
+    const customOrder = ['age', 'posrank', 'ppr', 'td', 'yds', 'gs'];
+    // Initial columns to exclude for all positions
+    const excludedColumns = new Set(['rank', 'g', 'vbd', 'twopp', 'td_other', 'fantpos', 'player', 'twopm']);
     
-    // Add additional exclusions for quarterbacks
-    if (position === 'QB') {
-      excludedColumns.add('yds_receiving');
-      excludedColumns.add('target');
-    }
-   // Check if playerStats is an object and has at least one key
-   if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
-    // Get the first key to inspect available stats
-    const firstKey = Object.keys(playerStats)[0];
-    if (playerStats[firstKey]) {
-      // Exclude unwanted columns
-      const columnsToRender = Object.keys(playerStats[firstKey])
-        .filter(col => !excludedColumns.has(col) && 
-          !Object.keys(playerStats).every(year => playerStats[year][col] === 0)
-        );
-
+    // Additional columns to exclude for quarterbacks
+    const qbExcludedColumns = position === 'QB' ? new Set(['yds_receiving', 'tgt']) : new Set();
+    
+    if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
+      const firstKey = Object.keys(playerStats)[0];
+      if (playerStats[firstKey]) {
+        // Start with the custom order columns and add the remaining ones that are not excluded
+        const columnsToRender = [
+          ...customOrder,
+          ...Object.keys(playerStats[firstKey]).filter(col =>
+            !customOrder.includes(col) && !excludedColumns.has(col)
+          )
+        ];
+  
+        // Rename the columns based on your requirements
+        const renamedColumns = columnsToRender.map(col => {
+          switch (col) {
+            case 'att_rushing':
+              return 'Rushes';
+            case 'yr':
+              return 'YPR';
+            case 'ya':
+              return 'YPC';
+            case 'yds_receiving':
+              return 'Rec Yds';
+            case 'yds_rushing':
+              return 'Rush Yds';
+            case 'td_receiving':
+              return 'Rec TDs'; // Renamed 'td_receiving'
+            case 'td_rushing':
+              return 'Rush TDs'; // Renamed 'td_rushing'
+            default:
+              return col.toUpperCase(); // Keep other headers in uppercase
+          }
+        });
+      
+  
         const rows = Object.keys(playerStats).map(year => (
           <tr key={year}>
             <th>{year}</th>
@@ -276,7 +299,7 @@ function Model() {
               <tr>
                 <th>Year</th>
                 {columnsToRender.map(col => (
-                  <th key={col}>{col === 'att_rushing' ? 'Rushes' : col.toUpperCase()}</th> // Rename 'att_rushing' to 'Rushes'
+                  <th key={col}>{col === 'att_rushing' ? 'Rushes' : col.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
@@ -287,8 +310,6 @@ function Model() {
         );
       }
     }
-  
-    // Return a message or nothing if playerStats is not in the expected format
     return <div>No data available</div>;
   };
   const hasStats = Object.keys(playerStats).length > 0;
@@ -332,12 +353,12 @@ function Model() {
       </div>
     )}
       <div>
-        {selectedPlayer && (
-          <div>
-            <h2>{selectedPlayer.player}</h2>
-            {renderStatsGrid(playerStats)}
-          </div>
-        )}
+         {selectedPlayer && hasStats && (
+    <div>
+      <h2>{selectedPlayer.player}</h2>
+      {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
+    </div>
+  )}
       </div>
     </div>
   );
