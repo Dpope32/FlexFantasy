@@ -1,133 +1,256 @@
 /* Model.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;700&display=swap');
+
 html {
   font-size: 16px;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 body, html {
   height: 100%;
   margin: 0;
-  background: linear-gradient(to right, #618ea1, #203a43, #2c5364); /* Example gradient background */
+  background: #0a1215;
+  font-family: 'Kodchasan', sans-serif;
 }
 
 .model-page {
   text-align: center;
-  padding: 20px;
-  color: #17113e;
-  font-family: 'Arial', sans-serif;
+  padding: 2rem;
+  color: #ffffff;
+  font-family: 'Kodchasan', sans-serif;
   zoom: 70%;
+  display: flex;
+  flex-direction: column;
+}
+.main-header {
+  all: initial;
+  padding-left: 200px;
+  font-size: 6rem; 
+  background: linear-gradient(to right, rgb(37, 248, 255), rgb(8, 104, 178), rgb(52, 52, 90));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: left; 
 }
 
-input {
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 0.3rem;
-  border: 2px solid #61dafb; /* React blue border */
-  font-size: 1rem;
-  width: 20rem; /* Larger width for input */
-  color: #203541;
+.model-page .top-players-container {
+  border-radius: 5px;
+  margin-left: 200px;
+  margin-top: 100px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-size: 2rem;
+  color: rgb(91, 244, 255);
+  flex-direction: row-reverse;
+}
+
+.model-page .top-player {
+  padding: 10px;
+  background: #1e3e5d;
+  color: #e7e7e7;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-size: 2rem;
+}
+
+.model-page .top-player:hover {
+  transform: scale(1.05);
+}
+
+
+input, button {
+  padding: 0.75rem;
+  margin: 1rem 0;
+  border: none; 
+  border-radius: 1.5rem; 
+  background-color: #090c0ebb; 
+  color: #ffffff; 
+  font-size: 1.8rem;
+  outline: none; 
+  width: 100%;
+  max-width: 30rem;
+  box-shadow: 0 4px 8px rgba(242, 242, 242, 0.102); 
+  transition: all 0.3s ease; 
+}
+
+input:focus, button:focus {
+  box-shadow: 0 0 0 2pt #61dafb; 
+}
+
+input::placeholder {
+  color: #b1c4d1; 
 }
 
 .suggestions-list {
   position: absolute;
-  width: 20rem; /* Match the width of the input field */
-  top: 2.5rem; /* Position it below the input */
+  width: 20rem; 
+  top: 2.5rem; 
   left: 50%;
-  transform: translateX(-50%); /* Center it below the input field */
-  background: #fff;
+  transform: translateX(-50%); 
+  background: #11333a;
   z-index: 10;
-  border-radius: 0.3rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Hide overflow for border radius */
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden; 
+  list-style-type: none; 
+  padding-left: 0; 
 }
 
 .suggestions-list li {
-  padding: 0.5rem;
+  padding: 0.75rem;
+  transition: background-color 0.2s;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
-  transition: background-color 0.2s; /* Smooth background transition */
 }
 
 .suggestions-list li:hover {
-  background-color: #f9f9f9; /* Light grey background on hover */
+  background-color: #4ea0d3; 
 }
 
 .suggestions-list li:nth-child(odd) {
-  background-color: #73d9f2;
+  background-color: #000000;
 }
 
 .suggestions-list li:last-child {
   border-bottom: none;
 }
-
 .model-page table {
-  width: 100%; /* Full width */
-  margin-top: 1rem;
-  border-spacing: 0; /* Remove spacing */
+  margin-left: 100px;
+  width: 100%;
+  margin-top: 2rem;
+  border-collapse: collapse;
+  color: #fff; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); 
+  border-radius: 20px; 
+  overflow: hidden; 
+  background: transparent; 
 }
-
-.model-page th, .model-page td {
-  padding: 12px 15px;
+.model-page th {
+  background-color: #1b2838;
+  color: #ffffff;
+  padding: 20px; 
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-size: 24px; /* Slightly smaller font for data cells */
+  font-weight: normal; 
+}
+.model-page td {
+  background-color: #1b2838; 
+  color: #a4f5fa; 
+  padding: 0px; 
+  text-align: center;
+  font-weight: normal;
+  font-size: 1.2rem; 
 }
 
 .model-page th {
-  background-color: #203541; /* Green headers for contrast */
-  color: white;
-  font-size: 16px; /* Larger font for headers */
+  background-color: #09151e; 
+  font-size: 1.15rem; 
+  letter-spacing: 0.05em;
 }
 .model-page tbody tr:nth-child(odd) {
-  background-color: #68c2d7;
+  background-color: #0d1f2a; 
 }
+.model-page tbody tr:nth-child(even) {
+  background-color: #102533; 
+}
+
+.model-page tbody tr {
+  font-weight: normal; 
+  transition: background-color 0.3s ease; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); 
+}
+
 
 .model-page tbody tr:hover {
-  background-color: #ddd;
+  background-color: #387aa6; 
+  cursor: pointer; 
+}
+.player-name-container h2, .player-info h2 {
+  margin: 0;
+  padding: 0.5rem 0;
 }
 
-input, button {
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-}
-
-.player-name-container {
-  background-color: #4CAF50; /* Adjust to your color scheme */
-  color: white;
-  padding: 15px 30px;
-  display: inline-block;
-  border-radius: 5px;
-  margin-top: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.player-name-container h2 {
-  margin: 0; /* Removing default margin */
-}
 
 .chart-container {
-  margin-top: 20px; /* Adjust as needed */
+  margin-left: 100px;
+  margin-top: 20px; 
   margin-bottom: 50px;
-  border: 1px solid #ddd; /* Optional border */
-  box-shadow: 0px 0px 15px rgba(0,0,0,0.1); /* Optional shadow for depth */
-  padding: 20px; /* Optional padding */
-  border-radius: 8px; /* Optional border radius for rounded corners */
-}
-
-.player-info {
-  color: #45ffec; /* White text */
-  font-size: 20px; /* Larger font size */
-  text-align: left; /* Center the text */
-  margin-top: 20px; /* Space above the player info */
+  border: 3px solid #81f4ff; 
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.665); 
+  padding: 10px;
+  border-radius: 25px; 
 }
 
 .player-info h2 {
-  font-size: 4rem; /* Larger font size for the player name */
-  margin-bottom: 0.5rem; /* Space between the name and position */
+  padding-left: 100px;
+  font-size: 5rem; 
+  margin-bottom: 0.5rem; 
+  background: linear-gradient(to right, rgb(37, 248, 255), rgb(8, 104, 178), rgb(52, 52, 90));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: left; 
+}
+
+.top-players-container {
+  display: flex; /* Use grid display */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* This will create a responsive grid */
+  gap: 1rem; /* Adjust the gap between grid items */
+  margin-bottom: 2rem; /* Space below the grid */
+  margin-top: 2rem;
+}
+
+.top-players-year {
+  background: #19232d; /* A dark shade for contrast */
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.top-player {
+  background: #1a1a2e; /* Slightly lighter than the year background for depth */
+  color: #e7e7e7; /* Light color for the text */
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  justify-content: space-between; /* To space out rank and name */
+  align-items: center;
+  border: 1px solid #555; /* Add a border for definition */
+}
+
+.top-player:hover {
+  background-color: #4a6572;
+  transform: translateY(-2px); /* A subtle lift effect on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.hide-top-players {
+  display: none;
+}
+
+.back-button {
+  margin-top: .2px; /* Adjust as needed */
+  background-color: #171045; /* Choose a suitable color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  max-width: 6rem;
+  font-size: 24px;
+  /* Styling to make it stand out as a button */
+  position: absolute; /* or 'fixed' depending on your layout */
+  left: 220px; /* adjust as needed */
+  top: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background-color: #e2e2e2; /* Slightly darker on hover */
 }

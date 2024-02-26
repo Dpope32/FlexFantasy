@@ -334,17 +334,6 @@ button {
   padding: 50px;
 }
 
-.back-button {
-  background-color: #ff0000; 
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 24px;
-  margin-right: 50px;
-}
-
 .change-owner-label {
   margin-right: 5px;
   font-weight: bold;

@@ -16,7 +16,7 @@
   align-items: center; 
   justify-content: center;
   overflow: hidden; 
-  zoom: 60%
+  zoom: 70%
 }
 
 
@@ -97,7 +97,7 @@
     max-width: 100%;
     height: auto;
     opacity: 0; 
-    zoom: 65%;
+    zoom: 55%;
     margin-left: 500px;
   }
 
