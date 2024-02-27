@@ -291,7 +291,7 @@ return (
           <h2 className="left-panel-header">Flex Fantasy</h2>
           <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
           <button className="my-profile-button">My Profile</button>
-          <button className="model-button" onClick={() => navigate('/model')}>Model</button>
+          <button className="model-button" onClick={() => navigate('/model')}>Research</button>
           <button className="settings-button">Settings</button>
         </div>
         <div className="main-content">
@@ -344,16 +344,18 @@ return (
 const PlayerModal = ({ player, onClose }) => {
   return (
     <div className="modal-backdrop">
-      <div className="modal-content" style={{ transform: 'scale(2)' }}>
-        <h2>{player.full_name}</h2>
-        <p>Rank: {player.rank}</p>
-        <p>Points: {player.points}</p>
-        <p>Experience: {player.experience}</p>
-        <p>Yards: {player.yards}</p>
-        <p>Touchdowns: {player.touchdowns}</p>
-        <p>Points Per Game: {player.ppg}</p>
-        <p>Keep Trade Cut Value: {player.ktc}</p>
-        <p>Age: {player.age}</p>
+      <div className="modal-content">
+        <h2>{player.full_name || player.player}</h2>
+        <div className="stats-grid">
+          <p className="label">Rank:</p> <p className="value">{player.rank}</p>
+          <p className="label">Points:</p> <p className="value">{player.points?.toFixed(2) || player.ppg?.toFixed(2)}</p>
+          <p className="label">Experience:</p> <p className="value">{player.experience}</p>
+          <p className="label">Yards:</p> <p className="value">{player.yards}</p>
+          <p className="label">Touchdowns:</p> <p className="value">{player.touchdowns}</p>
+          <p className="label">Points Per Game:</p> <p className="value">{player.ppg?.toFixed(2)}</p>
+          <p className="label">Keep Trade Cut Value:</p> <p className="value">{player.ktc}</p>
+          <p className="label">Age:</p> <p className="value">{player.age}</p>
+        </div>
         <button onClick={onClose}>Close</button>
       </div>
     </div>

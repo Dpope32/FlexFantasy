@@ -28,7 +28,7 @@ function StartPage({ setUser }) {
         <h2 className="left-panel-header">Flex Fantasy</h2>
         <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
         <button className="my-profile-button">My Profile</button>
-        <button className="model-button" onClick={() => navigate('/model')}>Model</button>
+        <button className="model-button" onClick={() => navigate('/model')}>Research</button>
         <button className="settings-button">Settings</button>
       </div>
       <div className="content">

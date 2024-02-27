@@ -266,6 +266,7 @@ if (isLoading) {
 if (!rosters.length) {
   return <div>No rosters found for league {leagueId}</div>;
 }
+
 const displayStarters = (roster) => {
   const totalStarters = roster.starters.length;
   return roster.starters.map((playerId, index) => {
@@ -446,7 +447,7 @@ return (
       <h2 className="left-panel-header">Flex Fantasy</h2>
       <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
       <button className="my-profile-button">My Profile</button>
-      <button className="model-button" onClick={() => navigate('/model')}>Model</button>
+      <button className="model-button" onClick={() => navigate('/model')}>Research</button>
       <button className="settings-button">Settings</button>
     </div>
     <div className="pages-container">
@@ -477,7 +478,6 @@ return (
         {ownerRoster ? (
           <div className="roster-container">
             <div className="left-container">
-              {/* Column 1 */}
               <div className="column">
                 <div className="starters-and-ir">
                 {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}

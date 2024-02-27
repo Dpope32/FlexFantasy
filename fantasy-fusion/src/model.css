@@ -35,42 +35,19 @@ body, html {
 }
 .main-header {
   all: initial;
-  padding-left: 200px;
+  padding-left: 10px;
   font-weight: bolder; 
-  font-size: 6rem; 
+  font-size: 7rem; 
   background: linear-gradient(to right, rgb(2, 247, 255), rgb(8, 104, 178), rgb(52, 52, 90));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-align: left; 
 }
 
-.model-page .top-players-container {
-  border-radius: 5px;
-  margin-left: 200px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  font-size: 2rem;
-  color: rgb(91, 244, 255);
-  flex-direction: row-reverse;
-}
-
-.model-page .top-player {
-  padding: 10px;
-  background: #1e3e5d;
-  color: #e7e7e7;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  font-size: 2rem;
-}
-
-.model-page .top-player:hover {
-  transform: scale(1.05);
-}
 
 input, button {
   padding: 0.75rem;
-  margin: 1rem 0;
+  margin-right: 1550px;
   border: none; 
   border-radius: 1.5rem; 
   background-color: #090c0ebb; 
@@ -125,8 +102,7 @@ input::placeholder {
   border-bottom: none;
 }
 .model-page table {
-  margin-left: 100px;
-  width: 50%;
+  margin-left: 450px;
   margin-top: 2rem;
   border-collapse: collapse;
   color: #fff; 
@@ -134,28 +110,28 @@ input::placeholder {
   border-radius: 20px; 
   overflow: hidden; 
   background: transparent; 
+  justify-content: center;
 }
 .model-page th {
-  background-color: #1b2838;
   color: #ffffff;
-  padding: 10px; 
+  padding: 15px; 
   text-align: center;
   font-weight: normal; 
+  background-color: #09151e; 
+  font-size: 1.15rem; 
+  letter-spacing: 0.05em;
+  justify-content: center;
 }
 .model-page td {
-  background-color: #1b2838; 
+  background-color: #24364d; 
   color: #a4f5fa; 
   padding: 0px; 
   text-align: center;
   font-weight: normal;
   font-size: 1.2rem; 
+  justify-content: center;
 }
 
-.model-page th {
-  background-color: #09151e; 
-  font-size: 1.15rem; 
-  letter-spacing: 0.05em;
-}
 .model-page tbody tr:nth-child(odd) {
   background-color: #0d1f2a; 
 }
@@ -163,23 +139,14 @@ input::placeholder {
   background-color: #102533; 
 }
 
-.model-page tbody tr {
-  font-weight: normal; 
-  transition: background-color 0.3s ease; 
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); 
-}
-
-.model-page tbody tr:hover {
-  background-color: #387aa6; 
-  cursor: pointer; 
-}
 .player-name-container h2, .player-info h2 {
   margin: 0;
   padding: 0.5rem 0;
+  justify-content: center;
 }
 
 .chart-container {
-  margin-left: 100px;
+  margin-left: 200px;
   margin-top: 70px; 
   margin-bottom: 50px;
   border: 3px solid #81f4ff; 
@@ -190,12 +157,16 @@ input::placeholder {
 
 .player-info h2 {
   padding-left: 100px;
-  font-size: 5rem; 
+  font-size: 6rem; 
   margin-bottom: 0.5rem; 
-  background: linear-gradient(to right, rgb(37, 248, 255), rgb(8, 104, 178), rgb(52, 52, 90));
+  background: linear-gradient(to right, rgb(0, 247, 255), rgb(57, 141, 204), rgb(255, 255, 255));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-align: left; 
+  justify-content: center;
+}
+
+.model-page .top-player:hover {
+  transform: scale(1.05);
 }
 
 .top-players-container {
@@ -205,40 +176,40 @@ input::placeholder {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
   gap: 1rem; 
   margin-bottom: 2rem; 
-  margin-left: auto;
-  margin-right: auto;
   margin-top: 2rem;
   border-radius: 30px;
-  flex-direction: reverse; 
+  cursor: pointer;
+  transition: transform 0.2s;
+  color: rgb(91, 244, 255);
+  width: 2000px;
 }
 
 .top-players-year {
-  background: #19232d; 
-  padding: 1rem;
+  background: #131b22; 
+  padding: 0rem;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 3rem;
 }
 
 .top-player {
-  background: var(--background-color-card);
-  color: var(--text-color-primary);
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
   cursor: pointer;
   border-radius: 30px;
-  transition: background-color 0.3s, transform 0.2s;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: 1px solid #555; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 400px; 
-  margin: 0.5rem; 
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 4px 8px rgb(0, 215, 253); 
+  margin: 1.2rem; 
   justify-content: center; 
   align-items: center; 
-  padding: 1rem;
+  padding: 10px;
+  background: #1e3e5d;
+  color: #e7e7e7;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-size: 1.7rem;
 }
 
 .top-player:hover {
@@ -263,7 +234,7 @@ input::placeholder {
 }
 
 .back-button {
-  margin-top: .2px;
+  margin-top: 25px;
   background-color: #171045; 
   border: none;
   border-radius: 5px;

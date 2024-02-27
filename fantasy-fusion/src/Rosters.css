@@ -350,8 +350,6 @@ button {
   gap: 10px;
 }
 
-
-
 .title-roster {
   font-size: 8rem;
   font-weight: bold;
@@ -364,8 +362,6 @@ button {
   text-transform: uppercase;
   margin-bottom: 50px;
 }
-
-
 
 .starters,.bench, .ir, .taxi, .user-leagues {
   font-size: 1.5em; 
