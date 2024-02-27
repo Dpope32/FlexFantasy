@@ -13,17 +13,29 @@ function Model() {
   const navigate = useNavigate();
   const [showTopPlayers, setShowTopPlayers] = useState(true);
   const topPlayerIds = {
+    2014 : ["904", "1408", "745", "536", "103", "669", "1527", "560", "175", "574"],
+    2015: ["536", "2168", "947", "184", "954", "648", "1992", "515", "1426"],
+    2016: ["2391", "3164", "96", "676", "1408", "904", "2168", "730", "24", "2216"],
+    2017: ["2315", "1408", "4098", "4035", "2320", "1426", "536", "1234", "956", "676"],
     2018: ['2315','4866','4034', '4035', '4046', '3321','3164', '1466', '536', '2133'],
-    2023: ["4034", "6786", "2212", "3321", "6904", "2749", "7547", "3294", "2216", "4881"],
-    2022: ["4046", "5850", "4034", "3198", "6794", "4663", "2212", "2133", "1466", "4988"],
-    2021: ["6813", "4039", "5872", "2212", "4663", "6797", "167", "7564", "5012", "6794"],
-    2020: ["3198", "4035", "4029", "2133", "1466", "3321", "2212", "96", "5849", "4046"],
     2019: ["4034", "4881", "3198", "4199", "3164", "4029", "3199", "1466", "4988", "956"],
+    2020: ["3198", "4035", "4029", "2133", "1466", "3321", "2212", "96", "5849", "4046"],
+    2021: ["6813", "4039", "5872", "2212", "4663", "6797", "167", "7564", "5012", "6794"],
+    2022: ["4046", "5850", "4034", "3198", "6794", "4663", "2212", "2133", "1466", "4988"],
+    2023: ["4034", "6786", "2212", "3321", "6904", "2749", "7547", "3294", "2216", "4881"],
+  };
+
+  const isColumnAllZeros = (stats, field) => {
+    if (Array.isArray(stats)) {
+      return stats.length > 0 && stats.every(stat => stat[field] === 0);
+    }
+    console.error('stats is not an array:', stats);
+    return false;
   };
 
   const handleBack = () => {
-    setSelectedPlayer(null); // Deselect the player
-    setShowTopPlayers(true); // Show the top players again
+    setSelectedPlayer(null); 
+    setShowTopPlayers(true); 
   };
 
   const uniqueSuggestions = (data) => {
@@ -74,7 +86,6 @@ function Model() {
     }
   };
 
-
   const handleSelectPlayer = (player) => {
     setSelectedPlayer(player);
     setSearchTerm('');
@@ -85,57 +96,63 @@ function Model() {
 
   const prepareChartData = (playerStats) => {
     const years = Object.keys(playerStats).sort();
-    const fantptData = years.map(year => playerStats[year].fantpt);
-    const posrankData = years.map(year => playerStats[year].posrank);
-    const ydsData = years.map(year => playerStats[year].yds);
-    const gamesData = years.map(year => playerStats[year].gs); // Use 'gs' for games played
+    const datasets = [
+      {
+        label: 'Fantasy Points',
+        dataKey: 'fantpt',
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        yAxisID: 'y',
+      },
+      {
+        label: 'Position Rank',
+        dataKey: 'posrank',
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        yAxisID: 'y1',
+      },
+      {
+        label: 'Yards',
+        dataKey: 'yds',
+        borderColor: 'rgb(255, 206, 86)',
+        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+        yAxisID: 'y3',
+      },
+    ];
   
-    // Calculate points per game using 'gs'
+    const filteredDatasets = datasets.map(dataset => {
+      const data = years.map(year => playerStats[year][dataset.dataKey]);
+      const allZeros = data.every(value => value === 0);
+      if (dataset.dataKey === 'posrank') {
+        const maxPosRank = Math.max(...data);
+        dataset.data = data.map(rank => maxPosRank - rank + 1);
+      } else {
+        dataset.data = data;
+      }
+  
+      return allZeros ? null : dataset;
+    }).filter(dataset => dataset !== null); 
+    const gamesData = years.map(year => playerStats[year].gs);
+    const fantptData = years.map(year => playerStats[year].fantpt);
     const ppgData = fantptData.map((totalPoints, index) => {
       const games = gamesData[index];
-      return games ? (totalPoints / games).toFixed(2) : 0; // Avoid division by zero
+      return games ? (totalPoints / games).toFixed(2) : 0;
     });
-    // Find the maximum pos_rank for inversion
-    const maxPosRank = Math.max(...posrankData);
-  
-    // Invert pos_rank values by subtracting from the maxPosRank
-    const invertedPosRankData = posrankData.map(rank => maxPosRank - rank + 1); // +1 ensures that the lowest rank is not zero
-  
+    const ppgAllZeros = ppgData.every(value => value === 0);
+    if (!ppgAllZeros) {
+      filteredDatasets.push({
+        label: 'Points Per Game',
+        data: ppgData,
+        borderColor: 'rgb(123, 239, 178)',
+        backgroundColor: 'rgba(123, 239, 178, 0.2)',
+        yAxisID: 'ppg',
+      });
+    }
     return {
       labels: years,
-      datasets: [
-        {
-          label: 'Fantasy Points',
-          data: fantptData,
-          borderColor: 'rgb(75, 192, 192)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          yAxisID: 'y',
-        },
-        {
-          label: 'Position Rank',
-          data: invertedPosRankData,
-          borderColor: 'rgb(255, 99, 132)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          yAxisID: 'y1',
-        },
-        {
-          label: 'Yards',
-          data: ydsData,
-          borderColor: 'rgb(255, 206, 86)',
-          backgroundColor: 'rgba(255, 206, 86, 0.2)',
-          yAxisID: 'y3',
-        },
-        {
-          label: 'Points Per Game',
-          data: ppgData,
-          borderColor: 'rgb(123, 239, 178)',
-          backgroundColor: 'rgba(123, 239, 178, 0.2)',
-          yAxisID: 'ppg', // Assign the new y-axis here
-        },
-      ],
+      datasets: filteredDatasets,
     };
   };
-
   const chartOptions = {
     scales: {
       y: {
@@ -242,12 +259,15 @@ function Model() {
     'yds_rushing': 'Rush Yds',
     'td_receiving': 'Rec TDs',
     'td_rushing': 'Rush TDs',
-    'att_rushing': 'Rushes'
+    'att_rushing': 'Rushes',
+    'ovrank' : 'OVR',
   };
 
   const renderStatsGrid = (playerStats, position) => {
-    const customOrder = ['age', 'posrank', 'ppr', 'ppg', 'td', 'yds', 'gs', 'att', 'cmp', 'att_rushing', 'yds_rushing'];
+    const customOrder = ['age', 'posrank', 'ppr', 'ppg', 'td', 'yds', 'gs', 'ovrank', 'att_rushing', 'yds_rushing'];
     const excludedColumns = new Set(['rank', 'fantpt', 'g', 'vbd', 'twopp', 'td_other', 'fantpos', 'player', 'twopm']);
+    const fieldsToExclude = ['cmp', 'rushes', 'rush_tds']; 
+    const columnsAllZeros = fieldsToExclude.filter(field => isColumnAllZeros(playerStats, field));
   if (position !== 'QB') {
     excludedColumns.add('att');
     excludedColumns.add('cmp');
@@ -258,6 +278,10 @@ function Model() {
       excludedColumns.add('td_receiving');
       excludedColumns.add('yds_receiving');
       excludedColumns.add('rec');
+    }
+    if (position === 'TE', 'WR') {
+      excludedColumns.add('td_rushing');
+      excludedColumns.add('ya');
     }
     if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
       const firstKey = Object.keys(playerStats)[0];
@@ -289,7 +313,6 @@ function Model() {
         <tr>
           <th>Year</th>
           {columnsToRender.map(col => {
-            // Use the renamed column if it exists, otherwise use the original column name
             const displayName = renamedColumns[col] || col;
             return <th key={col}>{displayName}</th>;
           })}
@@ -306,15 +329,14 @@ return <div>No data available</div>;
 };
   const hasStats = Object.keys(playerStats).length > 0;
 
-
   const ModelPage = () => {
     const [isPlayerSelected, setIsPlayerSelected] = useState(false);
     return (
       <div>
-        {/* Rest of your component JSX goes here */}
       </div>
     );
   }
+
 
   return (
     <div className="model-page">
@@ -325,15 +347,11 @@ return <div>No data available</div>;
         <button className="model-button" onClick={() => navigate('/model')}>Model</button>
         <button className="settings-button">Settings</button>
       </div>
-
-      {/* Conditionally render the header based on whether a player is selected */}
       {!selectedPlayer && (
         <header className="main-header">
           <span>Model</span>
         </header>
       )}
-
-      {/* Main content area */}
       <div className="main-content">
     <div className="search-section">
       <input
@@ -352,10 +370,7 @@ return <div>No data available</div>;
                )}
              </div>
              {selectedPlayer && (
-        <button className="back-button" onClick={handleBack}>
-          Back
-        </button>
-      )}
+        <button className="back-button" onClick={handleBack}>Back</button>)}
               {selectedPlayer && (
           <div className="player-info">
         <h2>{`${selectedPlayer} - ${getMostRecentFantpos(playerStats) || 'Position not available'}`}</h2>
@@ -379,6 +394,14 @@ return <div>No data available</div>;
         ))}
       </div>
     )}
+      <div>
+         {selectedPlayer && hasStats && (
+            <div>
+              <h2>{selectedPlayer.player}</h2>
+              {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
+            </div>
+          )}
+      </div>
     {selectedPlayer && hasStats && (
       <div className="chart-container" style={{height: '50vh', width: '120vw' }}>
         <Line 
@@ -387,19 +410,9 @@ return <div>No data available</div>;
         />
       </div>
     )}
-      <div>
-         {selectedPlayer && hasStats && (
-            <div>
-
-              <h2>{selectedPlayer.player}</h2>
-              {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
-            </div>
-          )}
-      </div>
     </div>
     </div>
   );
-  
 }
 
 export default Model;

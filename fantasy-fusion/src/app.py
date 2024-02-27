@@ -7,7 +7,6 @@ import os
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
 db = SQLAlchemy(app)
@@ -53,6 +52,17 @@ class NFLStatsBase(db.Model):
     ovrank = db.Column(db.Integer)
     sleeper_player_id = db.Column(db.Integer)
 
+class NFLStats2013(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2013'
+
+class NFLStats2014(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2014'
+
+class NFLStats2015(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2015'
+
+class NFLStats2016(NFLStatsBase):
+    __tablename__ = 'nfl_stats_2016'
 
 class NFLStats2017(NFLStatsBase):
     __tablename__ = 'nfl_stats_2017'
@@ -80,7 +90,7 @@ class NFLStats2023(NFLStatsBase):
 @app.route('/api/stats/2023', methods=['GET'])
 def get_2023_stats():
     try:
-        stats = NFLStats2023.query.limit(5).all()  # Adjust this as needed
+        stats = NFLStats2023.query.limit(5).all()  
         app.logger.info(f"Fetched {len(stats)} records from NFLStats2023.")
         
         # Serialize the data for JSON response
@@ -96,18 +106,9 @@ def get_2023_stats():
 
 @app.route('/api/stats/2023/player/<int:sleeper_player_id>', methods=['GET'])
 def get_player_stats_by_id(sleeper_player_id):
-    logging.debug("Received request for player with sleeper_player_id: %s", sleeper_player_id)
-
     try:
-        # Check database connection and query construction
-        logging.debug("Constructing database query for sleeper_player_id: %s", sleeper_player_id)
         player_stats = NFLStats2023.query.filter_by(sleeper_player_id=int(sleeper_player_id)).first()
-
-
-        logging.debug("Query result: %s", player_stats)
-
         if player_stats:
-            # Found the player, return their stats
             return jsonify({
                 'player': player_stats.player,
                 'yards': player_stats.yds,
@@ -115,37 +116,27 @@ def get_player_stats_by_id(sleeper_player_id):
                 'ppg': player_stats.ppr / player_stats.g if player_stats.g else 0
             })
         else:
-            # No player found with that ID
             return jsonify({'error': 'Player not found with sleeper_player_id={}'.format(sleeper_player_id)}), 404
-
     except Exception as e:
         logging.error(f"Failed to fetch player stats for ID {sleeper_player_id}: {e}")
-        raise  # Re-raise the exception to allow for further debugging
-
+        raise  
 
 @app.route('/api/players/search', methods=['GET'])
 def search_players():
-    search_term = request.args.get('name', '').strip() + "%"  # Prepare the search term for matching the beginning
-    
-    logging.debug(f"Searching for players with name starting with: {search_term}")
-
+    search_term = request.args.get('name', '').strip() + "%"  
     try:
         results = []
-        tables = [NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
-        
+        tables = [NFLStats2013, NFLStats2014, NFLStats2015, NFLStats2016, NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
         for table in tables:
-            # Use `startswith` to match the beginning of the player's name
             players = table.query.filter(table.player.startswith(search_term)).all()
             logging.debug(f"Found {len(players)} players in {table.__tablename__} starting with {search_term}")
             for player in players:
                 results.append({
-                    'year': table.__tablename__[-4:],  # Extract the year from the table name
+                    'year': table.__tablename__[-4:],  
                     'player': player.player,
                     'team': player.tm,
                     'position': player.fantpos,
-                    # Include other fields as necessary
                 })
-
         return jsonify(results)
     except Exception as e:
         logging.error(f"Failed to search for players: {e}")
@@ -156,29 +147,18 @@ def get_player_stats():
     player_name = request.args.get('name', '').strip()
     try:
         results = {}
-        # List of your table classes
-        tables = [NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
-        
+        tables = [NFLStats2013, NFLStats2014, NFLStats2015, NFLStats2016, NFLStats2017, NFLStats2018, NFLStats2019, NFLStats2020, NFLStats2021, NFLStats2022, NFLStats2023]
         for table in tables:
-            # Query for the player stats in each table
             player_stats = table.query.filter_by(player=player_name).first()
             if player_stats:
-                # Serialize all fields except sleeper_player_id and remove null values
                 stats_dict = {column.name: getattr(player_stats, column.name)
                               for column in player_stats.__table__.columns
                               if column.name != 'sleeper_player_id' and getattr(player_stats, column.name) is not None}
-                
-                # Add this year's stats to the results dictionary
                 results[table.__tablename__[-4:]] = stats_dict
-        
         return jsonify(results)
     except Exception as e:
         logging.error(f"Failed to fetch stats for player {player_name}: {e}")
         return jsonify({'error': 'Failed to fetch player stats'}), 500
-
-
-
-
 
 @app.route('/user/<username>', methods=['GET'])
 def get_user_id(username):
