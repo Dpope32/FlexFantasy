@@ -177,7 +177,7 @@ button {
   width: 100%; 
 }
 
-.left-panel {
+.left-panel2 {
   position: fixed;
   height: auto;
   width: 220px; 
@@ -194,7 +194,9 @@ button {
   border-radius: 0 25px 25px 0; 
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   opacity: 100%;
+  zoom: 70%;
 }
+
 .left-panel-header {
   font-size: 2rem;
   text-align: center;
@@ -214,7 +216,7 @@ button {
   margin-bottom: 400px;
   padding-bottom: 300px; 
   margin-left: 270px;
-  zoom: 90%;
+  zoom: 60%;
 }
 
 .scoring-settings-display {

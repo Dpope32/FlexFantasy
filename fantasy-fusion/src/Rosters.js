@@ -448,7 +448,7 @@ const sortPlayersByPoints = (playerIds) => {
   
   return (
     <>
-      <div className="left-panel">
+      <div className="left-panel2">
         <h2 className="left-panel-header">Flex Fantasy</h2>
         <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
         <button className="my-profile-button">My Profile</button>
