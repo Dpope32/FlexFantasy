@@ -19,7 +19,6 @@
   zoom: 70%
 }
 
-
 .App {
   background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%); 
   min-height: 100vh;
@@ -35,7 +34,7 @@
   bottom: 30%; 
   left: 42.5%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.75); /* Enhance readability */
+  background: rgba(0, 0, 0, 0.75); 
   border-radius: 10px; 
   align-items: center; 
   justify-content: center;
@@ -89,7 +88,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content vertically */
+  align-items: center; 
   justify-content: center;
 }
 

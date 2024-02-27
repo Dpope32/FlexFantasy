@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Rosters.css';
-import qbIcon from './qb.png'; 
-import rbIcon from './rb.png'; 
-import wrIcon from './wr.png'; 
-import teIcon from './te.png'; 
-import defIcon from './def.png'; 
-import flexIcon from './flex.png';
-import kIcon from './k.png';
+import qbIcon from './images/qb.png'; 
+import rbIcon from './images/rb.png'; 
+import wrIcon from './images/wr.png'; 
+import teIcon from './images/te.png'; 
+import defIcon from './images/def.png'; 
+import flexIcon from './images//flex.png';
+import kIcon from './images/k.png';
 
 function Rosters() {
   const [rosters, setRosters] = useState([]);
@@ -118,20 +118,15 @@ const [leagueId, setLeagueId] = useState(useParams().leagueId);
     }
     setIsLoading(true);
     try {
-      // Fetch league rosters
       const resLeagueRosters = await fetch(`http://localhost:5000/league/${leagueId}/rosters`);
       if (!resLeagueRosters.ok) throw new Error('Roster data fetch failed');
       const leagueRostersData = await resLeagueRosters.json();
-      
-      // Fetch league details
       const resLeagueDetails = await fetch(`http://localhost:5000/league/${leagueId}`);
       if (!resLeagueDetails.ok) throw new Error('League details fetch failed');
       const leagueDetailsData = await resLeagueDetails.json();
-
       setRosters(leagueRostersData);
       const ownerIds = leagueRostersData.map(roster => roster.owner_id);
       const uniqueOwnerIds = Array.from(new Set(ownerIds));
-     
       const users = await Promise.all(uniqueOwnerIds.map(owner_id =>
         fetch(`https://api.sleeper.app/v1/user/${owner_id}`)
           .then(res => {
@@ -311,7 +306,6 @@ const displayOwnerUsernameHeader = () => {
       .catch(error => console.error('Error switching leagues:', error))
       .finally(() => setIsLoading(false));
   };
-  
   
   const displayUserLeagues = () => {
     return userLeagues.map((league, index) => (
@@ -597,10 +591,6 @@ const PlayerModal = ({ player, onClose }) => {
     </div>
   );
 };
-
-
-
-
 
 export default Rosters;
 

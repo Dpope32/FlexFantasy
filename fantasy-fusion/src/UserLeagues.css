@@ -1,4 +1,3 @@
-/* UserLeagues.css */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
 
 .owner-header {
@@ -138,7 +137,6 @@ button:hover {
   background-color: #2577A9;
 }
 
-
   .TablesContainer {
     display: flex;
     justify-content: space-between;
@@ -159,7 +157,6 @@ th, td {
   overflow: hidden; 
   text-overflow: ellipsis; 
 }
-
 
   @keyframes glow {
     from {

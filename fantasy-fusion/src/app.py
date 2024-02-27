@@ -85,15 +85,11 @@ class NFLStats2022(NFLStatsBase):
 class NFLStats2023(NFLStatsBase):
     __tablename__ = 'nfl_stats_2023'
 
-# Other imports...
-
 @app.route('/api/stats/2023', methods=['GET'])
 def get_2023_stats():
     try:
         stats = NFLStats2023.query.limit(5).all()  
         app.logger.info(f"Fetched {len(stats)} records from NFLStats2023.")
-        
-        # Serialize the data for JSON response
         stats_list = [
             {'player': stat.player, 'yards': stat.yds, 'touchdowns': stat.td, 'ppg': stat.ppr / stat.g if stat.g else 0}
             for stat in stats
@@ -102,7 +98,6 @@ def get_2023_stats():
     except Exception as e:
         app.logger.error(f"Failed to fetch 2023 stats: {e}")
         return jsonify({'error': 'Failed to fetch data'}), 500
-
 
 @app.route('/api/stats/2023/player/<int:sleeper_player_id>', methods=['GET'])
 def get_player_stats_by_id(sleeper_player_id):
@@ -284,7 +279,6 @@ def fetch_user_data(year, user_id):
     user_url = f'https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}'
     response = requests.get(user_url)
     return response.json() if response.status_code == 200 else None
-
 
 @app.route('/leaguedetails/<league_id>', methods=['GET'])
 def get_league_details_endpoint(league_id):

@@ -514,8 +514,8 @@ button {
   transform: scale(1);
   opacity: 0; 
   animation: slideFade 0.5s forwards; 
-  line-height: 1.6; /* Improve readability with more line height */
-  letter-spacing: 0.5px; /* Slightly spread out the letters */
+  line-height: 1.6; 
+  letter-spacing: 0.5px; 
 }
 
 @keyframes slideFade {
@@ -530,11 +530,11 @@ button {
 }
 
 .modal-content h2 {
-  font-size: 3.5rem; /* Large font size for player's name */
-  margin: 1rem 0; /* Spacing above and below the title */
-  font-family: 'Orbitron', sans-serif; /* Sci-fi style font similar to the inspiration */
-  text-transform: uppercase; /* UPPERCASE letters */
-  color: #45a29e; /* Teal color for the title, stands out against the cyan text */
+  font-size: 3.5rem;
+  margin: 1rem 0; 
+  font-family: 'Orbitron', sans-serif; 
+  text-transform: uppercase; 
+  color: #45a29e; 
 }
 .modal-content p {
   display: flex;
@@ -544,46 +544,45 @@ button {
 }
 
 .modal-content p.label {
-  color: #45A29E; /* Different color for labels */
-  font-weight: bold; /* Bold for better visibility */
+  color: #45A29E; 
+  font-weight: bold; 
 }
 
 .modal-content button {
-  background-color: #66fcf1; /* Cyan button background to match the text */
-  color: #0b0c10; /* Dark text color for contrast */
-  border: 1px solid #45a29e; /* Teal border to tie it to the title */
-  padding: 1rem 2rem; /* Comfortable padding */
-  font-size: 1.25rem; /* Readable font size */
-  border-radius: 5px; /* Slightly rounded corners for the button */
+  background-color: #66fcf1; 
+  color: #0b0c10; 
+  border: 1px solid #45a29e; 
+  padding: 1rem 2rem; 
+  font-size: 1.25rem;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s, transform 0.2s; 
   width: 20%;
-  outline: none; /* Removes the outline to keep the design clean */
+  outline: none; 
 }
 
 .modal-content button:hover {
-  background-color: #0b0c10; /* Dark background on hover */
-  color: #66fcf1; /* Cyan text color on hover */
-  transform: translateY(-2px); /* Slight lift effect on hover */
+  background-color: #0b0c10; 
+  color: #66fcf1; 
+  transform: translateY(-2px); 
 }
 .modal-content, .modal-content button:focus {
-  /* New hover and focus state for better interaction */
-  background-color: #1abc9c; /* A complementary color for the button */
+  background-color: #1abc9c; 
   transform: translateY(-2px);
-  outline: none; /* Ensures that clicking the button doesn't show an outline */
+  outline: none; 
 }
 
 body {
-  font-family: 'Orbitron', sans-serif; /* Ensuring the font is consistent */
-  background: #0b0c10; /* Dark background for the entire page */
-  color: #c5c6c7; /* Off-white text color for readability */
+  font-family: 'Orbitron', sans-serif; 
+  background: #0b0c10; 
+  color: #c5c6c7;
 }
 
-/* Style the labels differently to make them stand out */
 .modal-content .label {
-  text-transform: uppercase; /* Capitalize the labels */
-  letter-spacing: 1px; /* More spacing for uppercase letters */
+  text-transform: uppercase; 
+  letter-spacing: 1px; 
 }
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -625,7 +624,6 @@ body {
   align-self: left;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;
@@ -670,7 +668,6 @@ body {
     font-size: 0.9rem; 
   }
 }
-
 
 button:hover {
   background-color: #cc8400; 

@@ -3,10 +3,10 @@ import { Routes, Route } from 'react-router-dom';
 import UserLeagues from './UserLeagues';
 import Rosters from './Rosters';
 import StartPage from './StartPage';
-import Model from './Model'; // Assuming you've created a Model component
-import Profile from './Profile'; // Assuming you've created a Profile component
-import Settings from './Settings'; // Assuming you've created a Settings component
-import NotFound from './NotFound'; // Assuming you've created a NotFound component for unmatched routes
+import Model from './Model'; 
+import Profile from './Profile'; 
+import Settings from './Settings'; 
+import NotFound from './NotFound';
 import './App.css';
 
 function App() {
@@ -26,7 +26,6 @@ function App() {
           <Route path="/model" element={<Model />} />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/settings" element={<Settings user={user} />} />
-          {/* Recommended to add a 404 Not Found page for unmatched routes */}
           <Route path="*" element={<NotFound />} />
         </Routes>
     </div>

@@ -232,33 +232,31 @@ input::placeholder {
   align-items: center;
   border: 1px solid #555; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 400px; /* Fixed width for each card */
-  margin: 0.5rem; /* Margin around cards */
+  width: 400px; 
+  margin: 0.5rem; 
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centers content vertically */
-  align-items: center; /* Centers content horizontally */
+  justify-content: center; 
+  align-items: center; 
   padding: 1rem;
 }
 
 .top-player:hover {
   background-color: var(--hover-color-card);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  transform: translateY(-5px); /* Lifts card slightly */
+  transform: translateY(-5px); 
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .model-page .top-players-container {
     flex-direction: column;
     align-items: center;
   }
   .model-page .top-player {
-    width: 100%; /* Full width on smaller screens */
+    width: 100%; 
     margin-bottom: 1rem;
   }
 }
-
 
 .hide-top-players {
   display: none;
