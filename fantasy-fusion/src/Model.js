@@ -5,6 +5,8 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto'; 
 import playerNames from './playerNames.json';
 
+
+
 function Model() {
   const [searchTerm, setSearchTerm] = useState('');
   const [playerStats, setPlayerStats] = useState({});

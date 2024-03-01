@@ -1,10 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;700&display=swap');
+:root {
+  --primary-bg-color: #050413;
+  --secondary-bg-color: #287f8f;
+  --accent-color: rgb(121, 252, 254);
+  --button-bg-color: #61dafb;
+  --button-bg-hover-color: #21a1f1;
+  --font-family-default: 'Kodchasan', sans-serif;
+  --font-family-accent: 'Kodchasan', sans-serif;
+  --font-color: var(--accent-color);
+  --panel-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+
+html {
+  zoom: reset;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Kodchasan', sans-serif;
+}
+
 .start-page {
   text-align: center;
   padding: 0;
   background-color: #000000;
   min-height: 100vh;
   color: rgb(121, 252, 254);
-  font-family: 'Arial', sans-serif;
+  font-family: 'Kodchasan', sans-serif;
   background-image: url('flex-fantasy.jpg');
   background-size: cover;
   background-position: top left; 
@@ -20,24 +50,26 @@
 }
 
 .App {
-  background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%); 
+  background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-family-accent);
 }
 
 .username-form {
   position: absolute; 
   bottom: 30%; 
-  left: 42.5%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.75); 
+  background: rgba(0, 0, 0, 0.75);
   border-radius: 10px; 
   align-items: center; 
+  max-width: 300px; 
   justify-content: center;
+  margin: auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -47,20 +79,23 @@
   }
   
   .username-input {
-    width: 70%;
     margin-right: 10px;
     font-size: 1.2rem;
     padding: 10px;
     margin-top: 10px;
   }
   
-  .submit-button {
-    background-color: #61dafb;
-    color: #282c34;
-    border: none;
-    border-radius: 25px;
-    transition: all 0.2s ease-in-out;
-  }
+.submit-button {
+  background-color: var(--button-bg-color);
+  color: #282c34;
+  border: none;
+  border-radius: 25px;
+  transition: all 0.2s ease-in-out;
+  padding: 10px 20px;
+  margin-top: 10px;
+  width: 100%;
+  margin-left: 1540px;
+}
   
   .submit-button:hover {
     background-color: #21a1f1;
@@ -92,21 +127,20 @@
   justify-content: center;
 }
 
-  .flex-fantasy-image {
-    max-width: 100%;
-    height: auto;
-    opacity: 0; 
-    zoom: 55%;
-    margin-left: 500px;
-  }
+.flex-fantasy-image {
+  max-width: 60%; /* Adjust as needed */
+  height: auto;
+  object-fit: contain; /* Keeps the aspect ratio without cropping */
+  margin: 0 auto; /* Center the image */
+}
+
 
   .table-container {
     text-align: left; 
   }
   
   .Table {
-    margin-left: 0; 
-    margin-right: auto; 
+    margin: auto;
   }
 
   @keyframes pulse {
@@ -140,4 +174,27 @@
     animation: pulse 1s infinite ease-in-out;
   }
   
+  .search-bar-container {
+    width: 100%;
+    position: fixed; /* or absolute depending on your layout */
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8); /* Adjust based on your design */
+    z-index: 10; /* To keep it above other content */
+    padding: 10px;
+  }
   
+  .search-input {
+    width: 90%;
+    padding: 10px;
+    margin: 0 auto;
+    display: block; /* To fill the width of its container */
+  }
+  
+  .suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+    /* Other styling as needed */
+  }
