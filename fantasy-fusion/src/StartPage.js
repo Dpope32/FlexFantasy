@@ -4,13 +4,32 @@ import { useNavigate } from 'react-router-dom';
 import flexFantasyImage from './flex-fantasy.jpg';
 
 function StartPage({ setUser }) {
-  const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showTopPlayers, setShowTopPlayers] = useState(true);
   const [playerStats, setPlayerStats] = useState({});
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState(''); 
+
+  const handleInputChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const userId = await fetchUser(username);
+    if (userId && password === 'yourPassword') {
+      navigate('/profile', { state: { userId, username } }); 
+    } else {
+      alert('Invalid username or password.');
+    }
+  };
 
   async function fetchUser(username) {
     const response = await fetch(`http://127.0.0.1:5000/user/${username}`);
@@ -21,9 +40,6 @@ function StartPage({ setUser }) {
     return null;
   }
 
-  const handleInputChange = (e) => {
-    setUsername(e.target.value);
-  };
   const fetchPlayerStats = async (playerName) => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/player/stats?name=${playerName}`);
@@ -35,21 +51,20 @@ function StartPage({ setUser }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmitLogin = async (e) => {
     e.preventDefault();
-    fetchUser(username).then((userId) => {
-      if (userId) {
-        navigate('/user-leagues', { state: { userId, username } });
-      } else {
-        alert('No user found with that username.');
-      }
-    });
+    const userId = await fetchUser(username);
+    if (userId && password === 'yourPassword') { 
+      navigate('/profile', { state: { userId, username } }); 
+    } else {
+      alert('Invalid username or password.');
+    }
   };
 
   const uniqueSuggestions = (data) => {
     const seen = new Set();
     const filteredData = data.filter(player => {
-      const playerName = player.player; // Assuming this is the structure of your player object
+      const playerName = player.player; 
       if (!seen.has(playerName)) {
         seen.add(playerName);
         return true;
@@ -114,7 +129,11 @@ function StartPage({ setUser }) {
         />
         {suggestions.length > 0 && (
           <ul className="suggestions-list">
-            {/* Render suggestions */}
+             {suggestions.map((player, index) => (
+            <li key={index} onClick={() => handleSelectPlayer(player)}>
+              {player} 
+            </li>
+                 ))}
           </ul>
         )}
       </div>
@@ -133,6 +152,41 @@ function StartPage({ setUser }) {
             Enter
           </button>
         </form>
+      </div>
+      <form onSubmit={handleSubmitLogin} className="login-form">
+      <h2 className="login-form-header">Login</h2> 
+        <label >
+          Username:
+        </label>
+        <input
+          id="username"
+          type="text"
+          value={username}
+          onChange={handleInputChange}
+          className="username-input"
+        />
+        <label htmlFor="password" className="password-label">
+          Password:
+        </label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={handlePasswordChange}
+          className="password-input"
+        />
+        <button type="login" className="login-button">
+          Login
+        </button>
+      </form>
+      <div className="right-panel">
+      <div className="right-panel">
+        <h2 className="right-panel-header">Flex Fantasy</h2>
+        <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
+        <button className="my-profile-button">My Profile</button>
+        <button className="model-button" onClick={() => navigate('/model')}>Research</button>
+        <button className="settings-button">Settings</button>
+      </div>
       </div>
     </div>
   );

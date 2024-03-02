@@ -59,15 +59,42 @@ body, html {
   font-family: var(--font-family-accent);
 }
 
+.username-label, .password-label {
+  font-size: 1.2rem;
+  color: var(--font-color);
+  margin-bottom: 5px;
+}
+
+.login-form {
+  position: absolute;
+  top: 16%; /* Adjust as needed */
+  left: 80%; /* Adjust as needed */
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  width: 700px; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--panel-shadow);
+}
+
+.login-form-header {
+  color: var(--font-color);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
 .username-form {
   position: absolute; 
-  bottom: 30%; 
+  bottom: 80%; 
+  left: 2%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.9);
   border-radius: 10px; 
   align-items: center; 
-  max-width: 300px; 
-  justify-content: center;
+  max-width: 450px; 
   margin: auto;
   width: 100%;
   display: flex;
@@ -76,18 +103,36 @@ body, html {
   
   .username-label {
     margin-right: 10px;
+    font-size: 2.2rem;
+  }
+  .username-input:focus, .password-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.3);
   }
   
   .username-input {
     margin-right: 10px;
     font-size: 1.2rem;
     padding: 10px;
-    margin-top: 10px;
+    margin-top: 20px;
   }
+
+  .username-input, .password-input {
+    font-size: 1rem;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--secondary-bg-color);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--font-color);
+  }
+
+  
   
 .submit-button {
   background-color: var(--button-bg-color);
-  color: #282c34;
+  color: #000000;
   border: none;
   border-radius: 25px;
   transition: all 0.2s ease-in-out;
@@ -96,29 +141,56 @@ body, html {
   width: 100%;
   margin-left: 1540px;
 }
+
+.login-button {
+  background-color: var(--button-bg-color);
+  color: var(--primary-bg-color);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 50%;
+  align-items: center;
+  display: inline;
+}
   
   .submit-button:hover {
     background-color: #21a1f1;
   }
 
-  .flex-fantasy-title {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 62px; 
-    text-shadow: 2px 2px 8px #0071b3ef; 
-  }
   .left-panel {
     position: fixed;
     top: 0;
     left: 0;
-    width: 200px;
+    width: 250px;
     height: 100%;
     background-color: #112240;
     padding: 1em;
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
 }
+
+.right-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #112240;
+  padding: 1em;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+.right-panel-header {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  margin-bottom: 50px;
+}
+
 
 .content {
   display: flex;
@@ -128,10 +200,9 @@ body, html {
 }
 
 .flex-fantasy-image {
-  max-width: 60%; /* Adjust as needed */
-  height: auto;
-  object-fit: contain; /* Keeps the aspect ratio without cropping */
-  margin: 0 auto; /* Center the image */
+  zoom: 65%;
+  margin-top: 73px;
+  display: flex;
 }
 
 
@@ -176,19 +247,20 @@ body, html {
   
   .search-bar-container {
     width: 100%;
-    position: fixed; /* or absolute depending on your layout */
+    position: absolute; 
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.8); /* Adjust based on your design */
-    z-index: 10; /* To keep it above other content */
+    background: rgba(0, 0, 0, 0.7); 
     padding: 10px;
   }
   
   .search-input {
     width: 90%;
     padding: 10px;
-    margin: 0 auto;
-    display: block; /* To fill the width of its container */
+    margin-left: 670px;
+    opacity: 0.5;
+    align-items: center;
+    display: flex;
   }
   
   .suggestions-list {
@@ -196,5 +268,4 @@ body, html {
     padding: 0;
     margin: 0;
     background: #fff;
-    /* Other styling as needed */
   }
