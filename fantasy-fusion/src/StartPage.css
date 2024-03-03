@@ -11,7 +11,6 @@
   --panel-shadow: 2px 0 5px rgba(0,0,0,0.5);
 }
 
-
 html {
   zoom: 100%;
 }
@@ -64,8 +63,6 @@ body, html {
   margin-bottom: 5px;
 }
 
-
-
 .login-form-header, .create-account-form-header {
   color: var(--font-color);
   text-align: center;
@@ -77,113 +74,110 @@ body, html {
   position: fixed;
   margin-left:100px;
   width: 100%;
-  height: calc(100%); /* Adjust this value to maintain the background height */
+  height: calc(100%); 
   overflow: hidden;
   background-image: url('./flex-fantasy.jpg');
-  background-size: contain; /* Adjust this value to 'contain' */
+  background-size: contain; 
   background-position: center;
   background-attachment: fixed;
 }
 
-  
-  .username-label {
-    margin-right: 10px;
-    font-size: 2.2rem;
-  }
-  .username-input:focus, .sleeper-username-input:focus, .email-input:focus, .password-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.3);
-  }
+.username-label {
+  margin-right: 10px;
+  font-size: 2.2rem;
+}
+.username-input:focus, .sleeper-username-input:focus, .email-input:focus, .password-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.3);
+}
 
+.username-input {
+  margin-right: 10px;
+  font-size: 1.2rem;
+  padding: 10px;
+  margin-top: 20px;
+}
 
-  .username-input {
-    margin-right: 10px;
-    font-size: 1.2rem;
-    padding: 10px;
-    margin-top: 20px;
-  }
+.username-input, .password-input, .email-input, .sleeper-username-input, input {
+  font-size: 1rem;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--secondary-bg-color);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--font-color);
+}
 
-  .username-input, .password-input, .email-input, .sleeper-username-input, input {
-    font-size: 1rem;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid var(--secondary-bg-color);
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--font-color);
-  }
+.username-form, .login-form, .account-creation-form {
+  position: absolute;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--panel-shadow);
+  width: auto; 
+  max-width: 400px; 
+}
 
-  .username-form, .login-form, .account-creation-form {
-    position: absolute;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--panel-shadow);
-    width: auto; /* Let the form width be determined by its content */
-    max-width: 400px; /* Prevent forms from becoming too wide */
-  }
-  
-  .account-creation-form-header {
-    color: var(--font-color);
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2rem;
-  }
+.account-creation-form-header {
+  color: var(--font-color);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
 
-  .username-form {
-    bottom: 20%; /* Adjust position as needed */
-    left: 50%; /* Center form */
-    transform: translateX(-50%);
-  }
-  
-  .login-form {
-    top: 9%; /* Center vertically */
-    right: 16%; /* Center form */
-    transform: translateX(50%);
-  }
-  
-  .account-creation-form {
-    top: 30%; /* Center vertically */
-    left: 22%; /* Center horizontally */
-    transform: translate(-50%, -50%);
-  }
+.username-form {
+  bottom: 20%; 
+  left: 50%; 
+  transform: translateX(-50%);
+}
 
-  .submit-button, .create-account-button, .login-button, button {
-    background-color: var(--button-bg-color);
-    color: #000000;
-    border: none;
-    border-radius: 25px;
-    transition: all 0.2s ease-in-out;
-    padding: 10px 20px;
-    margin-top: 10px;
-    font: 1em 'Kodchasan';
-    cursor: pointer;
-    width: 70%; /* Make buttons full width */
-    margin-left: 15%; /* Center buttons */
-  }
-  
-  .submit-button:hover {
-    background-color: #21a1f1;
-  }
-  
+.login-form {
+  top: 9%; 
+  right: 16%; 
+  transform: translateX(50%);
+}
 
-  .left-panel {
-    position: fixed;
-    top: 0;
-    width: 180px; /* Adjusted to not occupy too much space */
-    height: 100%;
-    background-color: #091221;
-    padding: 1em;
-    box-shadow: var(--panel-shadow);
-  }
+.account-creation-form {
+  top: 30%; 
+  left: 22%; 
+  transform: translate(-50%, -50%);
+}
 
-  .left-panel {
-    left: 0;
-  }
+.submit-button, .create-account-button, .login-button, button {
+  background-color: var(--button-bg-color);
+  color: #000000;
+  border: none;
+  border-radius: 25px;
+  transition: all 0.2s ease-in-out;
+  padding: 10px 20px;
+  margin-top: 10px;
+  font: 1em 'Kodchasan';
+  cursor: pointer;
+  width: 70%; 
+  margin-left: 15%;
+}
 
+.submit-button:hover {
+  background-color: #21a1f1;
+}
+
+.left-panel {
+  position: fixed;
+  top: 0;
+  width: 180px; 
+  height: 100%;
+  background-color: #091221;
+  padding: 1em;
+  box-shadow: var(--panel-shadow);
+  display: flexbox;
+}
+
+.left-panel {
+  left: 0;
+}
 
 .left-panel-header {
   font-size: 1.3rem;
@@ -193,49 +187,45 @@ body, html {
   color: #ffffff;
 }
 
+.table-container {
+  text-align: left; 
+}
 
+.Table {
+  margin: auto;
+}
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-  .table-container {
-    text-align: left; 
-  }
-  
-  .Table {
-    margin: auto;
-  }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .loading-text {
-    font-size: 2em;
-    font-weight: bold;
-    color: #29d;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    animation: pulse 1s infinite ease-in-out;
-  }
-  
-/* Search Bar Styles */
+.loading-text {
+  font-size: 2em;
+  font-weight: bold;
+  color: #29d;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  animation: pulse 1s infinite ease-in-out;
+}
+
 .search-bar-container {
   width: 100%;
   position: absolute;
@@ -254,29 +244,28 @@ body, html {
   opacity: 0.5;
   font-size: medium;
 }
-  .suggestions-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    background: #fff;
-  }
 
+.suggestions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background: #fff;
+}
 
-  .sleeper-button {
-    background-color: #8286cd;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem; 
-    font-size: 1rem; 
-    font-family: 'Nunito', sans-serif; 
-    border-radius: 30px; 
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-    display: block;
-    margin: 1rem auto; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-  }
-  .sleeper-button:hover {
-    background-color: var(--button-bg-hover-color);
-  }
-  
+.sleeper-button {
+  background-color: #8286cd;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem; 
+  font-size: 1rem; 
+  font-family: 'Nunito', sans-serif; 
+  border-radius: 30px; 
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  display: block;
+  margin: 1rem auto; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+}
+.sleeper-button:hover {
+  background-color: var(--button-bg-hover-color);
+}

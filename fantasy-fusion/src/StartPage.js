@@ -5,7 +5,8 @@ import { GoogleLogin } from 'react-google-login';
 import flexFantasyImage from './flex-fantasy.jpg';
 
 
-function StartPage({ setUser }) {
+function StartPage() {
+  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -105,7 +106,6 @@ function StartPage({ setUser }) {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    // Login logic using loginUsername and loginPassword
     try {
       const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
@@ -121,10 +121,9 @@ function StartPage({ setUser }) {
       const data = await response.json();
   
       if (response.ok) {
-        // Assuming setUser will set the user state in your app and you receive a token to store
-        localStorage.setItem('authToken', data.token); // Store the token
-        setUser(data.user); // Set the user data
-        navigate('/profile'); // Redirect to profile page after successful login
+        localStorage.setItem('authToken', data.token);
+        setUser(data.user);
+        navigate('/profile');
       } else {
         alert('Login failed. Please check your username and password.');
       }

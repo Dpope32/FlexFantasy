@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './StartPage.css';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from 'react-google-login';
+import { useLocation } from 'react-router-dom';
 
 
 function Sleeper() {
@@ -12,6 +13,8 @@ function Sleeper() {
   const [showTopPlayers, setShowTopPlayers] = useState(true);
   const [playerStats, setPlayerStats] = useState({});
   const [username, setUsername] = useState('');
+  const location = useLocation();
+  const sleeperUsernameFromProfile = location.state?.sleeperUsername;
 
   const navigateToSleeper = () => {
     navigate('/sleeper'); 
@@ -66,6 +69,18 @@ function Sleeper() {
     return filteredData;
   };
   
+  useEffect(() => {
+    if (sleeperUsernameFromProfile) {
+      setUsername(sleeperUsernameFromProfile);
+      fetchUser(sleeperUsernameFromProfile).then((userId) => {
+        if (userId) {
+          navigate('/user-leagues', { state: { userId, username: sleeperUsernameFromProfile } });
+        } else {
+          alert('No user found with that username.');
+        }
+      });
+    }
+  }, [sleeperUsernameFromProfile, navigate]);
 
   useEffect(() => {
     if (searchTerm.length >= 2) {
@@ -102,7 +117,6 @@ function Sleeper() {
       <div className="left-panel">
         <h2 className="left-panel-header">Flex Fantasy</h2>
         <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
-        <button className="my-profile-button">My Profile</button>
         <button className="model-button" onClick={() => navigate('/model')}>Research</button>
         <button className="sleeper-button" onClick={() => navigate('/sleeper')}>Sleeper</button>
         <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>

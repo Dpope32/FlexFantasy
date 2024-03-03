@@ -3,19 +3,27 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 from functools import lru_cache
 from flask_cors import CORS
-import os
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token
+from flask import Flask, request, jsonify
+from flask_uploads import UploadSet, configure_uploads, IMAGES
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
+
+from flask_jwt_extended import get_jwt_identity
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
-app.config['JWT_SECRET_KEY'] = 'LgkxDh-SkRv9o4Jgum2Vrg8tEI_Hv2Yt4NGhBiD5DQc'  # Change this to a random secret key
+app.config['JWT_SECRET_KEY'] = 'LgkxDh-SkRv9o4Jgum2Vrg8tEI_Hv2Yt4NGhBiD5DQc'  
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 CORS(app)
 logging.basicConfig(level=logging.DEBUG)
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/uploads'  # choose your file storage directory
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, photos)
 
 
 @app.route('/')
@@ -56,37 +64,26 @@ class NFLStatsBase(db.Model):
     posrank = db.Column(db.Integer)
     ovrank = db.Column(db.Integer)
     sleeper_player_id = db.Column(db.Integer)
-
 class NFLStats2013(NFLStatsBase):
     __tablename__ = 'nfl_stats_2013'
-
 class NFLStats2014(NFLStatsBase):
     __tablename__ = 'nfl_stats_2014'
-
 class NFLStats2015(NFLStatsBase):
     __tablename__ = 'nfl_stats_2015'
-
 class NFLStats2016(NFLStatsBase):
     __tablename__ = 'nfl_stats_2016'
-
 class NFLStats2017(NFLStatsBase):
     __tablename__ = 'nfl_stats_2017'
-
 class NFLStats2018(NFLStatsBase):
     __tablename__ = 'nfl_stats_2018'
-
 class NFLStats2019(NFLStatsBase):
     __tablename__ = 'nfl_stats_2019'
-
 class NFLStats2020(NFLStatsBase):
     __tablename__ = 'nfl_stats_2020'
-
 class NFLStats2021(NFLStatsBase):
     __tablename__ = 'nfl_stats_2021'
-
 class NFLStats2022(NFLStatsBase):
     __tablename__ = 'nfl_stats_2022'
-
 class NFLStats2023(NFLStatsBase):
     __tablename__ = 'nfl_stats_2023'
 
@@ -97,6 +94,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     sleeper_username = db.Column(db.String(120), unique=True, nullable=True)
     password_hash = db.Column(db.String(128)) 
+    profile_picture_url = db.Column(db.String(), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -107,31 +105,30 @@ class User(db.Model):
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+    logging.debug("Received registration data: %s", data)  # Log the incoming JSON data.
+
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    sleeper_username = data.get('sleeper_username', None)
+    sleeper_username = data.get('sleeperUsername')  # Make sure the key matches the frontend.
 
     if not all([username, email, password]):
         return jsonify({'error': 'Missing data'}), 400
 
-    # Check if user already exists
-    existing_user = User.query.filter_by(username=username).first()
-    if existing_user is not None:
-        return jsonify({'error': 'User already exists'}), 409
+    # Log the sleeper_username to make sure it's what you expect.
+    logging.debug("Sleeper username: %s", sleeper_username)
 
     user = User(username=username, email=email, sleeper_username=sleeper_username)
-    user.set_password(password)  # This hashes the password and sets the password_hash
-
+    user.set_password(password)
+    
     db.session.add(user)
     try:
         db.session.commit()
-        return jsonify({'message': 'User created successfully', 'user_id': user.user_id}), 201
-    except SQLAlchemyError as e:
+        return jsonify({'message': 'User created successfully'}), 201
+    except Exception as e:
+        logging.error("Error creating user: %s", e)
         db.session.rollback()
-        app.logger.error(f"SQLAlchemyError: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -154,8 +151,6 @@ def login():
     except Exception as e:
         app.logger.error(f"Login error: {e}")
         return jsonify({'error': 'An internal server error occurred'}), 500
-
-
 
 @app.route('/api/stats/2023', methods=['GET'])
 def get_2023_stats():
@@ -395,6 +390,26 @@ def get_all_usernames(self, rosters):
         username = self.fetch_username(owner_id)
         usernames[owner_id] = username
     return usernames
+
+@app.route('/upload-profile-picture', methods=['POST'])
+def upload_profile_picture():
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No photo uploaded'}), 400
+
+    current_user_id = get_jwt_identity()
+    if not current_user_id:
+        return jsonify({'error': 'Could not identify the user'}), 401
+
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    filename = photos.save(request.files['photo'])
+    file_url = photos.url(filename)
+    user.profile_picture_url = file_url
+    db.session.commit()
+
+    return jsonify({'imageUrl': file_url})
 
 if __name__ == '__main__':
     app.run(debug=True)

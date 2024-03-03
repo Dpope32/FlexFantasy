@@ -25,7 +25,7 @@ function App() {
           <Route path="/user-leagues" element={<UserLeagues user={user} />} />
           <Route path="/rosters/:leagueId" element={<Rosters />} />
           <Route path="/model" element={<Model />} />
-          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
           <Route path="/settings" element={<Settings user={user} />} />
           <Route path="/sleeper" element={<Sleeper />} />
           <Route path="*" element={<NotFound />} />
