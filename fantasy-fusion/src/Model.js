@@ -346,7 +346,8 @@ return <div>No data available</div>;
         <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
         <button className="my-profile-button">My Profile</button>
         <button className="model-button" onClick={() => navigate('/model')}>Research</button>
-        <button className="settings-button">Settings</button>
+        <button className="sleeper-button" onClick={() => navigate('/sleeper')}>Sleeper</button>
+        <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
       </div>
       {!selectedPlayer && (
         <header className="main-header">

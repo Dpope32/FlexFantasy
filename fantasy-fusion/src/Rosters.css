@@ -27,7 +27,7 @@
   color: white;
   border: none;
   padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
+  font-size: 1rem; 
   font-family: 'Nunito', sans-serif; 
   border-radius: 30px; 
   cursor: pointer;
@@ -47,7 +47,7 @@
   color: white;
   border: none;
   padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
+  font-size: 1rem; 
   font-family: 'Nunito', sans-serif; 
   border-radius: 30px; 
   cursor: pointer;
@@ -63,11 +63,11 @@
 }
 
 .button-3-button {
-  background-color: #415654;
+  background-color: #2ab1bb;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
+  font-size: 1rem; 
   font-family: 'Nunito', sans-serif; 
   border-radius: 30px; 
   cursor: pointer;
@@ -156,7 +156,7 @@ button {
   color: white;
   border: none;
   padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
+  font-size: 1rem; 
   font-family: 'Nunito', sans-serif; 
   border-radius: 30px; 
   cursor: pointer;

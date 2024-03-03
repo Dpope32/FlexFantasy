@@ -7,6 +7,7 @@ import Model from './Model';
 import Profile from './Profile'; 
 import Settings from './Settings'; 
 import NotFound from './NotFound';
+import Sleeper from './Sleeper';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/model" element={<Model />} />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/settings" element={<Settings user={user} />} />
+          <Route path="/sleeper" element={<Sleeper />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
     </div>

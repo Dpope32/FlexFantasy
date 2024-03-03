@@ -6,12 +6,17 @@ from flask_cors import CORS
 import os
 import logging
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
+app.config['JWT_SECRET_KEY'] = 'LgkxDh-SkRv9o4Jgum2Vrg8tEI_Hv2Yt4NGhBiD5DQc'  # Change this to a random secret key
+jwt = JWTManager(app)
 db = SQLAlchemy(app)
 CORS(app)
 logging.basicConfig(level=logging.DEBUG)
+
 
 @app.route('/')
 def index():
@@ -84,6 +89,73 @@ class NFLStats2022(NFLStatsBase):
 
 class NFLStats2023(NFLStatsBase):
     __tablename__ = 'nfl_stats_2023'
+
+class User(db.Model):
+    __tablename__ = 'users'  
+    user_id = db.Column(db.Integer, primary_key=True)  
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    sleeper_username = db.Column(db.String(120), unique=True, nullable=True)
+    password_hash = db.Column(db.String(128)) 
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    sleeper_username = data.get('sleeper_username', None)
+
+    if not all([username, email, password]):
+        return jsonify({'error': 'Missing data'}), 400
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user is not None:
+        return jsonify({'error': 'User already exists'}), 409
+
+    user = User(username=username, email=email, sleeper_username=sleeper_username)
+    user.set_password(password)  # This hashes the password and sets the password_hash
+
+    db.session.add(user)
+    try:
+        db.session.commit()
+        return jsonify({'message': 'User created successfully', 'user_id': user.user_id}), 201
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"SQLAlchemyError: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        user = User.query.filter_by(username=data['username']).first()
+
+        if user is None:
+            return jsonify({'error': 'User not found'}), 404
+
+        if not user.password_hash:
+            app.logger.error(f"User {user.username} has no password set.")
+            return jsonify({'error': 'Password not set for user'}), 500
+
+        if user.check_password(data['password']):
+            return jsonify({'message': 'Login successful'}), 200
+        else:
+            return jsonify({'error': 'Invalid username or password'}), 401
+
+    except Exception as e:
+        app.logger.error(f"Login error: {e}")
+        return jsonify({'error': 'An internal server error occurred'}), 500
+
+
 
 @app.route('/api/stats/2023', methods=['GET'])
 def get_2023_stats():

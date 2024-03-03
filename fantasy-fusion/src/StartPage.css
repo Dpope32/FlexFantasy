@@ -13,7 +13,7 @@
 
 
 html {
-  zoom: reset;
+  zoom: 100%;
 }
 
 *, *:before, *:after {
@@ -23,19 +23,18 @@ html {
 body, html {
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
+  height: auto;
+  overflow: auto;
   font-family: 'Kodchasan', sans-serif;
 }
 
 .start-page {
+  min-height: 100vh;
   text-align: center;
   padding: 0;
   background-color: #000000;
-  min-height: 100vh;
   color: rgb(121, 252, 254);
   font-family: 'Kodchasan', sans-serif;
-  background-image: url('flex-fantasy.jpg');
   background-size: cover;
   background-position: top left; 
   background-repeat: no-repeat;
@@ -46,7 +45,7 @@ body, html {
   align-items: center; 
   justify-content: center;
   overflow: hidden; 
-  zoom: 70%
+  zoom: 100%;
 }
 
 .App {
@@ -65,52 +64,39 @@ body, html {
   margin-bottom: 5px;
 }
 
-.login-form {
-  position: absolute;
-  top: 16%; /* Adjust as needed */
-  left: 80%; /* Adjust as needed */
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 10px;
-  width: 700px; /* Adjust as needed */
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--panel-shadow);
-}
 
-.login-form-header {
+
+.login-form-header, .create-account-form-header {
   color: var(--font-color);
   text-align: center;
   margin-bottom: 20px;
   font-size: 2rem;
 }
 
-.username-form {
-  position: absolute; 
-  bottom: 80%; 
-  left: 2%;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 10px; 
-  align-items: center; 
-  max-width: 450px; 
-  margin: auto;
+.flex-fantasy-image {
+  position: fixed;
+  margin-left:100px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  height: calc(100%); /* Adjust this value to maintain the background height */
+  overflow: hidden;
+  background-image: url('./flex-fantasy.jpg');
+  background-size: contain; /* Adjust this value to 'contain' */
+  background-position: center;
+  background-attachment: fixed;
 }
+
   
   .username-label {
     margin-right: 10px;
     font-size: 2.2rem;
   }
-  .username-input:focus, .password-input:focus {
+  .username-input:focus, .sleeper-username-input:focus, .email-input:focus, .password-input:focus {
     outline: none;
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.3);
   }
-  
+
+
   .username-input {
     margin-right: 10px;
     font-size: 1.2rem;
@@ -118,7 +104,7 @@ body, html {
     margin-top: 20px;
   }
 
-  .username-input, .password-input {
+  .username-input, .password-input, .email-input, .sleeper-username-input, input {
     font-size: 1rem;
     padding: 10px;
     margin-bottom: 10px;
@@ -128,82 +114,86 @@ body, html {
     color: var(--font-color);
   }
 
+  .username-form, .login-form, .account-creation-form {
+    position: absolute;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--panel-shadow);
+    width: auto; /* Let the form width be determined by its content */
+    max-width: 400px; /* Prevent forms from becoming too wide */
+  }
   
-  
-.submit-button {
-  background-color: var(--button-bg-color);
-  color: #000000;
-  border: none;
-  border-radius: 25px;
-  transition: all 0.2s ease-in-out;
-  padding: 10px 20px;
-  margin-top: 10px;
-  width: 100%;
-  margin-left: 1540px;
-}
+  .account-creation-form-header {
+    color: var(--font-color);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+  }
 
-.login-button {
-  background-color: var(--button-bg-color);
-  color: var(--primary-bg-color);
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  width: 50%;
-  align-items: center;
-  display: inline;
-}
+  .username-form {
+    bottom: 20%; /* Adjust position as needed */
+    left: 50%; /* Center form */
+    transform: translateX(-50%);
+  }
+  
+  .login-form {
+    top: 9%; /* Center vertically */
+    right: 16%; /* Center form */
+    transform: translateX(50%);
+  }
+  
+  .account-creation-form {
+    top: 30%; /* Center vertically */
+    left: 22%; /* Center horizontally */
+    transform: translate(-50%, -50%);
+  }
+
+  .submit-button, .create-account-button, .login-button, button {
+    background-color: var(--button-bg-color);
+    color: #000000;
+    border: none;
+    border-radius: 25px;
+    transition: all 0.2s ease-in-out;
+    padding: 10px 20px;
+    margin-top: 10px;
+    font: 1em 'Kodchasan';
+    cursor: pointer;
+    width: 70%; /* Make buttons full width */
+    margin-left: 15%; /* Center buttons */
+  }
   
   .submit-button:hover {
     background-color: #21a1f1;
   }
+  
 
   .left-panel {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 250px;
+    width: 180px; /* Adjusted to not occupy too much space */
     height: 100%;
-    background-color: #112240;
+    background-color: #091221;
     padding: 1em;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
+    box-shadow: var(--panel-shadow);
+  }
 
-.right-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 250px;
-  height: 100%;
-  background-color: #112240;
-  padding: 1em;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
+  .left-panel {
+    left: 0;
+  }
 
-.right-panel-header {
-  font-size: 2rem;
+
+.left-panel-header {
+  font-size: 1.3rem;
   text-align: center;
   margin-bottom: 1rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   color: #ffffff;
-  margin-bottom: 50px;
 }
 
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  justify-content: center;
-}
-
-.flex-fantasy-image {
-  zoom: 65%;
-  margin-top: 73px;
-  display: flex;
-}
 
 
   .table-container {
@@ -245,27 +235,48 @@ body, html {
     animation: pulse 1s infinite ease-in-out;
   }
   
-  .search-bar-container {
-    width: 100%;
-    position: absolute; 
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.7); 
-    padding: 10px;
-  }
-  
-  .search-input {
-    width: 90%;
-    padding: 10px;
-    margin-left: 670px;
-    opacity: 0.5;
-    align-items: center;
-    display: flex;
-  }
-  
+/* Search Bar Styles */
+.search-bar-container {
+  width: 100%;
+  position: absolute;
+  height: 6%;
+  top: 0;
+  left: 185px;
+  background: rgba(0, 0, 0, 0.0);
+  padding: 10px;
+}
+
+.search-input {
+  width: 100%;
+  height: 95%;
+  padding: 10px;
+  margin-right: 250px;
+  opacity: 0.5;
+  font-size: medium;
+}
   .suggestions-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
     background: #fff;
   }
+
+
+  .sleeper-button {
+    background-color: #8286cd;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem; 
+    font-size: 1rem; 
+    font-family: 'Nunito', sans-serif; 
+    border-radius: 30px; 
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    display: block;
+    margin: 1rem auto; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  }
+  .sleeper-button:hover {
+    background-color: var(--button-bg-hover-color);
+  }
+  
