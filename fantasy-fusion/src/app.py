@@ -7,24 +7,50 @@ import logging
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, request, jsonify
-from flask_uploads import UploadSet, configure_uploads, IMAGES
-from werkzeug.datastructures import FileStorage
+import os
 from werkzeug.utils import secure_filename
+import logging
 
-from flask_jwt_extended import get_jwt_identity
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5433/postgres'
 app.config['JWT_SECRET_KEY'] = 'LgkxDh-SkRv9o4Jgum2Vrg8tEI_Hv2Yt4NGhBiD5DQc'  
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
-CORS(app)
+CORS(app, supports_credentials=True, expose_headers=["Authorization"], allow_headers=["Authorization", "Content-Type"])
 logging.basicConfig(level=logging.DEBUG)
-app.config['UPLOADED_PHOTOS_DEST'] = 'static/uploads'  # choose your file storage directory
-photos = UploadSet('photos', IMAGES)
-configure_uploads(app, photos)
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(os.getcwd(), 'uploads')
 
+@app.route('/user-info', methods=['GET'])
+@jwt_required()
+def user_info():
+    try:
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            logging.error("JWT identity not found.")
+            return jsonify({'error': 'Authentication required, user ID not found.'}), 401
+
+        user = User.query.get(current_user_id)
+
+        if not user:
+            logging.error(f"User not found for ID: {current_user_id}")
+            return jsonify({'error': 'User not found'}), 404
+
+        user_info = {
+            'user_id': user.user_id,
+            'username': user.username,
+            'email': user.email,
+            'sleeper_username': user.sleeper_username,
+            'profile_picture_url': user.profile_picture_url,
+        }
+
+        return jsonify(user_info=user_info), 200
+
+    except Exception as e:
+        logging.exception("An error occurred while fetching user info.")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/')
 def index():
@@ -101,7 +127,69 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+@app.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    try:
+        data = request.get_json()
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
 
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        new_password = data.get('newPassword')
+        if not new_password:
+            return jsonify({'error': 'New password is required'}), 400
+
+        user.set_password(new_password)
+        db.session.commit()
+
+        return jsonify({'message': 'Password updated successfully'}), 200
+    except SQLAlchemyError as e:
+        logging.error(f"Error updating password: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update password'}), 500
+
+@app.route('/upload-profile-picture', methods=['POST'])
+@jwt_required()
+def upload_profile_picture():
+    try:
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            return jsonify({'error': 'Authentication required'}), 401
+
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
+            file.save(file_path)
+            file_url = os.path.join('/uploads', filename)
+
+            user = User.query.get(current_user_id)
+            if user:
+                user.profile_picture_url = file_url
+                db.session.commit()
+                return jsonify({'imageUrl': file_url}), 200
+            else:
+                return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        logging.error(f"Error uploading profile picture: {e}")
+        return jsonify({'error': 'An internal error occurred'}), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Log the error including the stack trace
+    logging.error('Unhandled exception', exc_info=e)
+    return jsonify({'error': 'An internal error occurred'}), 500
+    
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -144,7 +232,9 @@ def login():
             return jsonify({'error': 'Password not set for user'}), 500
 
         if user.check_password(data['password']):
-            return jsonify({'message': 'Login successful'}), 200
+            # Generate the JWT access token
+            access_token = create_access_token(identity=user.user_id)
+            return jsonify({'message': 'Login successful', 'access_token': access_token}), 200
         else:
             return jsonify({'error': 'Invalid username or password'}), 401
 
@@ -390,26 +480,6 @@ def get_all_usernames(self, rosters):
         username = self.fetch_username(owner_id)
         usernames[owner_id] = username
     return usernames
-
-@app.route('/upload-profile-picture', methods=['POST'])
-def upload_profile_picture():
-    if 'photo' not in request.files:
-        return jsonify({'error': 'No photo uploaded'}), 400
-
-    current_user_id = get_jwt_identity()
-    if not current_user_id:
-        return jsonify({'error': 'Could not identify the user'}), 401
-
-    user = User.query.get(current_user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
-    filename = photos.save(request.files['photo'])
-    file_url = photos.url(filename)
-    user.profile_picture_url = file_url
-    db.session.commit()
-
-    return jsonify({'imageUrl': file_url})
 
 if __name__ == '__main__':
     app.run(debug=True)

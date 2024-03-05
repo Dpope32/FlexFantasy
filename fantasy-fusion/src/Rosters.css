@@ -33,7 +33,7 @@
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   display: block;
-  margin: 1rem auto; 
+  margin: 0.2rem auto; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
@@ -53,7 +53,7 @@
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   display: block;
-  margin: 1rem auto; 
+  margin: 0.2rem auto; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
@@ -87,7 +87,7 @@
   color: white;
   border: none;
   padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
+  font-size: 1rem; 
   font-family: 'Nunito', sans-serif; 
   border-radius: 30px; 
   cursor: pointer;
@@ -101,20 +101,7 @@
   background-color: #c0392b;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
 }
-.button-5-button {
-  background-color: #4c537a;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
-  font-family: 'Nunito', sans-serif; 
-  border-radius: 30px; 
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-  display: block;
-  margin: 1rem auto; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-}
+
 
 button {
   background-color: #4990d3;
@@ -130,20 +117,6 @@ button {
 .button-5-button:hover {
   background-color: #c0392b;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
-}
-.button-6-button {
-  background-color: #4c4e59;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem; 
-  font-size: 1.2rem; 
-  font-family: 'Nunito', sans-serif; 
-  border-radius: 30px; 
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-  display: block;
-  margin: 1rem auto; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
 .button-6-button:hover {
@@ -162,7 +135,7 @@ button {
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   display: block;
-  margin: 1rem auto; 
+  margin: 0.2rem auto; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
@@ -177,10 +150,10 @@ button {
   width: 100%; 
 }
 
-.left-panel2 {
+.left-panel {
   position: fixed;
   height: auto;
-  width: 220px; 
+  width: 180px; 
   flex-shrink: 0; 
   position: fixed;
   text-align: center;
@@ -194,7 +167,7 @@ button {
   border-radius: 0 25px 25px 0; 
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   opacity: 100%;
-  zoom: 70%;
+  zoom: 100%;
 }
 
 .left-panel-header {

@@ -29,7 +29,7 @@ body, html {
   padding: 2rem;
   color: #ffffff;
   font-family: 'Kodchasan', sans-serif;
-  zoom: 70%;
+  zoom: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -146,7 +146,7 @@ input::placeholder {
 }
 
 .chart-container {
-  margin-left: 200px;
+  margin-left: 300px;
   margin-top: 70px; 
   margin-bottom: 50px;
   border: 3px solid #81f4ff; 
@@ -157,7 +157,8 @@ input::placeholder {
 
 .player-info h2 {
   padding-left: 100px;
-  font-size: 6rem; 
+  font-size: 3rem; 
+  margin-top: 4.5rem; 
   margin-bottom: 0.5rem; 
   background: linear-gradient(to right, rgb(0, 247, 255), rgb(57, 141, 204), rgb(255, 255, 255));
   -webkit-background-clip: text;
@@ -234,16 +235,16 @@ input::placeholder {
 }
 
 .back-button {
-  margin-top: 25px;
+  margin-top: 85px;
   background-color: #171045; 
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   max-width: 6rem;
-  font-size: 24px;
+  font-size: 20px;
   position: absolute; 
-  left: 220px;
+  left: 0px;
   top: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+// App.js
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './AuthContext'; // Import the AuthProvider
 import UserLeagues from './UserLeagues';
 import Rosters from './Rosters';
 import StartPage from './StartPage';
@@ -11,25 +13,20 @@ import Sleeper from './Sleeper';
 import './App.css';
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  const handleSetUser = (userData) => {
-    console.log('Setting user:', userData);
-    setUser(userData);
-  };
-
   return (
     <div className="App">
+      <AuthProvider> {/* Wrap your components in AuthProvider */}
         <Routes>
-          <Route path="/" element={<StartPage setUser={handleSetUser} />} />
-          <Route path="/user-leagues" element={<UserLeagues user={user} />} />
+          <Route path="/" element={<StartPage />} />
+          <Route path="/user-leagues" element={<UserLeagues />} />
           <Route path="/rosters/:leagueId" element={<Rosters />} />
           <Route path="/model" element={<Model />} />
-          <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
-          <Route path="/settings" element={<Settings user={user} />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/sleeper" element={<Sleeper />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+      </AuthProvider>
     </div>
   );
 }
