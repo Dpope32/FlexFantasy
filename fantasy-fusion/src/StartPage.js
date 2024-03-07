@@ -20,6 +20,8 @@ function StartPage() {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [email, setEmail] = useState('');
+  const { login, fetchUser } = useAuth();
+
   const [sleeperUsername, setSleeperUsername] = useState('');
   const navigateToSleeper = () => {
     navigate('/sleeper'); 
@@ -39,7 +41,7 @@ function StartPage() {
       username: createUsername,
       email: email,
       sleeperUsername: createSleeperUsername,
-      password: createPassword
+      password: createPassword,
     };
     try {
       const response = await fetch('http://127.0.0.1:5000/register', {
@@ -51,19 +53,21 @@ function StartPage() {
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        setUser(data);
-        setShowSuccessPopup(true); 
+        // Assuming the server sends back the user data and token on successful registration
+        localStorage.setItem('authToken', data.access_token);
+        setUser(data.user_info); // Ensure the backend sends user_info
+        setShowSuccessPopup(true);
         setTimeout(() => {
-          setShowSuccessPopup(false); 
+          setShowSuccessPopup(false);
         }, 3000);
+        navigate('/profile');
       } else {
-        alert('Failed to create account. Please try again.');
+        throw new Error(data.error || 'Failed to create account.');
       }
     } catch (error) {
       console.error('Account creation error:', error);
-      alert('An error occurred. Please try again.');
+      alert(error.message || 'An error occurred. Please try again.');
     }
   };
   
@@ -107,20 +111,22 @@ function StartPage() {
         },
         body: JSON.stringify({
           username: loginUsername,
-          password: loginPassword
+          password: loginPassword,
         }),
       });
+
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        setUser(data.user);
+        // Use the correct token property returned by your backend
+        localStorage.setItem('authToken', data.access_token); 
+        setUser(data.user_info); // Ensure the backend sends user_info
         navigate('/profile');
       } else {
-        alert('Login failed. Please check your username and password.');
+        throw new Error(data.error || 'Login failed. Please check your username and password.');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred during login. Please try again.');
+      alert(error.message || 'An error occurred during login. Please try again.');
     }
   };
   

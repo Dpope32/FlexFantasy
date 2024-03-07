@@ -331,25 +331,12 @@ return <div>No data available</div>;
 
   return (
     <div className="model-page">
-      <div className="left-panel">
-        <h2 className="left-panel-header">Flex Fantasy</h2>
-        <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
-        <button className="model-button" onClick={() => navigate('/model')}>Research</button>
-        <button className="sleeper-button" onClick={() => navigate('/sleeper')}>Sleeper</button>
-        <button className="my-profile-button" onClick={() => navigate('/profile')}>My Profile</button>
-        <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
-      </div>
-      {!selectedPlayer && (
-        <header className="main-header">
-          <span>Research</span>
-        </header>
-      )}
-      <div className="main-content">
-    <div className="search-section">
+            <div className="search-bar-container">
       <input
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Enter NFL player name"
+        className="search-bar"
       />
       {suggestions.length > 0 && (
         <ul className="suggestions-list">
@@ -368,6 +355,20 @@ return <div>No data available</div>;
         <h2>{`${selectedPlayer} - ${getMostRecentFantpos(playerStats) || 'Position not available'}`}</h2>
       </div>
     )}
+      <div className="left-panel">
+        <h2 className="left-panel-header">Flex Fantasy</h2>
+        <button className="button-3-button" onClick={() => navigate('/')}>Home</button>
+        <button className="model-button" onClick={() => navigate('/model')}>Research</button>
+        <button className="sleeper-button" onClick={() => navigate('/sleeper')}>Sleeper</button>
+        <button className="my-profile-button" onClick={() => navigate('/profile')}>My Profile</button>
+        <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
+      </div>
+      {!selectedPlayer && (
+        <header className="main-header">
+          <span>Research</span>
+        </header>
+      )}
+      <div className="main-content">
     {showTopPlayers && (
       <div className="top-players-container">
         {Object.entries(topPlayerIds).map(([year, playerIds]) => (

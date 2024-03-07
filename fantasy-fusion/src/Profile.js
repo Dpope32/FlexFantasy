@@ -14,7 +14,6 @@ const Profile = () => {
   const [playerStats2023, setPlayerStats2023] = useState({});
   const [allRosters, setAllRosters] = useState([]);
   const { user, setUser } = useAuth();
-  console.log(setUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [allPlayersInfo, setAllPlayersInfo] = useState({});
   const location = useLocation();
@@ -23,12 +22,10 @@ const Profile = () => {
   const [playerStats, setPlayerStats] = useState({});
   const [suggestions, setSuggestions] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [userDetails, setUserDetails] = useState({});
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [sleeperUsername, setSleeperUsername] = useState('');
   const [modalContent, setModalContent] = useState(null);
   const { state } = location;
   const userId = state?.userId;
@@ -39,14 +36,18 @@ const Profile = () => {
     navigate(`/rosters/${leagueId}`, { state: { leagueName, username } });
   };
   
+  const leagueType = (metadata) => {
+    return metadata?.auto_continue === "on" ? "Dynasty" : "Redraft";
+  };
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const token = localStorage.getItem('authToken'); // Retrieve the token from local storage
-      console.log('Retrieved token:', token); // Log the retrieved token
+      const token = localStorage.getItem('authToken'); 
+      console.log('Token from storage:', token); 
   
       if (!token) {
-        console.log('No token found');
+        console.log('No token found, user might not be logged in or session expired');
+        // Redirect to login or handle user not logged in
         return;
       }
   
@@ -59,15 +60,15 @@ const Profile = () => {
           },
         });
   
-        console.log('Response status:', response.status); // Log the response status
+        console.log('Response status:', response.status); 
   
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
   
         const data = await response.json();
-        console.log('User data:', data); // Log the fetched user data
-        setUser(data.user_info); // Adjust according to your response structure
+        console.log('User data:', data); 
+        setUser(data.user_info); 
       } catch (error) {
         console.error('Failed to fetch user details:', error);
       }
@@ -75,6 +76,7 @@ const Profile = () => {
   
     fetchUserInfo();
   }, [setUser]);
+  
 
   const handleLogout = () => {
     setUser(null); // Reset the user state
@@ -84,15 +86,17 @@ const Profile = () => {
   
 // This function fetches the user_id using the sleeperUsername
 async function fetchUserId(sleeperUsername) {
-  const response = await fetch(`http://127.0.0.1:5000/user/${sleeperUsername}`);
+  const response = await fetch(`http://127.0.0.1:5000/user/${user.sleeper_username}`);
   if (response.ok) {
     const data = await response.json();
     return data.user_id;
   } else {
-    console.error('Failed to fetch user ID for sleeper username:', sleeperUsername);
+    console.error('Failed to fetch user ID for sleeper username:', user.sleeper_username);
     return null;
   }
 }
+
+
 
 // Modify the fetchLeagues function to use the above utility
 const fetchLeagues = async (sleeperUsername) => {
@@ -109,10 +113,21 @@ const fetchLeagues = async (sleeperUsername) => {
       throw new Error('Failed to fetch leagues from Sleeper API.');
     }
     const leaguesData = await response.json();
-    setLeagues(leaguesData);
-    console.log('Fetched leagues:', leaguesData); // Log the fetched leagues data
+    const transformedData = leaguesData.map(league => ({
+      leagueId: league.league_id,
+      name: league.name !== "Leagues will be posted here!" ? league.name : null,
+      size: league.total_rosters,
+      benchSpots: league.roster_positions.filter(pos => pos === "BN").length,
+      scoringSettings: parseScoringSettings(league.scoring_settings),
+      waiverBudget: league.settings.waiver_budget,
+      tradeDeadline: parseTradeDeadline(league.settings.trade_deadline),
+      type: league.metadata?.auto_continue === "on" ? "Dynasty" : "Redraft",
+    })).filter(league => league.name);
+    setLeagues(transformedData);
   } catch (error) {
-    console.error('Error fetching leagues with user ID:', error);
+    console.error('Error fetching leagues:', error);
+  } finally {
+    setIsLoading(false); // Loading process ends
   }
 };
 
@@ -146,7 +161,6 @@ useEffect(() => {
       return response.json();
     })
     .then(data => {
-      console.log('Player stats for Josh Allen:', data['6744']);
       setPlayerStats2023(data);
       const positionRanks = calculatePositionRanks(data);
       setPositionRanks(positionRanks); 
@@ -188,6 +202,19 @@ useEffect(() => {
       }
     }, []);
 
+    useEffect(() => {
+      console.log('Location state:', location.state);
+      const { userId } = location.state || {};
+      console.log('UserId from location:', userId);
+      
+      if (userId) {
+        fetchAllRostersAndPlayers();
+      } else {
+        console.log('UserId is not set');
+      }
+    }, [location]);
+    
+
 
   const renderLeagues = () => leagues.map(league => (
     <li key={league.league_id}>
@@ -225,32 +252,7 @@ useEffect(() => {
     return positionRanks;
   };
 
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    try {
-      const authToken = localStorage.getItem('authToken');
-      const response = await fetch('http://127.0.0.1:5000/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ newPassword })
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        alert('Password changed successfully!');
-        setShowChangePasswordForm(false); // Hide the form on success
-        setNewPassword(''); // Clear the password input
-      } else {
-        throw new Error(data.error || 'Failed to change password');
-      }
-    } catch (error) {
-      alert(error);
-      console.error('Password change error:', error);
-    }
-  };
+
   
   const handleBack = () => {
     setSelectedPlayer(null); 
@@ -279,7 +281,6 @@ useEffect(() => {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const body = await response.text(); 
-          console.log(body); 
           const data = JSON.parse(body);
           const uniquePlayerSuggestions = uniqueSuggestions(data);
           setSuggestions(uniquePlayerSuggestions.map(player => player.player));
@@ -292,6 +293,37 @@ useEffect(() => {
     }
   }, [searchTerm]);
   
+  const fetchAllRostersAndPlayers = async () => {
+    setIsLoading(true);
+    try {
+      const leaguesResponse = await fetch(`https://api.sleeper.app/v1/user/${userId}/leagues/nfl/${year}`);
+      console.log('Leagues Data:', await leaguesResponse.json());
+      const leaguesData = await leaguesResponse.json();
+      const rostersPromises = leaguesData.map(league => fetch(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`));
+      const rostersResponses = await Promise.all(rostersPromises);
+      let filteredRosters = [];
+  
+      for (const response of rostersResponses) {
+        const rostersData = await response.json();
+        console.log('Rosters Data for a league:', rostersData);
+        const userRosters = rostersData.filter(roster => roster.owner_id === userId); 
+        filteredRosters = filteredRosters.concat(userRosters);
+      }
+  
+      setAllRosters(filteredRosters);
+    } catch (error) {
+      console.error('Error fetching all rosters and players info:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+useEffect(() => {
+  if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
+    const newRanks = calculatePositionRanks(playerStats2023);
+    setPositionRanks(newRanks);
+  }
+}, [allPlayersInfo, playerStats2023]); 
 
 const fetchPlayerStats = async (playerName) => {
   try {
@@ -469,6 +501,19 @@ const getMostRecentFantpos = (stats) => {
   return mostRecentStats ? mostRecentStats.fantpos : null; // or a default value
 };
 
+const toggleChangePasswordModal = () => {
+  setIsChangePasswordModalVisible(!isChangePasswordModalVisible);
+};
+
+
+useEffect(() => {
+  if (userId) {
+    fetchAllRostersAndPlayers().then(() => {
+      console.log(calculateExposure()); 
+    });
+  }
+}, [userId, year]);
+
 const calculateExposure = () => {
   let playerExposure = {};
   let playerLeagues = {};
@@ -504,6 +549,31 @@ const calculateExposure = () => {
 
   return playerExposureArray.sort((a, b) => b.exposure - a.exposure);
 };
+  
+
+
+useEffect(() => {
+  try {
+    if (userId) {
+      fetchAllRostersAndPlayers();
+    } else {
+      console.log('UserId is not set');
+    }
+  } catch (error) {
+    console.error('Error in useEffect:', error);
+  }
+}, [userId]);
+
+
+const handleChangePassword = async (e) => {
+  e.preventDefault();
+  // Here you would normally validate the passwords, 
+  // make a request to your backend, etc. For now, just close the modal.
+  toggleChangePasswordModal();
+  // Clear the newPassword state to reset the form input
+  setNewPassword('');
+};
+
 
 const renamedColumns = {
   'yr': 'YPR',
@@ -523,6 +593,10 @@ const columns = useMemo(
     {
       Header: 'League Name',
       accessor: 'name',
+    },
+    {
+      Header: 'Type',
+      accessor: 'type', // The "type" key from your transformed data
     },
     {
       Header: 'Size',
@@ -689,9 +763,10 @@ const hasStats = Object.keys(playerStats).length > 0;
 if (!user) {
   return <div>Loading user data...</div>; // or any other fallback UI
 }
+
 return (
   <div className="profile-page">
-  <div className="search-bar-container">
+     <div className="search-bar-container">
       <input
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -708,35 +783,28 @@ return (
                  </ul>
                )}
              </div>
-             <div className="profile-content">
-             <div className="profile-container">
-          <div className="profile-background">
-            <img src={hotpotImage} alt="Profile" className="profile-picture" />
-          </div>
-          <div className="user-details">
-            {userDetails ? (
-              <>
-                <h1>{user.username || 'No Username'}</h1>
-                <p>Email: {user.email || 'No Email'}</p>
-                <h2>Sleeper Username: {user.sleeper_username || 'No Sleeper Username'}</h2>
-              </>
-            ) : (
-              <p>Loading user details...</p>
-            )}
-           {showChangePasswordForm && (
-              <form onSubmit={handlePasswordChange}>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="New Password"
-                  required
-                />
-                <button type="submit">Update Password</button>
-              </form>
-            )}
-      </div>
+<div className="profile-container">
+  <div className="profile-picture-container">
+    <img src={hotpotImage} alt="Profile" className="profile-picture" />
+    <h1 className="username">{user.username || 'No Username'}</h1>
+  </div>
+  <div className="user-info-container">
+    <div className="user-info email">
+      <span className="label">Email:</span>
+      <span className="value">{user.email || 'No Email'}</span>
+    </div>
+    <div className="user-info sleeper-username">
+      <span className="label">Sleeper Username:</span>
+      <span className="value">{user.sleeper_username || 'No Sleeper Username'}</span>
+    </div>
+    <button className="change-password-modal-button" onClick={toggleChangePasswordModal}>
+            Change Password
+          </button>
+
+    </div>
         </div>
+          <div className="profile-content">
+            
         <div className="leagues-container">
         <h2 className="header-title">Leagues</h2>
         <div className="headers-container"></div>

@@ -150,26 +150,6 @@ button {
   width: 100%; 
 }
 
-.left-panel {
-  position: fixed;
-  height: auto;
-  width: 180px; 
-  flex-shrink: 0; 
-  position: fixed;
-  text-align: center;
-  top: 0;
-  left: 0;
-  height: 100%;
-  margin-right: 0px;
-  background: linear-gradient(to right, #2c3e50, #102a3c);
-  color: #ecf0f1;
-  padding: 1rem;
-  border-radius: 0 25px 25px 0; 
-  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-  opacity: 100%;
-  zoom: 100%;
-}
-
 .left-panel-header {
   font-size: 2rem;
   text-align: center;
@@ -189,7 +169,7 @@ button {
   margin-bottom: 400px;
   padding-bottom: 300px; 
   margin-left: 270px;
-  zoom: 60%;
+  zoom: 100%;
 }
 
 .scoring-settings-display {
@@ -200,63 +180,6 @@ button {
   border-radius: 5px;
 }
 
-
-.Table {
-  max-width: none;
-  margin-left: 0;
-  margin-right: auto;
-  width: auto;
-  font-size: 1.4em;
-  border: 1px solid #000000;
-  border-radius: 1rem;
-  border-spacing: 0;
-  overflow-x: auto; 
-  box-shadow: 0px 0px 100px rgb(36, 57, 124);
-  padding: 15px;
-  font-family: 'Arial', sans-serif;
-  font-size: 24px;
-  line-height: 30px;
-  table-layout: fixed;
-  empty-cells: show;
-  opacity: 1.5;
-  transition: all 0.7s ease;
-  white-space: nowrap;
-  scroll-behavior: smooth;
-  display: table;
-  text-align: left;
-
-}
-
-.Table td {
-  font-size:30px;
-  margin: 0px;
-  text-align: left;
-  cursor: pointer;
-  border-bottom: 1px solid #ddd; 
-}
-
-.Table th {
-  background-color: #0A192F; 
-  color: #fff;
-  line-height: 1.75;
-  font-size: 1.2em;
-  font-size: 1.2em;
-}
-.Table tr:nth-child(even) {
-  background-color: rgb(131, 177, 194);
-  color: rgb(0, 0, 0);
-}
-
-.Table tr:hover {
-  background-color: #68d0c6f7; 
-}
-
-@media (max-width: 768px) {
-  .table th, .table td {
-    padding: 10px; 
-    font-size: 1em; 
-  }
-}
 .icon {
   width: 1.6em;
   height: 1.6em;
@@ -267,10 +190,9 @@ button {
 }
 
 .controls-container {
-  width: 95%; 
+  width: 100%; 
   background-color: #28373d;
   margin-left: 120px;
-  margin-right: 2070px;
   margin-bottom: 40px;
   margin-top: 0px;
   border-radius: 5px;
@@ -324,7 +246,7 @@ button {
 }
 
 .title-roster {
-  font-size: 8rem;
+  font-size: 6rem;
   font-weight: bold;
   font-style: italic;
   color: #32d3ff;

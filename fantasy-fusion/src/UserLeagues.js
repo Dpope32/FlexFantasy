@@ -296,7 +296,7 @@ return (
           <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
         </div>
         <div className="main-content">
-        <h1 className="owner-header">Owner: {displayOwnerUsernameHeader()}</h1>
+        <h1 className="owner-header">{displayOwnerUsernameHeader()}</h1>
         <div className="TablesContainer">
       <div className="Table1Container">
       <h2 className="header-title">Shares</h2>

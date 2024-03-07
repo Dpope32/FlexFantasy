@@ -20,10 +20,10 @@ export const AuthProvider = ({ children }) => {
         // Inside your login function
         const data = await response.json();
         console.log('Login response data:', data);
-        if (response.ok && data.token) {
-            localStorage.setItem('authToken', data.token);
-            console.log('Token stored:', localStorage.getItem('authToken'));
-          } else {
+        if (response.ok && data.access_token) { // Make sure to check for the correct token key
+          localStorage.setItem('authToken', data.access_token); // Store the token
+          setUser(data.user_info); // Set user info if needed
+      } else {
             console.error('Login failed or token missing:', data);
         }
     } catch (error) {

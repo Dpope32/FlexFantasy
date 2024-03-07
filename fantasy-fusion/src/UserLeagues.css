@@ -7,11 +7,11 @@
   top: 0;
   left: 0;
   margin: 1rem;
-  padding: 1.5rem;
+  padding: 1rem;
   border: 2px solid #4D9FEC; 
   border-radius: 25px;
   background-color: #1B2A41; 
-  margin-left: 250px;
+  margin-left: 200px;
 }
 
   .page-container {
@@ -58,69 +58,9 @@
     padding: 50px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
-    zoom: 65%;
+    zoom: 100%;
   }
   
-  
-  .TableWrapper {
-    overflow-x: auto;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5);
-    border-radius: 5px;
-}
-
-  
-  .Table {
-    width: 100%;
-    color: rgb(0, 0, 0);
-    margin-bottom: 20px;
-    border-collapse: collapse;
-    background-color: #3a7099; 
-    table-layout: auto;
-    margin: 0 auto; 
-    opacity: 1.5;
-    transition: all 0.7s ease;
-    white-space: nowrap;
-    scroll-behavior: smooth;
-    display: table;
-    text-align: left;
-    line-height: 20px;
-    margin: 10px; 
-    max-width: 45%; 
-    flex: 1 1 auto; 
-  }   
-
-  
-  th, td {
-    padding: 12px 15px;
-    border: 1px solid #1d2e3e;
-    text-align: left;
-    overflow: hidden;
-    font-size: 1.0em; 
-    text-overflow: ellipsis;
-    font-weight: bold; 
-    white-space: nowrap; 
-  }
-  
-  th {
-    background-color: #29497a;
-    color: #E3E3E3;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-  
-  td {
-    color: 222; 
-    background-color: #ffffff2d;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #e5f6f8;
-  }
-  
-  
-  tr:hover {
-    background-color: #e0e0e0;
-  }
   
   button {
     background-color: #4D9FEC;
@@ -167,24 +107,6 @@ th, td {
     }
   }
   
-.header-title {
-  font-size: 4em; 
-  border-radius: 5px;
-  font-weight: bold;
-  color: #3ec9d5;
-  width: 100%;
-  text-align: center;
-  background: linear-gradient(45deg, #163857, #e8e8e8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: #E3E3E3;
-  animation: glow 1s ease-in-out infinite alternate;
-  padding-top: 50px;
-}
-  
-.headers-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+  .glow {
+    animation: glow 1s infinite alternate;
+  }

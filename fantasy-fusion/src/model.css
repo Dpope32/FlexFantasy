@@ -36,8 +36,10 @@ body, html {
 .main-header {
   all: initial;
   padding-left: 10px;
+  margin-top: 80px;
+  margin-left: 250px;
   font-weight: bolder; 
-  font-size: 7rem; 
+  font-size: 4rem; 
   background: linear-gradient(to right, rgb(2, 247, 255), rgb(8, 104, 178), rgb(52, 52, 90));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,6 +50,7 @@ body, html {
 input, button {
   padding: 0.75rem;
   margin-right: 1550px;
+  margin-left: 0;
   border: none; 
   border-radius: 1.5rem; 
   background-color: #090c0ebb; 
@@ -173,7 +176,6 @@ input::placeholder {
 .top-players-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
   gap: 1rem; 
   margin-bottom: 2rem; 
@@ -182,7 +184,8 @@ input::placeholder {
   cursor: pointer;
   transition: transform 0.2s;
   color: rgb(91, 244, 255);
-  width: 2000px;
+  width: 1700px;
+  margin-left: 250px;
 }
 
 .top-players-year {
@@ -190,27 +193,26 @@ input::placeholder {
   padding: 0rem;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  font-size: 3rem;
+  font-size: 1.2rem;
 }
 
 .top-player {
   cursor: pointer;
   border-radius: 30px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   border: 1px solid #555; 
   box-shadow: 0 4px 8px rgb(0, 215, 253); 
-  margin: 1.2rem; 
+  margin: .8rem; 
   justify-content: center; 
   align-items: center; 
-  padding: 10px;
+  padding: 5px;
   background: #1e3e5d;
   color: #e7e7e7;
   border-radius: 5px;
   cursor: pointer;
   transition: transform 0.2s;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
 }
 
 .top-player:hover {

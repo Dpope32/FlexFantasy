@@ -69,3 +69,23 @@
   letter-spacing: 0.1em;
   animation: pulse 1s infinite ease-in-out;
 }
+
+.left-panel {
+  position: fixed;
+  height: auto;
+  width: 180px; 
+  flex-shrink: 0; 
+  position: fixed;
+  text-align: center;
+  top: 0;
+  left: 0;
+  height: 100%;
+  margin-right: 0px;
+  background: linear-gradient(to right, #2c3e50, #102a3c);
+  color: #ecf0f1;
+  padding: 1rem;
+  border-radius: 0 25px 25px 0; 
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  opacity: 100%;
+  zoom: 100%;
+}
