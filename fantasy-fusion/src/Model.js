@@ -386,15 +386,7 @@ return <div>No data available</div>;
         ))}
       </div>
     )}
-      <div>
-         {selectedPlayer && hasStats && (
-            <div>
-              <h2>{selectedPlayer.player}</h2>
-              {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
-            </div>
-          )}
-      </div>
-    {selectedPlayer && hasStats && (
+        {selectedPlayer && hasStats && (
       <div className="chart-container" style={{height: '30vh', width: '50vw' }}>
         <Line 
           data={prepareChartData(playerStats)}
@@ -402,6 +394,14 @@ return <div>No data available</div>;
         />
       </div>
     )}
+      <div>
+         {selectedPlayer && hasStats && (
+             <div className="player-chart">
+              <h2>{selectedPlayer.player}</h2>
+              {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
+            </div>
+          )}
+      </div>
     </div>
     </div>
   );

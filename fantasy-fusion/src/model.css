@@ -25,8 +25,8 @@ body, html {
 }
 
 .model-page {
-  text-align: center;
-  padding: 2rem;
+  text-align: left;
+  padding: 1rem;
   color: #ffffff;
   font-family: 'Kodchasan', sans-serif;
   zoom: 100%;
@@ -55,7 +55,7 @@ input, button {
   border-radius: 1.5rem; 
   background-color: #090c0ebb; 
   color: #ffffff; 
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   outline: none; 
   width: 100%;
   max-width: 30rem;
@@ -73,13 +73,12 @@ input::placeholder {
 
 .suggestions-list {
   position: absolute;
-  width: 20rem; 
-  top: 2.5rem; 
-  left: 50%;
+  width: 30rem; 
+  top: 3.0rem; 
+  left: 41.7%;
   transform: translateX(-50%); 
-  background: #11333a;
+  background: #283031;
   z-index: 10;
-  border-radius: 0.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden; 
   list-style-type: none; 
@@ -145,12 +144,12 @@ input::placeholder {
 .player-name-container h2, .player-info h2 {
   margin: 0;
   padding: 0.5rem 0;
-  justify-content: center;
+  justify-content: left;
 }
 
 .chart-container {
-  margin-left: 300px;
-  margin-top: 70px; 
+  margin-left: 450px;
+  margin-top: 30px; 
   margin-bottom: 50px;
   border: 3px solid #81f4ff; 
   box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.665); 
@@ -159,14 +158,12 @@ input::placeholder {
 }
 
 .player-info h2 {
-  padding-left: 100px;
-  font-size: 3rem; 
+  font-size: 4rem; 
   margin-top: 4.5rem; 
-  margin-bottom: 0.5rem; 
   background: linear-gradient(to right, rgb(0, 247, 255), rgb(57, 141, 204), rgb(255, 255, 255));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  justify-content: center;
+  margin-left: 450px;
 }
 
 .model-page .top-player:hover {
@@ -253,4 +250,8 @@ input::placeholder {
 
 .back-button:hover {
   background-color: #e2e2e2;
+}
+
+.player-chart {
+  margin-right: 400px;
 }

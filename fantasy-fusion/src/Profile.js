@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, useSortBy, useFilters } from 'react-table';
 import './StartPage.css';
 import './Profile.css';
-import { Line } from 'react-chartjs-2';
 import hotpotImage from './Hotpot.png'; 
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -14,17 +13,11 @@ const Profile = () => {
   const [playerStats2023, setPlayerStats2023] = useState({});
   const [allRosters, setAllRosters] = useState([]);
   const { user, setUser } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
   const [allPlayersInfo, setAllPlayersInfo] = useState({});
   const location = useLocation();
   const [positionRanks, setPositionRanks] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [playerStats, setPlayerStats] = useState({});
-  const [suggestions, setSuggestions] = useState([]);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [userDetails, setUserDetails] = useState({});
   const [username, setUsername] = useState('');
   const [modalContent, setModalContent] = useState(null);
   const { state } = location;
@@ -39,6 +32,37 @@ const Profile = () => {
   const leagueType = (metadata) => {
     return metadata?.auto_continue === "on" ? "Dynasty" : "Redraft";
   };
+
+  useEffect(() => {
+    const { userId, user } = location.state || {};
+    if (userId) {
+    fetch('http://127.0.0.1:5000/stats/nfl/regular/2023')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error fetching player stats: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Player stats for Josh Allen:', data['6744']);
+      setPlayerStats2023(data);
+      const positionRanks = calculatePositionRanks(data);
+      setPositionRanks(positionRanks); 
+    })
+
+    .catch(error => console.error('Error fetching player stats:', error));
+      fetch('http://127.0.0.1:5000/players/nfl')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error fetching player info: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => setAllPlayersInfo(data))
+      .catch(error => console.error('Error fetching player info:', error));
+      }
+    }, []);
+    
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -85,20 +109,24 @@ const Profile = () => {
   };
   
 // This function fetches the user_id using the sleeperUsername
-async function fetchUserId(sleeperUsername) {
-  const response = await fetch(`http://127.0.0.1:5000/user/${user.sleeper_username}`);
-  if (response.ok) {
+async function fetchUserId() {
+  if (!user || !user.sleeper_username) {
+    console.error('User or sleeper_username is not available.');
+    return null;
+  }
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/user/${user.sleeper_username}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user ID.');
+    }
     const data = await response.json();
     return data.user_id;
-  } else {
-    console.error('Failed to fetch user ID for sleeper username:', user.sleeper_username);
+  } catch (error) {
+    console.error('Failed to fetch user ID:', error);
     return null;
   }
 }
 
-
-
-// Modify the fetchLeagues function to use the above utility
 const fetchLeagues = async (sleeperUsername) => {
   try {
     // First fetch the user_id using the sleeperUsername
@@ -130,395 +158,86 @@ const fetchLeagues = async (sleeperUsername) => {
     setIsLoading(false); // Loading process ends
   }
 };
-
-// Call the fetchLeagues function in useEffect
+  
 useEffect(() => {
-  if (user && user.sleeperUsername) {
-    fetchLeagues(user.sleeperUsername);
+  if (user && user.sleeper_username) {
+    fetchLeagues(user.sleeper_username);
   }
-}, [user]); // Make sure to call this effect when the user state updates
-  
-  useEffect(() => {
-    console.log('User State:', user);
-    fetchLeagues();
-  }, [user]);
+}, [user, year]);
 
-  useEffect(() => {
-    console.log('User State:', user);
-    if (user && user.sleeperUsername) {
-      fetchLeagues(user.sleeperUsername);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const { userId, user } = location.state || {};
-    if (userId) {
-    fetch('http://127.0.0.1:5000/stats/nfl/regular/2023')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Error fetching player stats: ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      setPlayerStats2023(data);
-      const positionRanks = calculatePositionRanks(data);
-      setPositionRanks(positionRanks); 
-    })
-
-    .catch(error => console.error('Error fetching player stats:', error));
-      fetch('http://127.0.0.1:5000/players/nfl')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Error fetching player info: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(data => setAllPlayersInfo(data))
-      .catch(error => console.error('Error fetching player info:', error));
-
-      fetch(`http://127.0.0.1:5000/user/${userId}/leagues/${year}`)
-        .then(response => response.json())
-        .then(data => {
-          const transformedData = data.map(league => ({
-            leagueId: league.league_id, 
-            name: league.name !== "Leagues will be posted here!" ? league.name : null,
-            size: league.total_rosters,
-            benchSpots: league.roster_positions.filter(pos => pos === "BN").length,
-            scoringSettings: parseScoringSettings(league.scoring_settings),
-            waiverBudget: league.settings.waiver_budget,
-            tradeDeadline: parseTradeDeadline(league.settings.trade_deadline),
-          })).filter(league => league.name !== null); 
-          setLeagues(transformedData);
-          setIsLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching leagues:', error);
-          setIsLoading(false);
-        });
-      } else {
-        console.log('User ID not available');
-        setIsLoading(false);
-      }
-    }, []);
-
-    useEffect(() => {
-      console.log('Location state:', location.state);
-      const { userId } = location.state || {};
-      console.log('UserId from location:', userId);
-      
-      if (userId) {
-        fetchAllRostersAndPlayers();
-      } else {
-        console.log('UserId is not set');
-      }
-    }, [location]);
-    
-
-
-  const renderLeagues = () => leagues.map(league => (
-    <li key={league.league_id}>
-      {league.name} - {league.season}
-    </li>
-  ));
-
-  const isColumnAllZeros = (stats, field) => {
-    if (Array.isArray(stats)) {
-      return stats.length > 0 && stats.every(stat => stat[field] === 0);
-    }
-    console.error('stats is not an array:', stats);
-    return false;
-  };
-
-  const calculatePositionRanks = (playerStats) => {
-    const positionScores = {};
-    Object.entries(playerStats).forEach(([playerId, stats]) => {
-      const position = allPlayersInfo[playerId]?.position || 'DEF';
-      if (!positionScores[position]) {
-        positionScores[position] = [];
-      }
-      positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
-    });
-  
-    const positionRanks = {};
-    Object.keys(positionScores).forEach(position => {
-      if (positionScores[position] && Array.isArray(positionScores[position])) {
-        positionScores[position].sort((a, b) => b.points - a.points)
-          .forEach((entry, index) => {
-            positionRanks[entry.playerId] = index + 1; 
-          });
-      }
-    });
-    return positionRanks;
-  };
-
-
-  
-  const handleBack = () => {
-    setSelectedPlayer(null); 
-  };
-
-  const uniqueSuggestions = (data) => {
-    const seen = new Set();
-    const filteredData = data.filter(player => {
-      const playerName = player.player; // Assuming this is the structure of your player object
-      if (!seen.has(playerName)) {
-        seen.add(playerName);
-        return true;
-      }
-      return false;
-    });
-  
-    return filteredData;
-  };
-
-  useEffect(() => {
-    if (searchTerm.length >= 2) {
-      const fetchData = async () => {
-        try {
-          const response = await fetch(`http://127.0.0.1:5000/api/players/search?name=${searchTerm}`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          const body = await response.text(); 
-          const data = JSON.parse(body);
-          const uniquePlayerSuggestions = uniqueSuggestions(data);
-          setSuggestions(uniquePlayerSuggestions.map(player => player.player));
-        } catch (error) {
-          console.error('Error fetching players:', error);
-        }
-      };
-      setSuggestions([]);
-      fetchData();
-    }
-  }, [searchTerm]);
-  
-  const fetchAllRostersAndPlayers = async () => {
-    setIsLoading(true);
-    try {
-      const leaguesResponse = await fetch(`https://api.sleeper.app/v1/user/${userId}/leagues/nfl/${year}`);
-      console.log('Leagues Data:', await leaguesResponse.json());
-      const leaguesData = await leaguesResponse.json();
-      const rostersPromises = leaguesData.map(league => fetch(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`));
-      const rostersResponses = await Promise.all(rostersPromises);
-      let filteredRosters = [];
-  
-      for (const response of rostersResponses) {
-        const rostersData = await response.json();
-        console.log('Rosters Data for a league:', rostersData);
-        const userRosters = rostersData.filter(roster => roster.owner_id === userId); 
-        filteredRosters = filteredRosters.concat(userRosters);
-      }
-  
-      setAllRosters(filteredRosters);
-    } catch (error) {
-      console.error('Error fetching all rosters and players info:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-useEffect(() => {
-  if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
-    const newRanks = calculatePositionRanks(playerStats2023);
-    setPositionRanks(newRanks);
-  }
-}, [allPlayersInfo, playerStats2023]); 
-
-const fetchPlayerStats = async (playerName) => {
+const fetchAllRostersAndPlayers = async (sleeperUsername) => {
   try {
-    const response = await fetch(`http://127.0.0.1:5000/api/player/stats?name=${playerName}`);
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    const stats = await response.json();
-    setPlayerStats(stats);
-  } catch (error) {
-    console.error('Error fetching player stats:', error);
+    // First fetch the user_id using the sleeperUsername
+    const userId = await fetchUserId(sleeperUsername);
+  if (!userId) {
+    console.error(`User ID for sleeper username '${sleeperUsername}' not found.`);
+    return;
   }
-};
-
-const handleSelectPlayer = (player) => {
-  setSelectedPlayer(player);
-  setSearchTerm('');
-  setSuggestions([]);
-  fetchPlayerStats(player); 
-};
-
-const prepareChartData = (playerStats) => {
-  const years = Object.keys(playerStats).sort();
-  const datasets = [
-    {
-      label: 'Fantasy Points',
-      dataKey: 'fantpt',
-      borderColor: 'rgb(75, 192, 192)',
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      yAxisID: 'y',
-    },
-    {
-      label: 'Position Rank',
-      dataKey: 'posrank',
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.2)',
-      yAxisID: 'y1',
-    },
-    {
-      label: 'Yards',
-      dataKey: 'yds',
-      borderColor: 'rgb(255, 206, 86)',
-      backgroundColor: 'rgba(255, 206, 86, 0.2)',
-      yAxisID: 'y3',
-    },
-  ];
-
-  const filteredDatasets = datasets.map(dataset => {
-    const data = years.map(year => playerStats[year][dataset.dataKey]);
-    const allZeros = data.every(value => value === 0);
-    if (dataset.dataKey === 'posrank') {
-      const maxPosRank = Math.max(...data);
-      dataset.data = data.map(rank => maxPosRank - rank + 1);
-    } else {
-      dataset.data = data;
+    setIsLoading(true);
+    const leaguesResponse = await fetch(`https://api.sleeper.app/v1/user/${userId}/leagues/nfl/${year}`);
+    if (!leaguesResponse.ok) {
+      throw new Error('Failed to fetch leagues from Sleeper API.');
     }
 
-    return allZeros ? null : dataset;
-  }).filter(dataset => dataset !== null); 
-  const gamesData = years.map(year => playerStats[year].gs);
-  const fantptData = years.map(year => playerStats[year].fantpt);
-  const ppgData = fantptData.map((totalPoints, index) => {
-    const games = gamesData[index];
-    return games ? (totalPoints / games).toFixed(2) : 0;
+    const leaguesData = await leaguesResponse.json();
+    const rostersPromises = leaguesData.map(league => {
+      return fetch(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`);
+    });
+    const rostersResponses = await Promise.all(rostersPromises);
+    let filteredRosters = [];
+
+    for (const response of rostersResponses) {
+      const rostersData = await response.json();
+      const userRosters = rostersData.filter(roster => roster.owner_id === userId);
+      filteredRosters = filteredRosters.concat(userRosters);
+    }
+    setAllRosters(filteredRosters);
+  } catch (error) {
+    console.error('Error fetching leagues:', error);
+  } finally {
+    setIsLoading(false); // Loading process ends
+  }
+};
+
+const calculatePositionRanks = (playerStats2023) => {
+  const positionScores = {};
+  Object.entries(playerStats2023).forEach(([playerId, stats]) => {
+    const position = allPlayersInfo[playerId]?.position || 'DEF';
+    if (!positionScores[position]) {
+      positionScores[position] = [];
+    }
+    positionScores[position].push({ playerId, points: stats.pts_ppr || 0 });
   });
-  const ppgAllZeros = ppgData.every(value => value === 0);
-  if (!ppgAllZeros) {
-    filteredDatasets.push({
-      label: 'Points Per Game',
-      data: ppgData,
-      borderColor: 'rgb(123, 239, 178)',
-      backgroundColor: 'rgba(123, 239, 178, 0.2)',
-      yAxisID: 'ppg',
-    });
-  }
-  return {
-    labels: years,
-    datasets: filteredDatasets,
-  };
+
+  const positionRanks = {};
+  Object.keys(positionScores).forEach(position => {
+    if (positionScores[position] && Array.isArray(positionScores[position])) {
+      positionScores[position].sort((a, b) => b.points - a.points)
+        .forEach((entry, index) => {
+          positionRanks[entry.playerId] = index + 1; 
+        });
+    }
+  });
+  return positionRanks;
 };
-const chartOptions = {
-  scales: {
-    y: {
-      type: 'linear',
-      display: true,
-      position: 'left',
-        ticks: {
-          color: '#fff', // Change the color to fit your theme
-          font: {
-            size: 20, // Increase the font size here
-          },
-        },
-    },
-    x: {
-      ticks: {
-        color: '#fff', // Set the color to white
-        font: {
-          size: 20, // Set the font size to 20
-        },
-      },
-    },
-
-    y1: {
-      type: 'linear',
-      display: true,
-      position: 'right',
-      ticks: {
-        color: '#fff', // Set the color to white
-        suggestedMin: 0,
-        suggestedMax: 100, // Adjust this based on the range of your PPG data
-        
-        font: {
-          size: 20, // Set the font size to 20
-        },
-      },
-      grid: {
-        drawOnChartArea: false, // Only show the y-axis line on the right
-      },
-      
-    },
-
-    y3: {
-      type: 'linear',
-      display: false,
-      position: 'right',
-      ticks: {
-        color: '#fff', // Set the color to white
-        min: 0, // Absolute minimum
-        max: 5000 ,// Absolute maximum
-        font: {
-          size: 20, // Set the font size to 20
-        },
-      },
-      grid: {
-        drawOnChartArea: false,
-      },
-    },
-    y4: { // Add this new y-axis for PPG
-      type: 'linear',
-      display: true,
-      position: 'right',
-      title: {
-        display: true,
-        text: 'PPG'
-      },
-      ticks: {
-        color: '#fff',
-        font: {
-          size: 20,
-        },
-        // You can adjust the suggestedMin and suggestedMax to scale your data appropriately
-        suggestedMin: 0,
-        suggestedMax: 30, // Adjust this based on the range of your PPG data
-      }
-    },
-  },
-  plugins: {
-    legend: {
-      labels: {
-        color: '#fff', // Change the color to fit your theme
-        font: {
-          size: 20, // Increase the font size here
-        },
-      },
-    },
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-};
-
-const getMostRecentFantpos = (stats) => {
-  const sortedYears = Object.keys(stats).sort().reverse();
-  if (sortedYears.length === 0) return null; // or a default value like 'N/A'
-  
-  const mostRecentYear = sortedYears[0];
-  const mostRecentStats = stats[mostRecentYear];
-  return mostRecentStats ? mostRecentStats.fantpos : null; // or a default value
-};
-
-const toggleChangePasswordModal = () => {
-  setIsChangePasswordModalVisible(!isChangePasswordModalVisible);
-};
-
-
 useEffect(() => {
-  if (userId) {
-    fetchAllRostersAndPlayers().then(() => {
-      console.log(calculateExposure()); 
-    });
-  }
-}, [userId, year]);
+  const fetchData = async () => {
+    if (user && user.sleeper_username) {
+      console.log('Fetching data...');
+      await fetchAllRostersAndPlayers(user.sleeper_username);
+      // After fetchAllRostersAndPlayers, you expect allPlayersInfo to be populated.
+      console.log('All rosters and player info should now be available.');
+    }
+  };
+
+  fetchData();
+}, [user, year]); 
 
 const calculateExposure = () => {
   let playerExposure = {};
   let playerLeagues = {};
   let leaguesProcessed = new Set();
-  console.log('Leagues:', leagues);
+  console.log('All Rosters:', allRosters);
 
   allRosters.forEach(roster => {
     if (roster.players) {
@@ -549,30 +268,35 @@ const calculateExposure = () => {
 
   return playerExposureArray.sort((a, b) => b.exposure - a.exposure);
 };
-  
-
 
 useEffect(() => {
-  try {
-    if (userId) {
-      fetchAllRostersAndPlayers();
-    } else {
-      console.log('UserId is not set');
-    }
-  } catch (error) {
-    console.error('Error in useEffect:', error);
+  if (Object.keys(allPlayersInfo).length > 0 && allRosters.length > 0) {
+    console.log('Calculating exposure since player info and rosters are available.');
+    const exposureData = calculateExposure();
+    console.log('Exposure data:', exposureData);
+  } else {
+    console.log('Waiting for player info and rosters to be available...');
   }
-}, [userId]);
+}, [allPlayersInfo, allRosters]);
+
+useEffect(() => {
+  if (Object.keys(allPlayersInfo).length > 0 && Object.keys(playerStats2023).length > 0) {
+    const newRanks = calculatePositionRanks(playerStats2023);
+    setPositionRanks(newRanks);
+  }
+}, [allPlayersInfo, playerStats2023]); 
+
+  const renderLeagues = () => leagues.map(league => (
+    <li key={league.league_id}>
+      {league.name} - {league.season}
+    </li>
+  ));
 
 
-const handleChangePassword = async (e) => {
-  e.preventDefault();
-  // Here you would normally validate the passwords, 
-  // make a request to your backend, etc. For now, just close the modal.
-  toggleChangePasswordModal();
-  // Clear the newPassword state to reset the form input
-  setNewPassword('');
+const toggleChangePasswordModal = () => {
+  setIsChangePasswordModalVisible(!isChangePasswordModalVisible);
 };
+
 
 
 const renamedColumns = {
@@ -648,71 +372,6 @@ const displaySharersTable = () => {
   );
 };
 
-const renderStatsGrid = (playerStats, position) => {
-  const customOrder = ['age', 'posrank', 'ppr', 'ppg', 'td', 'yds', 'gs', 'ovrank', 'att_rushing', 'yds_rushing'];
-  const excludedColumns = new Set(['rank', 'fantpt', 'g', 'vbd', 'twopp', 'td_other', 'fantpos', 'player', 'twopm']);
-  const fieldsToExclude = ['cmp', 'rushes', 'rush_tds']; 
-  const columnsAllZeros = fieldsToExclude.filter(field => isColumnAllZeros(playerStats, field));
-if (position !== 'QB') {
-  excludedColumns.add('att');
-  excludedColumns.add('cmp');
-  excludedColumns.add('int');
-}
-  if (position === 'QB') {
-    excludedColumns.add('tgt');
-    excludedColumns.add('td_receiving');
-    excludedColumns.add('yds_receiving');
-    excludedColumns.add('rec');
-  }
-  if (position === 'TE', 'WR') {
-    excludedColumns.add('td_rushing');
-    excludedColumns.add('ya');
-  }
-  if (typeof playerStats === 'object' && Object.keys(playerStats).length > 0) {
-    const firstKey = Object.keys(playerStats)[0];
-    if (playerStats[firstKey]) {
-      Object.keys(playerStats).forEach(year => {
-        const ppr = playerStats[year]['ppr'];
-        const games = playerStats[year]['gs'];
-        playerStats[year]['ppg'] = games > 0 ? (ppr / games).toFixed(2) : 0;
-      });
-      const columnsToRender = [
-        ...customOrder,
-        ...Object.keys(playerStats[firstKey]).filter(col =>
-          !customOrder.includes(col) && !excludedColumns.has(col)
-        )
-      ];
-    
-const rows = Object.keys(playerStats).map(year => (
-  <tr key={year}>
-    <th>{year}</th>
-    {columnsToRender.map(col => (
-      <td key={col}>{playerStats[year][col]}</td>
-    ))}
-  </tr>
-));
-
-return (
-  <table>
-    <thead>
-      <tr>
-        <th>Year</th>
-        {columnsToRender.map(col => {
-          const displayName = renamedColumns[col] || col;
-          return <th key={col}>{displayName}</th>;
-        })}
-      </tr>
-    </thead>
-    <tbody>
-      {rows}
-    </tbody>
-  </table>
-);
-}
-}
-return <div>No data available</div>;
-};
-
 const parseScoringSettings = (settings) => {
   let scoring = 'Non-PPR'; 
   if (settings.rec === 1.0) {
@@ -758,7 +417,6 @@ const {
   prepareRow,
 } = useTable({ columns, data }, useFilters, useSortBy);
 
-const hasStats = Object.keys(playerStats).length > 0;
   
 if (!user) {
   return <div>Loading user data...</div>; // or any other fallback UI
@@ -766,23 +424,6 @@ if (!user) {
 
 return (
   <div className="profile-page">
-     <div className="search-bar-container">
-      <input
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Enter NFL player name"
-        className="search-bar"
-      />
-      {suggestions.length > 0 && (
-        <ul className="suggestions-list">
-          {suggestions.map((player, index) => (
-            <li key={index} onClick={() => handleSelectPlayer(player)}>
-              {player} 
-            </li>
-                 ))}
-                 </ul>
-               )}
-             </div>
 <div className="profile-container">
   <div className="profile-picture-container">
     <img src={hotpotImage} alt="Profile" className="profile-picture" />
@@ -852,30 +493,6 @@ return (
       <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
       <button className="sign-out-button" onClick={handleLogout}>Sign Out</button>
     </div>
-             {selectedPlayer && (
-        <button className="back-button" onClick={handleBack}>Back</button>)}
-              {selectedPlayer && (
-          <div className="player-info">
-        <h2>{`${selectedPlayer} - ${getMostRecentFantpos(playerStats) || 'Position not available'}`}</h2>
-      </div>
-    )}
-      <div>
-         {selectedPlayer && hasStats && (
-            <div>
-              <h2>{selectedPlayer.player}</h2>
-              {renderStatsGrid(playerStats, getMostRecentFantpos(playerStats))}
-            </div>
-          )}
-      </div>
-    {selectedPlayer && hasStats && (
-      <div className="chart-container" style={{height: '40vh', width: '80vw' }}>
-        <Line 
-          data={prepareChartData(playerStats)}
-          options={chartOptions}
-          className='chart'
-        />
-      </div>
-    )}    
    </div>
   );
 }

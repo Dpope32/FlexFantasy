@@ -38,23 +38,17 @@
     align-items: center;
   }
 
-  .change-password-container {
-    padding: .5rem;
-    margin-top: .5rem;
-    border-top: .5px solid #ccc;
-  }
   
   .change-password-modal-button {
-    /* Your specific styles for the change password button */
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
-    padding: 15px;
     text-align: center;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     width: 70%;
+    border-radius: 50px;
   }
   
   .change-password-button:hover {
@@ -147,6 +141,7 @@
   border-bottom: 2px solid #ccc;
   margin-bottom: 20px;
   text-align: center;
+  margin-left: 15px;
 }
   
 .headers-container {

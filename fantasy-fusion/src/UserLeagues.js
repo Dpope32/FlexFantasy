@@ -206,7 +206,7 @@ const displaySharersTable = () => {
       </thead>
       <tbody>
         {sharersData.map((item, index) => (
-          <tr key={item.playerId} onClick={() => handlePlayerClick(item.playerId)}>
+          <tr key={item.playerId} onClick={() => handleClick(item.playerId)}>
             <td>{item.player}</td>
             <td>{item.num}</td> 
             <td >{item.exposure}%</td>
@@ -217,24 +217,40 @@ const displaySharersTable = () => {
   );
 };
       
-const handlePlayerClick = (playerId) => {
-  const playerDetails = allPlayersInfo[playerId];
-  const playerStats = playerStats2023[playerId];
-  const rank = positionRanks[playerId] || 'N/A';
-  
-  const playerData = {
-    full_name: playerDetails.full_name,
-    rank: rank,
-    points: playerStats.pts_ppr,
-    experience: playerDetails.years_exp,
-    yards: playerStats.yards, 
-    touchdowns: playerStats.touchdowns, 
-    ppg: playerStats.ppg, 
-    ktc: playerStats.ktc, 
-    age: playerDetails.age, 
-  };
-  setModalContent(playerData);
-  setShowModal(true);
+const handleClick = async (playerId) => {
+  try {
+    // Fetch player statistics from your PostgreSQL database via your API
+    const statsUrl = `http://127.0.0.1:5000/api/stats/2023/player/${playerId}`;
+    const statsResponse = await fetch(statsUrl);
+    if (!statsResponse.ok) {
+      throw new Error(`HTTP error! Status: ${statsResponse.status}`);
+    }
+    const statsData = await statsResponse.json();
+
+    // Fetch player information from the allPlayersInfo state variable
+    const playerDetails = allPlayersInfo[playerId];
+
+    // Calculate rank from the positionRanks state variable
+    const rank = positionRanks[playerId] || 'N/A';
+    const playerStats = allPlayersInfo[playerId];
+    // Construct the final data object for the modal
+    const playerData = {
+      ...playerDetails,  // Data from the allPlayersInfo state variable
+      ...statsData,      // Data from your own API
+      rank,              // Rank calculated from positionRanks
+      points: playerStats.pts_ppr, // Assuming pts_ppr is the total points
+      experience: playerDetails.years_exp || 'N/A',
+      ktc: playerDetails.ktc || 'N/A',
+      age: playerDetails.age || 'N/A',
+      ppg: parseFloat((playerDetails.pts_ppr / playerDetails.g || statsData.ppg).toFixed(2)) // Points per game rounded to 2 decimal places
+    };
+    console.log(statsData.ppr);
+    // Update modal content and show modal
+    setModalContent(playerData);
+    setShowModal(true);
+  } catch (error) {
+    console.error('Failed to fetch player stats:', error);
+  }
 };
 
 const data = useMemo(() => leagues, [leagues]);
@@ -346,7 +362,7 @@ const PlayerModal = ({ player, onClose }) => {
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h2>{player.full_name || player.player}</h2>
+        <h2>{player.full_name || player.player} 2023 Stats</h2>
         <div className="stats-grid">
           <p className="label">Rank:</p> <p className="value">{player.rank}</p>
           <p className="label">Points:</p> <p className="value">{player.points?.toFixed(2) || player.ppg?.toFixed(2)}</p>
@@ -362,5 +378,6 @@ const PlayerModal = ({ player, onClose }) => {
     </div>
   );
 };
+
 
 export default UserLeagues;

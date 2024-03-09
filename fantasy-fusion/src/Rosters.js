@@ -455,7 +455,6 @@ return (
       <span className="title-roster">{leagueName}</span>
       <div className="Rosters">
         <div className="controls-container">
-          <h1 className="owners-header">Owner: {displayOwnerUsernameHeader()}</h1>
           <div className="scoring-settings-display">
             <h2>Scoring Settings: {scoringString}</h2>
           </div>
@@ -467,13 +466,14 @@ return (
             </span>
           </div>
           <div className="owner-control">
-            <label className="change-owner-label">Change Owner:</label>
+          <h1 className="owners-header">Owner: {displayOwnerUsernameHeader()}</h1>
+            <label className="change-owner-label"></label>
             <select className="owner-dropdown" value={tempSelectedOwner} onChange={handleOwnerChange}>
               {owners.map(owner => (
                 <option key={owner.owner_id} value={owner.username}>{owner.username}</option>
               ))}
             </select>
-            <button onClick={handleEnterButtonClick}>Enter</button>
+            <button className="enter-button" onClick={handleEnterButtonClick}>Enter</button>
           </div>
         </div>   
         {ownerRoster ? (
@@ -482,7 +482,7 @@ return (
               <div className="column">
                 <div className="starters-and-ir">
                 {showModal && <PlayerModal player={modalContent} onClose={() => setShowModal(false)} />}
-                  <h1 className="starters">Starters</h1>
+                <h2 className="header-title">Starters</h2>
                   <table className="Table">
                     <thead>
                       <tr>
@@ -498,7 +498,7 @@ return (
                 {ownerRoster.reserve && ownerRoster.reserve.length > 0 && (
                   <div className="starters-and-ir">
                   
-                    <h1 className="ir">IR</h1>
+                  <h2 className="header-title">IR</h2>
                     <table className="Table">
                       <thead>
                         <tr>
@@ -516,7 +516,7 @@ return (
               </div>
               <div className="column">
               <div className="starters-and-ir">
-                  <h1 className="bench">Bench</h1>
+              <h2 className="header-title">Bench</h2>
                   <table className="Table">
                     <thead>
                       <tr>
@@ -531,7 +531,7 @@ return (
                 </div>
                 {ownerRoster.taxi && ownerRoster.taxi.length > 0 && (
                   <div className="starters-and-ir">
-                    <h1 className="taxi">Taxi</h1>
+                <h2 className="header-title">Taxi</h2>
                     <table className="Table">
                       <thead>
                         <tr>
@@ -576,7 +576,7 @@ const PlayerModal = ({ player, onClose }) => {
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h2>{player.full_name || player.player}</h2>
+        <h2>{player.full_name || player.player} 2023</h2>
         <div className="stats-grid">
           <p className="label">Rank:</p> <p className="value">{player.rank}</p>
           <p className="label">Points:</p> <p className="value">{player.points?.toFixed(2) || player.ppg?.toFixed(2)}</p>
