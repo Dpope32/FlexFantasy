@@ -160,17 +160,17 @@ function Model() {
         display: true,
         position: 'left',
           ticks: {
-            color: '#fff', // Change the color to fit your theme
+            color: '#fff', 
             font: {
-              size: 20, // Increase the font size here
+              size: 20, 
             },
           },
       },
       x: {
         ticks: {
-          color: '#fff', // Set the color to white
+          color: '#fff', 
           font: {
-            size: 20, // Set the font size to 20
+            size: 20, 
           },
         },
       },
@@ -180,16 +180,16 @@ function Model() {
         display: true,
         position: 'right',
         ticks: {
-          color: '#fff', // Set the color to white
+          color: '#fff', 
           suggestedMin: 0,
-          suggestedMax: 100, // Adjust this based on the range of your PPG data
+          suggestedMax: 100, 
           
           font: {
-            size: 20, // Set the font size to 20
+            size: 20, 
           },
         },
         grid: {
-          drawOnChartArea: false, // Only show the y-axis line on the right
+          drawOnChartArea: false, 
         },
         
       },
@@ -199,18 +199,18 @@ function Model() {
         display: false,
         position: 'right',
         ticks: {
-          color: '#fff', // Set the color to white
-          min: 0, // Absolute minimum
-          max: 5000 ,// Absolute maximum
+          color: '#fff', 
+          min: 0, 
+          max: 5000 ,
           font: {
-            size: 20, // Set the font size to 20
+            size: 20,
           },
         },
         grid: {
           drawOnChartArea: false,
         },
       },
-      y4: { // Add this new y-axis for PPG
+      y4: { 
         type: 'linear',
         display: true,
         position: 'right',
@@ -223,18 +223,17 @@ function Model() {
           font: {
             size: 20,
           },
-          // You can adjust the suggestedMin and suggestedMax to scale your data appropriately
           suggestedMin: 0,
-          suggestedMax: 30, // Adjust this based on the range of your PPG data
+          suggestedMax: 30, 
         }
       },
     },
     plugins: {
       legend: {
         labels: {
-          color: '#fff', // Change the color to fit your theme
+          color: '#fff',
           font: {
-            size: 20, // Increase the font size here
+            size: 20,
           },
         },
       },

@@ -1,31 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './StartPage.css';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from 'react-google-login';
 import flexFantasyImage from './flex-fantasy.jpg';
 import { useAuth } from './AuthContext';
 
-
 function StartPage() {
   const [user, setUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [showTopPlayers, setShowTopPlayers] = useState(true);
-  const [playerStats, setPlayerStats] = useState({});
   const [createUsername, setCreateUsername] = useState('');
   const [createPassword, setCreatePassword] = useState('');
   const [createSleeperUsername, setCreateSleeperUsername] = useState('');
-  const navigate = useNavigate();
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const navigate = useNavigate();
   const { login, fetchUser } = useAuth();
 
   const [sleeperUsername, setSleeperUsername] = useState('');
   const navigateToSleeper = () => {
     navigate('/sleeper'); 
   };
+
   const handleCreateUsernameChange = (e) => setCreateUsername(e.target.value);
   const handleCreatePasswordChange = (e) => setCreatePassword(e.target.value);
   const handleCreateSleeperUsernameChange = (e) => setCreateSleeperUsername(e.target.value);
@@ -33,7 +28,7 @@ function StartPage() {
   const handleLoginPasswordChange = (e) => setLoginPassword(e.target.value);
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handleSleeperUsernameChange = (e) => setSleeperUsername(e.target.value);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
     
   const handleAccountCreation = async (e) => {
     e.preventDefault();
@@ -54,9 +49,8 @@ function StartPage() {
 
       const data = await response.json();
       if (response.ok) {
-        // Assuming the server sends back the user data and token on successful registration
         localStorage.setItem('authToken', data.access_token);
-        setUser(data.user_info); // Ensure the backend sends user_info
+        setUser(data.user_info); 
         setShowSuccessPopup(true);
         setTimeout(() => {
           setShowSuccessPopup(false);
@@ -71,7 +65,6 @@ function StartPage() {
     }
   };
   
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = {
@@ -130,46 +123,11 @@ function StartPage() {
     }
   };
   
-
-  const responseGoogle = async (response) => {
-    console.log(response);
-    if (response.tokenId) {
-      try {
-        const backendResponse = await fetch('http://127.0.0.1:5000/auth/google', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token: response.tokenId }),
-        });
-  
-        const data = await backendResponse.json();
-        if (backendResponse.ok) {
-          setUser(data);
-          navigate('/profile');
-        } else {
-          console.error('Failed to log in with Google:', data);
-          alert('Google login failed. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error during Google login:', error);
-        alert('An error occurred during Google login. Please try again.');
-      }
-    } else {
-      console.error('Google response error:', response.error);
-    }
-  };
   
 
   return (
     <div className="start-page">
-            <img src={flexFantasyImage} alt="Flex Fantasy" className="flex-fantasy-image" />
-      <div className="left-panel">
-        <h2 className="left-panel-header">Flex Fantasy</h2>
-        <button className="model-button" onClick={() => navigate('/model')}>Research</button>
-        <button className="sleeper-button" onClick={() => navigate('/sleeper')}>Sleeper</button>
-        <button className="settings-button" onClick={() => navigate('/settings')}>Settings</button>
-      </div>
+    <img src={flexFantasyImage} alt="Flex Fantasy" className="flex-fantasy-image" />
       <form onSubmit={handleLoginSubmit} className="login-form">
         <h2 className="login-form-header">Login</h2>
         <input
@@ -231,15 +189,21 @@ function StartPage() {
         />
         <button type="submit" className="create-account-button">Submit</button>
       </form>
+        {/* Success Popup */}
+        {showSuccessPopup && (
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded">
+            User Created Successfully!
+          </div>
+        )}
 
-      {/* Google Login */}
-      <GoogleLogin
-        clientId="326568789285-dloscuq7ejd31hv3929tnhqusdrnoui1.apps.googleusercontent.com"
-        onSuccess={responseGoogle}
-        onFailure={responseGoogle}
-        cookiePolicy={'single_host_origin'}
-        className="google-login-button"
-      />
+      {/* Footer */}
+      <footer className="p-4 bg-white bg-opacity-90">
+        <div className="flex justify-evenly">
+          <span>About</span>
+          <a href="mailto:flexfantasy-business@gmail.com" className="text-blue-600 hover:underline">Contact</a>
+          <span>Terms of Service</span>
+        </div>
+      </footer>
     </div>
   );
 }

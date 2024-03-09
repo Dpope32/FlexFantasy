@@ -27,25 +27,6 @@ body, html {
   font-family: 'Kodchasan', sans-serif;
 }
 
-.start-page {
-  min-height: 100vh;
-  text-align: center;
-  padding: 0;
-  background-color: #000000;
-  color: rgb(121, 252, 254);
-  font-family: 'Kodchasan', sans-serif;
-  background-size: cover;
-  background-position: top left; 
-  background-repeat: no-repeat;
-  position: relative;
-  font-weight: bold;
-  font-size: 24px;
-  display: flex;
-  align-items: center; 
-  justify-content: center;
-  overflow: hidden; 
-  zoom: 100%;
-}
 
 .App {
   background: linear-gradient(to top left, rgba(14, 22, 45, 0.969) 10%, rgb(10, 18, 31) 100%);
@@ -71,15 +52,14 @@ body, html {
 }
 
 .flex-fantasy-image {
-  position: fixed;
-  margin-left:100px;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: calc(100%); 
-  overflow: hidden;
-  background-image: url('./flex-fantasy.jpg');
-  background-size: contain; 
+  height: 100%; 
+  background-size: cover; 
   background-position: center;
   background-attachment: fixed;
+  z-index: 0; 
 }
 .username-input:focus, .sleeper-username-input:focus, .email-input:focus, .password-input:focus {
   outline: none;
@@ -103,12 +83,13 @@ body, html {
   color: var(--font-color);
 }
 
-.username-form, .login-form, .account-creation-form {
-  position: absolute;
+.login-form, .account-creation-form {
+  position: relative; 
+  z-index: 1000; 
   padding: 20px;
   background: rgba(6, 25, 48, 0.8);
   border-radius: 10px;
-  display: flex;
+  display: block;
   flex-direction: column;
   box-shadow: var(--panel-shadow);
   width: auto; 
@@ -129,15 +110,19 @@ body, html {
 }
 
 .login-form {
-  top: 9%; 
-  right: 16%; 
-  transform: translateX(50%);
+  position: absolute;
+  right: 10%;  
+  top: 30%;
+  transform: translateY(-50%);
+  max-width: 400px;
 }
 
 .account-creation-form {
-  top: 30%; 
-  left: 22%; 
-  transform: translate(-50%, -50%);
+  position: absolute;
+  left: 10%; 
+  top: 35%;
+  transform: translateY(-50%);
+  max-width: 400px;
 }
 
 .submit-button, .create-account-button, .login-button, button {
@@ -156,6 +141,18 @@ body, html {
 
 .submit-button:hover {
   background-color: #21a1f1;
+}
+
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #091221; /* or any other color you prefer */
+  color: white; /* footer text color */
+  text-align: center;
+  padding: 10px 0;
+  z-index: 1000; /* Ensure it's above the background image */
 }
 
 .left-panel {
